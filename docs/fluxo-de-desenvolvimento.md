@@ -7,22 +7,31 @@ Como o repositório garante as regras do `CLAUDE.md`, e o que fazer quando algo 
 | Camada | Arquivo | O que faz |
 | --- | --- | --- |
 | Instruções do Claude Code | `CLAUDE.md` | Carregadas em toda sessão nesta pasta |
-| Hook do Claude Code | `.claude/settings.json`, `.claude/hooks/guard-git.js` | Bloqueia commit e push na `main`, push forçado, `--no-verify`, `reset --hard` e outros comandos destrutivos |
+| Hook do Claude Code | `.claude/settings.json`, `.claude/hooks/guard-git.js` | Bloqueia commit e push na `main`, push forçado, `--no-verify`, `reset --hard` e outros comandos destrutivos; roda `lint` antes de commit e `verify` antes de push |
+| Permissões do Claude Code | `.claude/settings.json` | Pede confirmação para merge, execução manual de workflow e edição do repositório; proíbe push forçado, `reset --hard` e `gh repo delete` |
 | Verificação de PR | `.github/workflows/ci.yml` | Job `verify`: lint, testes, build, teste do site gerado |
-| Proteção da `main` | `.github/branch-protection.json` | Exige PR, job `verify` aprovado e branch atualizada, inclusive para administradores |
-| Publicação | `.github/workflows/deploy.yml` | A cada push na `main`: verifica, publica no GitHub Pages e confere o site |
+| Proteção da `main` | `.github/branch-protection.json` | Exige PR, job `verify` aprovado, branch atualizada e conversas resolvidas, inclusive para administradores |
+| Publicação | `.github/workflows/deploy.yml` | A cada push na `main`, se `DEPLOY_AUTOMATICO=true`: verifica, publica no GitHub Pages e confere o site |
+| Atualização de actions | `.github/dependabot.yml` | Abre PR mensal; as actions são fixadas por hash do commit |
 
 ## Ambientes
 
 - **Testes:** o job `verify` em cada PR.
 - **Pré-visualização:** o artefato `site` de cada execução do CI, que vale por 7 dias. Baixe, extraia e sirva a pasta localmente. Não há URL pública por PR, porque o GitHub Pages não oferece isso.
-- **Produção:** https://fagundes1712.github.io/CosmoDash/, atualizada só pelo merge na `main`.
+- **Produção:** https://fagundes1712.github.io/CosmoDash/, atualizada pelo merge na `main` enquanto `DEPLOY_AUTOMATICO=true`, ou pela execução manual do Deploy.
 
 O site é um protótipo estático, sem banco e sem variáveis de produção.
 
 ## Política de deploy
 
-O merge de um PR aprovado na `main` é a autorização de publicação. Só o usuário autoriza o merge. O Deploy roda `npm run verify` de novo antes de publicar, então uma versão com falha não sai do build.
+A publicação automática começa desligada. Para ligar ou desligar:
+
+```bash
+gh variable set DEPLOY_AUTOMATICO --body true
+gh variable set DEPLOY_AUTOMATICO --body false
+```
+
+Com ela ligada, o merge de um PR aprovado na `main` é a autorização de publicação. Só o usuário autoriza o merge. O Deploy roda `npm run verify` de novo antes de publicar, então uma versão com falha não sai do build.
 
 ## Recuperação
 

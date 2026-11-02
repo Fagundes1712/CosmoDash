@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { spawnSync } = require('child_process');
 const path = require('path');
-const { check } = require('../.claude/hooks/guard-git.js');
+const { check, gate } = require('../.claude/hooks/guard-git.js');
 const { checkFile } = require('./check.js');
 
 const HOOK = path.resolve(__dirname, '..', '.claude', 'hooks', 'guard-git.js');
@@ -12,6 +12,9 @@ test('guard-git bloqueia o que viola as regras', () => {
   const blocked = [
     ['git commit -m x', 'main'],
     ['git add . && git commit -m x', 'main'],
+    ['git -C "D:/x y" commit -m x', 'main'],
+    ['git checkout main && git commit -m x', 'feat/x'],
+    ['git -C pasta push origin main', 'feat/x'],
     ['git push', 'main'],
     ['git push origin main', 'feat/x'],
     ['git push -u origin HEAD:main', 'feat/x'],
@@ -35,6 +38,8 @@ test('guard-git bloqueia o que viola as regras', () => {
 test('guard-git libera o fluxo normal', () => {
   const allowed = [
     ['git status', 'main'],
+    ['git checkout -b feat/x && git commit -m x', 'main'],
+    ['git switch feat/x && git push -u origin feat/x', 'main'],
     ['git checkout -b feat/x', 'main'],
     ['git pull origin main', 'main'],
     ['git fetch origin main', 'feat/x'],
@@ -48,6 +53,13 @@ test('guard-git libera o fluxo normal', () => {
     ['npm test', 'main'],
   ];
   for (const [cmd, branch] of allowed) assert.strictEqual(check(cmd, branch), null, cmd);
+});
+
+test('guard-git escolhe a verificação de cada comando', () => {
+  assert.strictEqual(gate('git add . && git commit -m x'), 'lint');
+  assert.strictEqual(gate('git -C pasta commit -m x'), 'lint');
+  assert.strictEqual(gate('git commit -m x && git push -u origin feat/x'), 'verify');
+  assert.strictEqual(gate('git status'), null);
 });
 
 test('guard-git como processo sai com 2 ao bloquear e 0 ao liberar', () => {

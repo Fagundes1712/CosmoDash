@@ -53,7 +53,7 @@ Peça a intervenção do usuário apenas em caso de falta de acesso, conflito re
 
 - Preserve alterações preexistentes. Outras sessões podem estar editando esta mesma pasta, então confira `git status` antes de trocar de branch, adicione ao commit só os arquivos da sua tarefa e nunca descarte o que não é seu.
 - Não desenvolva direto na `main`.
-- Não faça merge sem autorização do usuário naquele PR. O merge na `main` publica em produção.
+- Não faça merge sem autorização do usuário naquele PR. Com `DEPLOY_AUTOMATICO=true`, o merge na `main` publica em produção.
 - Não contorne proteções de branch nem verificações que falharam.
 - Nunca exponha segredos, tokens, senhas ou credenciais. O repositório é público, e tudo que entra nele fica visível.
 - Não execute comandos destrutivos sem avaliar o impacto e obter autorização.

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Planos e pagamentos</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <a class="org hide-c hide-m" href="Equipe.dc.html" title="Trocar organização">
+    <span class="orgmark" style="background:#5FE0F0">VL</span>
+    <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">Vértice Labs</span><span style="display:block;font-size:11.5px;color:#9AADC1">Admin · Plano {{curName}}</span></span>
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  </a>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Perfil.dc.html" class="nav" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">CA</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">Cauã Augusto</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · Vértice Labs</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Administração · Assinatura de Vértice Labs</div><h1 class="h1">Planos &amp; pagamentos</h1></div>
+    <div class="seg" role="group" aria-label="Ciclo de cobrança"><button class="{{cM}}" onClick="{{setM}}">Mensal</button><button class="{{cA}}" onClick="{{setA}}">Anual · −20%</button></div>
+  </header>
+
+  <section class="grid-a" style="grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))">
+    <div class="glass scan" style="padding:22px;display:flex;flex-direction:column;gap:12px;border-color:rgba(95,224,240,.3)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Plano atual</span><span class="chip gr">Ativo</span></div>
+      <div style="display:flex;align-items:baseline;gap:10px"><span class="disp" style="font-size:34px;font-weight:700">{{curName}}</span><span style="color:#9AADC1">{{curSeats}}</span></div>
+      <div style="font-size:13px;color:#C9D5E1">Próxima cobrança <b>05/11/2026</b> · <span class="disp" style="font-weight:700;color:#E7EEF6">{{curTotal}}</span></div>
+      <div style="font-size:12px;color:#9AADC1">{{cycleNote}}</div>
+    </div>
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Forma de pagamento</span><button class="btn sm" onClick="{{changeCard}}">Alterar</button></div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:64px;height:42px;border-radius:9px;background:linear-gradient(135deg,#1C2C44,#0E1828);border:1px solid rgba(150,200,255,.25);position:relative"><span style="position:absolute;left:8px;top:9px;width:14px;height:10px;border-radius:2px;background:#F3D06E"></span></div>
+        <div><div style="font-weight:700">{{pay.l}}</div><div style="font-size:12px;color:#9AADC1">{{pay.s}}</div></div>
+      </div>
+      <div class="seg" role="group" aria-label="Método" style="align-self:flex-start"><button class="{{pC}}" onClick="{{payC}}">Cartão</button><button class="{{pP}}" onClick="{{payP}}">Pix automático</button><button class="{{pB}}" onClick="{{payB}}">Boleto</button></div>
+    </div>
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+      <span class="hud">Uso do ciclo</span>
+      <sc-for list="{{usage}}" as="u" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span>{{u.n}}</span><span style="color:#9AADC1">{{u.v}}</span></div><div class="{{u.cls}}"><i style="width:{{u.w}}"></i></div></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:16px">
+    <sc-for list="{{plans}}" as="p" hint-placeholder-count="3">
+      <div class="glass lift" style="padding:24px;display:flex;flex-direction:column;gap:16px;border-color:{{p.bd}};position:relative">
+        <sc-if value="{{p.rec}}" hint-placeholder-val="{{false}}"><span class="chip or" style="position:absolute;top:18px;right:18px">Recomendado para 10+ pessoas</span></sc-if>
+        <div><div class="disp" style="font-size:22px;font-weight:700;color:{{p.c}}">{{p.n}}</div><div style="font-size:13px;color:#9AADC1;margin-top:4px">{{p.d}}</div></div>
+        <div style="display:flex;align-items:baseline;gap:6px"><span class="disp" style="font-size:36px;font-weight:700">{{p.price}}</span><span style="color:#9AADC1;font-size:13px">por usuário/mês</span></div>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;font-size:13.5px">
+          <sc-for list="{{p.f}}" as="x" hint-placeholder-count="5"><li style="display:flex;gap:10px;align-items:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{p.c}}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;margin-top:2px" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg><span>{{x}}</span></li></sc-for>
+        </ul>
+        <div style="margin-top:auto">
+          <sc-if value="{{p.isCur}}" hint-placeholder-val="{{false}}"><span class="btn" style="width:100%;cursor:default;opacity:.7">Seu plano atual</span></sc-if>
+          <sc-if value="{{p.canPick}}" hint-placeholder-val="{{true}}"><button class="{{p.btnCls}}" onClick="{{p.pick}}" style="width:100%">{{p.cta}}</button></sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </section>
+
+  <section class="glass" style="padding:8px 6px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px 4px"><h2 class="h2">Faturas</h2><span style="font-size:12px;color:#9AADC1">NF-e emitida automaticamente para o CNPJ cadastrado</span></div>
+    <div class="tblw"><table class="tbl">
+      <thead><tr><th>Competência</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Pago em</th><th></th></tr></thead>
+      <tbody>
+        <sc-for list="{{invoices}}" as="i" hint-placeholder-count="5">
+          <tr><td style="font-weight:700">{{i.m}}</td><td style="color:#C9D5E1">{{i.d}}</td><td class="disp" style="font-weight:700">{{i.v}}</td><td><span class="{{i.sc}}">{{i.s}}</span></td><td style="color:#9AADC1">{{i.p}}</td><td style="text-align:right"><button class="btn sm ghost" onClick="{{i.dl}}">Baixar PDF</button></td></tr>
+        </sc-for>
+      </tbody>
+    </table></div>
+  </section>
+</main>
+
+<sc-if value="{{hasModal}}" hint-placeholder-val="{{false}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="up-t">
+      <div class="hud" style="color:#5FE0F0">Confirmar mudança</div>
+      <h2 id="up-t" class="disp" style="margin:6px 0 16px;font-size:24px">{{m.from}} → {{m.to}}</h2>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;padding:16px;border-radius:14px;background:rgba(4,8,14,.5);border:1px solid rgba(150,200,255,.1)">
+        <div style="display:flex;justify-content:space-between"><span style="color:#9AADC1">Novo valor mensal (10 usuários)</span><b class="disp">{{m.total}}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#9AADC1">{{m.proLabel}}</span><b class="disp">{{m.pro}}</b></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#9AADC1">Cobrado em</span><b>{{pay.l}}</b></div>
+      </div>
+      <p style="font-size:12.5px;color:#9AADC1;line-height:1.5;margin:14px 0 18px">{{m.note}}</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeModal}}">Cancelar</button><button class="btn pri" onClick="{{confirm}}">Confirmar {{m.to}}</button></div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { collapsed: false, cycle: 'm', plan: 'pro', pending: null, pay: 'c', toast: null };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const CUR = 'Planos.dc.html';
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task','3'],['Atendimento'],['Suporte.dc.html','Suporte interno','sup','23'],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === CUR ? 'nav on' : 'nav' });
+    const brl = (v) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const k = s.cycle === 'a' ? 0.8 : 1;
+    const P = {
+      starter: { n: 'Starter', p: 49, rank: 0, c: '#9AADC1', d: 'Para começar a organizar vendas', seats: 'até 3 usuários', f: ['1 funil de vendas', '2.000 contatos', 'Tarefas e lembretes', 'Missões diárias e níveis', 'Suporte por e-mail'] },
+      pro: { n: 'Pro', p: 99, rank: 1, c: '#5FE0F0', d: 'Para times comerciais em crescimento', seats: '10 assentos', f: ['Funis ilimitados', '10.000 contatos', 'Suporte interno com SLA', 'Gamificação completa: desafios, conquistas e temporadas', 'Orion: 1.000 consultas por mês'] },
+      business: { n: 'Business', p: 169, rank: 2, c: '#FF9A62', d: 'Para operações com várias equipes', seats: 'assentos ilimitados', f: ['Tudo do Pro, sem limites de contatos', 'Múltiplas organizações com cobrança unificada', 'Permissões avançadas, SSO e auditoria', 'API e webhooks', 'Orion ilimitado com previsão de receita'] }
+    };
+    const cur = P[s.plan];
+    const total = cur.p * 10 * k;
+    const plans = Object.keys(P).map(id => { const p = P[id]; const up = p.rank > cur.rank; return { n: p.n, d: p.d, c: p.c, f: p.f, price: 'R$ ' + Math.round(p.p * k), isCur: id === s.plan, canPick: id !== s.plan, rec: id === 'business' && s.plan !== 'business', bd: id === s.plan ? 'rgba(95,224,240,.4)' : 'rgba(150,200,255,.12)', btnCls: up ? 'btn pri' : 'btn', cta: up ? 'Mudar para ' + p.n : 'Reduzir para ' + p.n, pick: () => this.setState({ pending: id }) }; });
+    let m = {};
+    if (s.pending) {
+      const np = P[s.pending]; const nt = np.p * 10 * k; const diff = nt - total; const up = diff > 0;
+      m = { from: cur.n, to: np.n, total: brl(nt), proLabel: up ? 'Diferença proporcional até 05/11' : 'Crédito na próxima fatura', pro: brl(Math.abs(diff) * 5 / 30), note: up ? 'O upgrade vale na hora. Os recursos novos aparecem para toda a organização no próximo carregamento.' : (s.pending === 'starter' ? 'O Starter permite até 3 usuários: antes de reduzir, 5 pessoas e o convite pendente precisam ser removidos. Funis extras ficam somente leitura.' : 'A redução vale no próximo ciclo. Recursos exclusivos ficam somente leitura.') };
+    }
+    const PAY = { c: { l: 'Visa •••• 7316', s: 'Vence 08/28 · titular Vértice Labs' }, p: { l: 'Pix automático', s: 'Débito autorizado no banco da empresa' }, b: { l: 'Boleto bancário', s: 'Enviado 5 dias antes do vencimento' } };
+    const U = [['Assentos', 9, s.plan === 'business' ? 0 : 10, ''], ['Contatos', 1284, s.plan === 'business' ? 0 : 10000, ''], ['Consultas ao Orion', 412, s.plan === 'business' ? 0 : 1000, ''], ['Armazenamento', 3.2, 20, ' GB']];
+    const usage = U.map(u => ({ n: u[0], v: u[2] ? u[1].toLocaleString('pt-BR') + u[3] + ' de ' + u[2].toLocaleString('pt-BR') + u[3] : u[1].toLocaleString('pt-BR') + u[3] + ' · ilimitado', w: u[2] ? Math.round(u[1] / u[2] * 100) + '%' : '8%', cls: u[2] && u[1] / u[2] >= 0.85 ? 'bar or' : 'bar' }));
+    const invoices = [['Out 2026', 'Pro · 10 assentos', 990, 'Paga', '05/10/2026'], ['Set 2026', 'Pro · 10 assentos', 990, 'Paga', '05/09/2026'], ['Ago 2026', 'Pro · 9 assentos', 891, 'Paga', '05/08/2026'], ['Jul 2026', 'Pro · 9 assentos', 891, 'Paga', '06/07/2026'], ['Jun 2026', 'Pro · 8 assentos', 792, 'Paga', '05/06/2026']].map(i => ({ m: i[0], d: i[1], v: brl(i[2]), s: i[3], sc: 'chip gr', p: i[4], dl: () => this.flash('Fatura de ' + i[0] + ' baixada') }));
+    const pm = (x) => () => { this.setState({ pay: x }); this.flash('Forma de pagamento: ' + PAY[x].l); };
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6', toggle: () => this.setState({ collapsed: !s.collapsed }), nav,
+      cM: s.cycle === 'm' ? 'on' : '', cA: s.cycle === 'a' ? 'on' : '', setM: () => this.setState({ cycle: 'm' }), setA: () => this.setState({ cycle: 'a' }),
+      curName: cur.n, curSeats: cur.seats, curTotal: brl(total) + (s.cycle === 'a' ? '/mês' : ''),
+      cycleNote: s.cycle === 'a' ? 'Cobrança anual de ' + brl(total * 12) + ' · economia de ' + brl(cur.p * 10 * 12 * 0.2) + ' por ano' : 'No anual você economiza ' + brl(cur.p * 10 * 12 * 0.2) + ' por ano',
+      pay: PAY[s.pay], pC: s.pay === 'c' ? 'on' : '', pP: s.pay === 'p' ? 'on' : '', pB: s.pay === 'b' ? 'on' : '', payC: pm('c'), payP: pm('p'), payB: pm('b'),
+      changeCard: () => this.flash('Checkout seguro para novo cartão aberto'),
+      usage, plans, invoices, hasModal: !!s.pending, m, closeModal: () => this.setState({ pending: null }),
+      confirm: () => { const n = P[s.pending].n; this.setState({ plan: s.pending, pending: null }); this.flash('Plano alterado para ' + n); },
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Suporte interno</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <a class="org hide-c hide-m" href="Equipe.dc.html" title="Trocar organização">
+    <span class="orgmark" style="background:#5FE0F0">VL</span>
+    <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">Vértice Labs</span><span style="display:block;font-size:11.5px;color:#9AADC1">Admin · Plano Pro</span></span>
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  </a>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Metas.dc.html" class="glass hide-c" style="padding:14px;border-radius:16px;text-decoration:none;color:#E7EEF6;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud" style="color:#ADA0FF">Nível 14 · Estrategista</span><span class="xp">2.340 / 3.000</span></div>
+      <div class="bar vi"><i style="width:78%"></i></div>
+      <div style="font-size:11.5px;color:#9AADC1">Faltam 660 XP para o Nível 15</div>
+    </a>
+    <a href="Perfil.dc.html" class="nav" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">CA</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">Cauã Augusto</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · Vértice Labs</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Atendimento · Central de tickets</div><h1 class="h1">Suporte interno</h1></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="glass" style="padding:8px 14px;border-radius:12px;display:flex;gap:18px;align-items:center;font-size:12.5px">
+        <span><span class="disp" style="font-size:16px;font-weight:700">{{openN}}</span> <span style="color:#9AADC1">abertos</span></span>
+        <span><span class="disp" style="font-size:16px;font-weight:700;color:#5ADFA4">94%</span> <span style="color:#9AADC1">no SLA</span></span>
+        <span><span class="disp" style="font-size:16px;font-weight:700">38 min</span> <span style="color:#9AADC1">1ª resposta</span></span>
+        <span><span class="disp" style="font-size:16px;font-weight:700;color:#F3D06E">4,7</span> <span style="color:#9AADC1">CSAT</span></span>
+      </div>
+    </div>
+  </header>
+
+  <div style="display:flex;gap:16px;align-items:stretch;flex-wrap:wrap">
+    <section class="glass" style="flex:1 1 320px;max-width:100%;padding:14px;display:flex;flex-direction:column;gap:8px" aria-label="Fila de tickets">
+      <div class="seg" role="group" aria-label="Origem" style="align-self:flex-start"><button class="{{qC}}" onClick="{{setC}}">Clientes</button><button class="{{qI}}" onClick="{{setI}}">Interno · 2</button><button class="{{qR}}" onClick="{{setR}}">Resolvidos</button></div>
+      <sc-for list="{{queue}}" as="t" hint-placeholder-count="5">
+        <button class="{{t.cls}}" onClick="{{t.pick}}" style="flex-direction:column;align-items:stretch;gap:8px">
+          <span style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="hud" style="font-size:10.5px">{{t.id}} · {{t.ch}}</span><span class="{{t.pCls}}">{{t.prio}}</span></span>
+          <span style="font-weight:700;font-size:13.5px;line-height:1.35">{{t.title}}</span>
+          <span style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#9AADC1"><span>{{t.from}}</span><span style="color:{{t.slaC}};font-weight:700">{{t.sla}}</span></span>
+        </button>
+      </sc-for>
+      <sc-if value="{{qEmpty}}" hint-placeholder-val="{{false}}"><div style="padding:24px;text-align:center;color:#9AADC1;font-size:13px">Nada por aqui.</div></sc-if>
+    </section>
+
+    <section class="glass" style="flex:999 1 460px;min-width:0;padding:0;display:flex;flex-direction:column;overflow:hidden" aria-label="Conversa">
+      <div style="padding:18px 22px;border-bottom:1px solid rgba(150,200,255,.1);display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="min-width:0"><div class="hud">{{cur.id}} · {{cur.ch}} · {{cur.cat}}</div><h2 class="disp" style="margin:4px 0 0;font-size:20px">{{cur.title}}</h2></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="{{cur.stCls}}">{{cur.status}}</span>
+          <sc-if value="{{cur.open}}" hint-placeholder-val="{{true}}"><button class="btn sm pri" onClick="{{resolve}}">Resolver · +20 XP</button></sc-if>
+        </div>
+      </div>
+      <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:14px;min-height:380px">
+        <sc-for list="{{msgs}}" as="m" hint-placeholder-count="3">
+          <div style="display:flex;gap:12px;align-self:{{m.align}};max-width:min(560px,92%);flex-direction:{{m.dir}}">
+            <span class="av sm" style="background:{{m.c}}">{{m.i}}</span>
+            <div style="padding:12px 14px;border-radius:14px;background:{{m.bg}};border:1px solid {{m.bd}};font-size:13.5px;line-height:1.55">
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;font-size:12px"><b>{{m.who}}</b><span style="color:#7A8EA3">{{m.at}}</span><sc-if value="{{m.note}}" hint-placeholder-val="{{false}}"><span class="chip yl" style="height:20px">Nota interna</span></sc-if></div>
+              <div style="color:#D4DEE9;white-space:pre-line">{{m.txt}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{cur.open}}" hint-placeholder-val="{{true}}">
+        <div style="padding:14px 18px 18px;border-top:1px solid rgba(150,200,255,.1);display:flex;flex-direction:column;gap:10px;background:rgba(4,8,14,.35)">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <div class="seg" role="group" aria-label="Tipo de mensagem"><button class="{{mR}}" onClick="{{setReply}}">Responder cliente</button><button class="{{mN}}" onClick="{{setNote}}">Nota interna</button></div>
+            <span style="font-size:12px;color:#7A8EA3">Macros:</span>
+            <sc-for list="{{macros}}" as="x" hint-placeholder-count="3"><button class="btn sm ghost" onClick="{{x.use}}" style="border:1px dashed rgba(150,200,255,.25)">{{x.l}}</button></sc-for>
+          </div>
+          <label for="rp" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Mensagem</label>
+          <textarea id="rp" class="inp" rows="3" value="{{draft}}" onChange="{{onDraft}}" placeholder="{{ph}}" style="border-color:{{draftBd}}"></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:12px;color:#9AADC1">{{hint}}</span><button class="btn pri" onClick="{{send}}">Enviar</button></div>
+        </div>
+      </sc-if>
+    </section>
+
+    <aside style="flex:1 1 280px;display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="glass scan" style="padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div class="hud">Prazo do SLA</div>
+        <div class="disp" style="font-size:34px;font-weight:700;color:{{cur.slaC}}">{{cur.sla}}</div>
+        <div class="bar or"><i style="width:{{cur.slaW}}"></i></div>
+        <div style="font-size:12px;color:#9AADC1">Prioridade {{cur.prio}} · responsável {{cur.agent}}</div>
+      </div>
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+        <div class="hud">Solicitante</div>
+        <div style="display:flex;gap:12px;align-items:center"><span class="av" style="background:{{cur.fc}}">{{cur.fi}}</span><div><div style="font-weight:700">{{cur.from}}</div><div style="font-size:12px;color:#9AADC1">{{cur.org}}</div></div></div>
+        <sc-if value="{{cur.hasDeal}}" hint-placeholder-val="{{true}}">
+          <a href="Pipeline.dc.html" style="padding:12px;border-radius:12px;background:rgba(255,154,98,.07);border:1px solid rgba(255,154,98,.3);text-decoration:none;color:#E7EEF6;font-size:12.5px;line-height:1.5"><b style="color:#FF9A62">Negócio aberto:</b> {{cur.deal}}. Resolver este ticket influencia a negociação.</a>
+        </sc-if>
+        <dl style="display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;font-size:12.5px">
+          <dt style="color:#9AADC1">Cliente desde</dt><dd style="margin:0;font-weight:600">{{cur.since}}</dd>
+          <dt style="color:#9AADC1">Tickets 90d</dt><dd style="margin:0;font-weight:600">{{cur.hist}}</dd>
+        </dl>
+      </div>
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div class="hud">Fila por agente</div>
+        <sc-for list="{{agents}}" as="a" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:10px;font-size:13px"><span class="av sm" style="background:{{a.c}}">{{a.i}}</span><span style="flex:1">{{a.n}}</span><span class="chip">{{a.q}} abertos</span></div></sc-for>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = {
+    collapsed: false, q: 'c', sel: '#4830', mode: 'r', draft: '', toast: null, resolved: {},
+    extra: {},
+    tickets: [
+      { id: '#4830', q: 'c', ch: 'E-mail', cat: 'Integrações', title: 'Integração com ERP parou de sincronizar pedidos', from: 'Helena Duarte', fi: 'HD', fc: '#5FE0F0', org: 'Grupo Lumen · Dir. Comercial', prio: 'Alta', sla: '52 min', slaW: '86%', slaC: '#FF9A62', agent: 'Diego Almeida', deal: 'Expansão Grupo Lumen · R$ 48.000 em Negociação', since: 'mar 2025', hist: '6 (2 abertos)',
+        msgs: [['c', 'Helena Duarte', '15:12', 'Desde ontem à noite os pedidos do ERP não aparecem no Órbita. Temos reunião de fechamento de mês amanhã cedo e preciso dos números corretos.'], ['a', 'Diego Almeida', '15:20', 'Oi, Helena! Já estou verificando. Pode me confirmar se alguém do seu time trocou a senha do usuário de integração esta semana?'], ['n', 'Diego Almeida', '15:41', 'O token da integração expirou na renovação de senha. Precisa reautenticar com o admin do cliente.\nCauã: atenção, Lumen está em negociação de expansão.']] },
+      { id: '#4827', q: 'c', ch: 'Chat', cat: 'Acesso', title: 'Usuários sem acesso após troca de senha', from: 'Marcos Lima', fi: 'ML', fc: '#ADA0FF', org: 'Grupo Lumen · TI', prio: 'Média', sla: '1h 40min', slaW: '58%', slaC: '#F3D06E', agent: 'Júlia Prado', deal: 'Expansão Grupo Lumen · R$ 48.000 em Negociação', since: 'mar 2025', hist: '6 (2 abertos)',
+        msgs: [['c', 'Marcos Lima', '14:02', 'Três vendedores nossos não conseguem entrar desde a política nova de senha.'], ['a', 'Júlia Prado', '14:10', 'Oi, Marcos. Vou forçar a redefinição para os três e te aviso em seguida.']] },
+      { id: '#4819', q: 'c', ch: 'WhatsApp', cat: 'Relatórios', title: 'Relatório mensal com valores divergentes', from: 'Rui Moura', fi: 'RM', fc: '#FF9A62', org: 'Casa Moura · Financeiro', prio: 'Média', sla: '3h 05min', slaW: '35%', slaC: '#F3D06E', agent: 'Diego Almeida', deal: '', since: 'ago 2024', hist: '3 (1 aberto)',
+        msgs: [['c', 'Rui Moura', '11:47', 'O total de setembro no relatório está R$ 4.200 acima do que fechamos. Podem conferir?']] },
+      { id: '#4825', q: 'c', ch: 'Chat', cat: 'Importação', title: 'Dúvida sobre importação de contatos', from: 'Laura Brito', fi: 'LB', fc: '#5ADFA4', org: 'Solaris Energia · Compras', prio: 'Baixa', sla: '6h', slaW: '15%', slaC: '#5ADFA4', agent: 'Júlia Prado', deal: '', since: 'hoje', hist: '1',
+        msgs: [['c', 'Laura Brito', '16:05', 'Acabamos de assinar! Qual o formato do CSV para importar nossa base de 2 mil contatos?']] },
+      { id: 'I-212', q: 'i', ch: 'Interno', cat: 'Permissões', title: 'Acesso ao funil Expansão de contas', from: 'Thiago Nunes', fi: 'TN', fc: '#F3D06E', org: 'Vértice Labs · SDR', prio: 'Média', sla: '4h', slaW: '30%', slaC: '#5ADFA4', agent: 'Cauã Augusto', deal: '', since: 'equipe', hist: '2',
+        msgs: [['c', 'Thiago Nunes', '10:15', 'Vou assumir as contas de expansão da Squad Ômega. Preciso de permissão de edição no funil Expansão.']] },
+      { id: 'I-209', q: 'i', ch: 'Interno', cat: 'Materiais', title: 'Template de proposta com o logo novo', from: 'Bianca Kato', fi: 'BK', fc: '#ADA0FF', org: 'Vértice Labs · Closer', prio: 'Baixa', sla: '1 dia', slaW: '10%', slaC: '#5ADFA4', agent: 'Marina Lopes', deal: '', since: 'equipe', hist: '4',
+        msgs: [['c', 'Bianca Kato', 'ontem', 'O modelo de proposta ainda usa o logo antigo. Alguém consegue atualizar?']] }
+    ]
+  };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const nRes = Object.keys(s.resolved).length;
+    const openN = 23 - nRes;
+    const CUR = 'Suporte.dc.html';
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task','3'],['Atendimento'],['Suporte.dc.html','Suporte interno','sup',String(openN)],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === CUR ? 'nav on' : 'nav' });
+
+    const PC = { 'Alta': 'chip or', 'Média': 'chip yl', 'Baixa': 'chip' };
+    const AV = { a: ['#F3D06E'], n: ['#F3D06E'] };
+    const inQ = (t) => s.q === 'r' ? !!s.resolved[t.id] : (t.q === s.q && !s.resolved[t.id]);
+    const queue = s.tickets.filter(inQ).map(t => ({ id: t.id, ch: t.ch, prio: t.prio, pCls: PC[t.prio], title: t.title, from: t.from + ' · ' + t.org.split(' · ')[0], sla: s.resolved[t.id] ? 'Resolvido' : t.sla, slaC: s.resolved[t.id] ? '#5ADFA4' : t.slaC, cls: s.sel === t.id ? 'rowb on' : 'rowb', pick: () => this.setState({ sel: t.id, draft: '' }) }));
+    const T = s.tickets.find(t => t.id === s.sel) || s.tickets[0];
+    const isRes = !!s.resolved[T.id];
+    const ini = (n) => n.split(' ').map(w => w[0]).slice(0, 2).join('');
+    const all = T.msgs.concat(s.extra[T.id] || []);
+    const msgs = all.map(m => {
+      const client = m[0] === 'c', note = m[0] === 'n';
+      return { who: m[1], at: m[2], txt: m[3], i: ini(m[1]), c: client ? T.fc : (m[1] === 'Cauã Augusto' ? '#5FE0F0' : m[1] === 'Júlia Prado' ? '#5ADFA4' : '#F3D06E'), note, align: client ? 'flex-start' : 'flex-end', dir: client ? 'row' : 'row-reverse', bg: note ? 'rgba(243,208,110,.08)' : client ? 'rgba(148,197,255,.06)' : 'rgba(95,224,240,.08)', bd: note ? 'rgba(243,208,110,.3)' : client ? 'rgba(150,200,255,.12)' : 'rgba(95,224,240,.25)' };
+    });
+    const cur = Object.assign({}, T, { hasDeal: !!T.deal, open: !isRes, status: isRes ? 'Resolvido' : 'Em andamento', stCls: isRes ? 'chip gr' : 'chip cy', sla: isRes ? 'Cumprido' : T.sla, slaC: isRes ? '#5ADFA4' : T.slaC });
+    const MAC = [['Reautenticar integração', 'Encontramos a causa: o token da integração expirou após a troca de senha. Envio agora o link para reautenticar — leva 2 minutos e os pedidos voltam a sincronizar em seguida.'], ['Prazo de correção', 'Já identificamos o problema e a correção sai em até 2 horas. Te aviso por aqui assim que estiver resolvido.'], ['Pedir print', 'Consegue me enviar um print da tela com a mensagem de erro? Assim agilizo a análise.']];
+    const macros = MAC.map(m => ({ l: m[0], use: () => this.setState({ draft: m[1] }) }));
+    const note = s.mode === 'n';
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6', toggle: () => this.setState({ collapsed: !s.collapsed }), nav,
+      openN, qC: s.q === 'c' ? 'on' : '', qI: s.q === 'i' ? 'on' : '', qR: s.q === 'r' ? 'on' : '',
+      setC: () => this.setState({ q: 'c' }), setI: () => this.setState({ q: 'i' }), setR: () => this.setState({ q: 'r' }),
+      queue, qEmpty: queue.length === 0, cur, msgs, macros,
+      mR: note ? '' : 'on', mN: note ? 'on' : '', setReply: () => this.setState({ mode: 'r' }), setNote: () => this.setState({ mode: 'n' }),
+      draft: s.draft, onDraft: (e) => this.setState({ draft: e.target.value }), ph: note ? 'Nota visível só para a equipe — use @ para mencionar' : 'Escreva sua resposta para ' + T.from.split(' ')[0] + '…', draftBd: note ? 'rgba(243,208,110,.45)' : 'rgba(150,200,255,.22)',
+      hint: note ? 'Notas internas não são enviadas ao cliente.' : 'Resposta enviada por ' + T.ch + '.',
+      send: () => { const txt = s.draft.trim(); if (!txt) return; const m = [note ? 'n' : 'a', 'Cauã Augusto', 'agora', txt]; this.setState({ extra: Object.assign({}, s.extra, { [T.id]: (s.extra[T.id] || []).concat([m]) }), draft: '' }); this.flash(note ? 'Nota interna adicionada' : 'Resposta enviada para ' + T.from); },
+      resolve: () => { this.setState({ resolved: Object.assign({}, s.resolved, { [T.id]: true }) }); this.flash('Ticket ' + T.id + ' resolvido dentro do SLA · +20 XP'); },
+      agents: [['Diego Almeida', 'DA', '#F3D06E', 11], ['Júlia Prado', 'JP', '#5ADFA4', 9], ['Marina Lopes', 'ML', '#FF9A62', 1], ['Cauã Augusto', 'CA', '#5FE0F0', 2]].map(a => ({ n: a[0], i: a[1], c: a[2], q: a[3] })),
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Órbita CRM · Suporte interno</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Atendimento · Central de tickets</div><h1 class="h1">Suporte interno</h1></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="glass" style="padding:8px 14px;border-radius:12px;display:flex;gap:18px;align-items:center;font-size:12.5px;flex-wrap:wrap">
+        <span><span class="disp" style="font-size:16px;font-weight:700">{{openN}}</span> <span style="color:#9AADC1">abertos</span></span>
+        <span><span class="disp" style="font-size:16px;font-weight:700;color:#5ADFA4">{{k.sla}}</span> <span style="color:#9AADC1">no SLA</span></span>
+        <span><span class="disp" style="font-size:16px;font-weight:700">{{k.first}}</span> <span style="color:#9AADC1">1ª resposta</span></span>
+        <span><span class="disp" style="font-size:16px;font-weight:700;color:#F3D06E">{{k.csat}}</span> <span style="color:#9AADC1">CSAT</span></span>
+      </div>
+    </div>
+  </header>
+
+  <div style="display:flex;gap:16px;align-items:stretch;flex-wrap:wrap">
+    <section class="glass" style="flex:1 1 320px;max-width:100%;padding:14px;display:flex;flex-direction:column;gap:8px" aria-label="Fila de tickets">
+      <div class="seg" role="group" aria-label="Origem" style="align-self:flex-start"><button class="{{qC}}" onClick="{{setC}}">Clientes</button><button class="{{qI}}" onClick="{{setI}}">Interno · {{nI}}</button><button class="{{qR}}" onClick="{{setR}}">Resolvidos</button></div>
+      <sc-for list="{{queue}}" as="t">
+        <button class="{{t.cls}}" onClick="{{t.pick}}" style="flex-direction:column;align-items:stretch;gap:8px">
+          <span style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="hud" style="font-size:10.5px">{{t.id}} · {{t.ch}}</span><span class="{{t.pCls}}">{{t.prio}}</span></span>
+          <span style="font-weight:700;font-size:13.5px;line-height:1.35">{{t.title}}</span>
+          <span style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#9AADC1"><span>{{t.from}}</span><span style="color:{{t.slaC}};font-weight:700">{{t.sla}}</span></span>
+        </button>
+      </sc-for>
+      <sc-if value="{{qEmpty}}"><div style="padding:24px;text-align:center;color:#9AADC1;font-size:13px">Nada por aqui.</div></sc-if>
+    </section>
+
+    <sc-if value="{{noCur}}"><section class="glass" style="flex:999 1 460px;min-width:0;padding:48px;text-align:center;color:#9AADC1">Selecione um ticket para ver a conversa.</section></sc-if>
+    <sc-if value="{{hasCur}}">
+    <section class="glass" style="flex:999 1 460px;min-width:0;padding:0;display:flex;flex-direction:column;overflow:hidden" aria-label="Conversa">
+      <div style="padding:18px 22px;border-bottom:1px solid rgba(150,200,255,.1);display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="min-width:0"><div class="hud">{{cur.id}} · {{cur.ch}} · {{cur.cat}}</div><h2 class="disp" style="margin:4px 0 0;font-size:20px">{{cur.title}}</h2></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="{{cur.stCls}}">{{cur.statusTxt}}</span>
+          <sc-if value="{{cur.canResolve}}"><button class="btn sm pri" onClick="{{resolve}}">Resolver{{cur.resolveXp}}</button></sc-if>
+          <sc-if value="{{cur.canReopen}}"><button class="btn sm" onClick="{{reopen}}">Reabrir</button></sc-if>
+        </div>
+      </div>
+      <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:14px;min-height:380px">
+        <sc-for list="{{msgs}}" as="m">
+          <div style="display:flex;gap:12px;align-self:{{m.align}};max-width:min(560px,92%);flex-direction:{{m.dir}}">
+            <span class="av sm" style="background:{{m.c}}">{{m.i}}</span>
+            <div style="padding:12px 14px;border-radius:14px;background:{{m.bg}};border:1px solid {{m.bd}};font-size:13.5px;line-height:1.55">
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;font-size:12px"><b>{{m.who}}</b><span style="color:#7A8EA3">{{m.at}}</span><sc-if value="{{m.note}}"><span class="chip yl" style="height:20px">Nota interna</span></sc-if></div>
+              <div style="color:#D4DEE9;white-space:pre-line">{{m.txt}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{cur.canReply}}">
+        <div style="padding:14px 18px 18px;border-top:1px solid rgba(150,200,255,.1);display:flex;flex-direction:column;gap:10px;background:rgba(4,8,14,.35)">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <div class="seg" role="group" aria-label="Tipo de mensagem"><button class="{{mR}}" onClick="{{setReply}}">Responder cliente</button><button class="{{mN}}" onClick="{{setNote}}">Nota interna</button></div>
+            <span style="font-size:12px;color:#7A8EA3">Macros:</span>
+            <sc-for list="{{macros}}" as="x"><button class="btn sm ghost" onClick="{{x.use}}" style="border:1px dashed rgba(150,200,255,.25)">{{x.l}}</button></sc-for>
+          </div>
+          <label for="rp" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Mensagem</label>
+          <textarea id="rp" class="inp" rows="3" value="{{draft}}" onChange="{{onDraft}}" placeholder="{{ph}}" style="border-color:{{draftBd}}"></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:12px;color:#9AADC1">{{hint}}</span><button class="btn pri" onClick="{{send}}">Enviar</button></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{cur.readOnly}}"><div style="padding:14px 18px;border-top:1px solid rgba(150,200,255,.1);font-size:12.5px;color:#9AADC1">Seu papel só permite consultar os tickets.</div></sc-if>
+    </section>
+
+    <aside style="flex:1 1 280px;display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="glass scan" style="padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div class="hud">Prazo do SLA</div>
+        <div class="disp" style="font-size:34px;font-weight:700;color:{{cur.slaC}}">{{cur.sla}}</div>
+        <div class="bar or"><i style="width:{{cur.slaW}}"></i></div>
+        <div style="font-size:12px;color:#9AADC1">Prioridade {{cur.prio}} · responsável {{cur.agent}}</div>
+      </div>
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+        <div class="hud">Solicitante</div>
+        <div style="display:flex;gap:12px;align-items:center"><span class="av" style="background:{{cur.fc}}">{{cur.fi}}</span><div><div style="font-weight:700">{{cur.from}}</div><div style="font-size:12px;color:#9AADC1">{{cur.org}}</div></div></div>
+        <sc-if value="{{cur.hasDeal}}">
+          <a href="{{cur.dealHref}}" style="padding:12px;border-radius:12px;background:rgba(255,154,98,.07);border:1px solid rgba(255,154,98,.3);text-decoration:none;color:#E7EEF6;font-size:12.5px;line-height:1.5"><b style="color:#FF9A62">Negócio aberto:</b> {{cur.deal}}. Resolver este ticket influencia a negociação.</a>
+        </sc-if>
+        <dl style="display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;font-size:12.5px">
+          <dt style="color:#9AADC1">Cliente desde</dt><dd style="margin:0;font-weight:600">{{cur.since}}</dd>
+          <dt style="color:#9AADC1">Tickets 90d</dt><dd style="margin:0;font-weight:600">{{cur.hist}}</dd>
+        </dl>
+      </div>
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div class="hud">Fila por agente</div>
+        <sc-for list="{{agents}}" as="a"><div style="display:flex;align-items:center;gap:10px;font-size:13px"><span class="av sm" style="background:{{a.c}}">{{a.i}}</span><span style="flex:1">{{a.n}}</span><span class="chip">{{a.q}}</span></div></sc-for>
+      </div>
+    </aside>
+    </sc-if>
+  </div>
+</main>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null, q: 'c', sel: null, mode: 'r', draft: '' };
+  renderVals() {
+    const s = this.state;
+    const O = Orb.data();
+    const PC = { 'Alta': 'chip or', 'Média': 'chip yl', 'Baixa': 'chip' };
+    const inQ = (t) => (s.q === 'r' ? t.status === 'resolved' : t.q === s.q && t.status === 'open');
+    const inQueue = O.tickets.filter(inQ);
+    const T = inQueue.find((t) => t.id === s.sel) || inQueue[0];
+    const queue = inQueue.map((t) => { const sla = Orb.slaInfo(t); return { id: t.id, ch: t.ch, prio: t.prio, pCls: PC[t.prio], title: t.title, from: t.from + ' · ' + t.org.split(' · ')[0], sla: t.status === 'resolved' ? sla.txt : sla.txt, slaC: sla.c, cls: T && T.id === t.id ? 'rowb on' : 'rowb', pick: () => this.setState({ sel: t.id, draft: '' }) }; });
+    const canSup = Orb.can('sup');
+    let cur = {}, msgs = [];
+    if (T) {
+      const isRes = T.status === 'resolved';
+      const sla = Orb.slaInfo(T);
+      const co = T.org.split(' · ')[0];
+      const deal = O.deals.find((d) => d.status === 'open' && d.co === co);
+      const openOfCo = O.tickets.filter((t) => t.org.split(' · ')[0] === co && t.status === 'open').length;
+      cur = { id: T.id, ch: T.ch, cat: T.cat, title: T.title, from: T.from, fi: Orb.ini(T.from), fc: T.fc, org: T.org, prio: T.prio, agent: T.agent, since: T.since, hist: T.hist + ' (' + Orb.pl(openOfCo, 'aberto', 'abertos') + ')',
+        hasDeal: !!deal, deal: deal ? deal.co + ' · ' + Orb.brl(deal.v) + ' em ' + Orb.SEED.stages[deal.st] : '', dealHref: deal ? 'Pipeline.dc.html?deal=' + deal.id : '',
+        statusTxt: isRes ? 'Resolvido' : 'Em andamento', stCls: isRes ? 'chip gr' : 'chip cy', sla: sla.txt, slaC: sla.c, slaW: sla.w,
+        canResolve: !isRes && canSup, canReopen: isRes && canSup, canReply: !isRes && canSup, readOnly: !isRes && !canSup, resolveXp: sla.min > 0 ? ' · +20 XP' : ' · sem XP' };
+      msgs = T.msgs.map((m) => {
+        const client = m[0] === 'c', note = m[0] === 'n';
+        const person = O.people.find((p) => p.n === m[1]);
+        return { who: m[1], at: m[2], txt: m[3], i: Orb.ini(m[1]), c: client ? T.fc : person ? person.c : '#F3D06E', note, align: client ? 'flex-start' : 'flex-end', dir: client ? 'row' : 'row-reverse', bg: note ? 'rgba(243,208,110,.08)' : client ? 'rgba(148,197,255,.06)' : 'rgba(95,224,240,.08)', bd: note ? 'rgba(243,208,110,.3)' : client ? 'rgba(150,200,255,.12)' : 'rgba(95,224,240,.25)' };
+      });
+    }
+    const MAC = [['Reautenticar integração', 'Encontramos a causa: o token da integração expirou após a troca de senha. Envio agora o link para reautenticar — leva 2 minutos e os pedidos voltam a sincronizar em seguida.'], ['Prazo de correção', 'Já identificamos o problema e a correção sai em até 2 horas. Te aviso por aqui assim que estiver resolvido.'], ['Pedir print', 'Consegue me enviar um print da tela com a mensagem de erro? Assim agilizo a análise.']];
+    const macros = MAC.map((m) => ({ l: m[0], use: () => this.setState({ draft: m[1] }) }));
+    const note = s.mode === 'n';
+    const agentNames = [...new Set(Object.keys(O.hidTickets).concat(O.tickets.map((t) => t.agent)))];
+    const agents = agentNames.map((n) => {
+      const p = O.people.find((x) => x.n === n);
+      return { n, i: Orb.ini(n), c: p ? p.c : '#9AADC1', q: Orb.pl((O.hidTickets[n] || 0) + O.tickets.filter((t) => t.agent === n && t.status === 'open').length, 'aberto', 'abertos') };
+    });
+    return Object.assign(Orb.shell(this, 'Suporte.dc.html'), {
+      k: O.k, openN: Orb.ticketsOpen(), nI: O.tickets.filter((t) => t.q === 'i' && t.status === 'open').length, qC: s.q === 'c' ? 'on' : '', qI: s.q === 'i' ? 'on' : '', qR: s.q === 'r' ? 'on' : '',
+      setC: () => this.setState({ q: 'c', sel: null, draft: '' }), setI: () => this.setState({ q: 'i', sel: null, draft: '' }), setR: () => this.setState({ q: 'r', sel: null, draft: '' }),
+      queue, qEmpty: queue.length === 0, hasCur: !!T, noCur: !T, cur, msgs, macros, agents,
+      mR: note ? '' : 'on', mN: note ? 'on' : '', setReply: () => this.setState({ mode: 'r' }), setNote: () => this.setState({ mode: 'n' }),
+      draft: s.draft, onDraft: (e) => this.setState({ draft: e.target.value }), ph: T ? (note ? 'Nota visível só para a equipe' : 'Escreva sua resposta para ' + T.from.split(' ')[0] + '…') : '', draftBd: note ? 'rgba(243,208,110,.45)' : 'rgba(150,200,255,.22)',
+      hint: note ? 'Notas internas não são enviadas ao cliente.' : T ? 'Demonstração: a resposta fica registrada aqui, sem envio real por ' + T.ch + '.' : '',
+      send: () => { const txt = s.draft.trim(); if (!txt) return Orb.flash(this, 'Escreva uma mensagem antes de enviar'); T.msgs.push([note ? 'n' : 'a', Orb.profile().name, Orb.clock(), txt]); Orb.save(); this.setState({ draft: '' }); Orb.flash(this, note ? 'Nota interna adicionada' : 'Resposta registrada para ' + T.from); },
+      resolve: () => { const ok = Orb.resolveTicket(T.id); this.setState({ sel: null }); Orb.flash(this, 'Ticket ' + T.id + (ok ? ' resolvido dentro do SLA · +20 XP' : ' resolvido fora do SLA · sem XP')); },
+      reopen: () => { Orb.reopenTicket(T.id); this.setState({ q: T.q, sel: T.id }); Orb.flash(this, 'Ticket ' + T.id + ' reaberto'); }
+    });
+  }
+}
+</script>
+</body>
+</html>

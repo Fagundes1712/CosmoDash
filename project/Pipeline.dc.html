@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Órbita CRM · Funis de vendas</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div>
+      <div class="hud">Comercial · Funil {{funnelName}}</div>
+      <h1 class="h1">Funis de vendas</h1>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div class="seg" role="group" aria-label="Filtro de negócios">
+        <button class="{{fAll}}" onClick="{{setAll}}">Todos</button>
+        <button class="{{fMine}}" onClick="{{setMine}}">Meus</button>
+        <button class="{{fRisk}}" onClick="{{setRisk}}">Em risco · {{riskCount}}</button>
+        <button class="{{fClosed}}" onClick="{{setClosed}}">Encerrados · {{closedCount}}</button>
+      </div>
+      <button class="btn pri" onClick="{{openNew}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Novo negócio</button>
+    </div>
+  </header>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <div class="seg" role="group" aria-label="Funil">
+      <sc-for list="{{funnels}}" as="f"><button class="{{f.cls}}" onClick="{{f.pick}}">{{f.name}}</button></sc-for>
+    </div>
+    <sc-if value="{{canPipe}}"><button class="btn sm ghost" onClick="{{openFunnel}}">+ Novo funil</button></sc-if>
+    <span style="font-size:12px;color:#7A8EA3">Arraste um card para mudar de etapa.</span>
+  </div>
+
+  <section class="grid-a" style="grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr))">
+    <div class="glass" style="padding:16px 18px"><div class="hud">Valor aberto</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px">{{totOpen}}</div><div style="font-size:12px;color:#9AADC1">{{totDeals}} negócios</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Valor ponderado</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px">{{weighted}}</div><div style="font-size:12px;color:#9AADC1">pela probabilidade de cada etapa</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Ganhos em {{month}}</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px;color:#5ADFA4">{{wonVal}}</div><div style="font-size:12px;color:#9AADC1">{{wonCount}} negócios · meta {{goal}}</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Parados +10 dias</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px;color:#FF9A62">{{riskCount}}</div><div style="font-size:12px;color:#9AADC1">sinalizados pelo Cosmo</div></div>
+  </section>
+
+  <sc-if value="{{isClosed}}">
+    <section class="glass" style="padding:8px 6px">
+      <div class="tblw"><table class="tbl">
+        <thead><tr><th>Empresa</th><th>Valor</th><th>Resultado</th><th>Motivo</th><th>Responsável</th><th></th></tr></thead>
+        <tbody><sc-for list="{{closed}}" as="c"><tr><td style="font-weight:700">{{c.co}}</td><td class="disp" style="font-weight:600">{{c.val}}</td><td><span class="{{c.cls}}">{{c.res}}</span></td><td style="color:#9AADC1">{{c.reason}}</td><td>{{c.owner}}</td><td style="text-align:right"><button class="btn sm" onClick="{{c.reopen}}">Reabrir</button></td></tr></sc-for></tbody>
+      </table></div>
+      <sc-if value="{{noClosed}}"><div style="padding:32px;text-align:center;color:#9AADC1">Nenhum negócio encerrado por aqui.</div></sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{isBoard}}">
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+    <section style="flex:999 1 640px;min-width:0;overflow-x:auto;padding-bottom:8px" aria-label="Quadro do funil">
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;min-width:1090px">
+        <sc-for list="{{cols}}" as="c">
+          <div class="{{c.zone}}" onDragOver="{{c.over}}" onDragLeave="{{c.leave}}" onDrop="{{c.drop}}" style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:18px;background:rgba(148,197,255,.03);border:1px solid rgba(150,200,255,.08);min-height:560px">
+            <div style="display:flex;flex-direction:column;gap:8px;padding:2px 4px 6px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:13.5px">{{c.name}}</span><span class="chip">{{c.count}}</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#9AADC1"><span class="disp" style="color:#E7EEF6;font-size:14px;font-weight:600">{{c.val}}</span><span>{{c.prob}}</span></div>
+              <div style="height:3px;border-radius:3px;background:{{c.color}};box-shadow:0 0 10px {{c.color}}"></div>
+            </div>
+            <sc-for list="{{c.cards}}" as="d">
+              <div role="button" tabindex="0" draggable="{{d.drag}}" class="{{d.cls}} dealcard" onClick="{{d.open}}" onDragStart="{{d.start}}" aria-label="{{d.co}}, {{d.valF}}" style="flex-direction:column;align-items:stretch;gap:10px;padding:14px;background:rgba(11,20,34,.85);border-color:{{d.border}}">
+                <span style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-weight:700;font-size:13.5px;line-height:1.3">{{d.co}}</span><span class="av sm" style="background:{{d.oc}}" title="{{d.owner}}">{{d.oi}}</span></span>
+                <span class="disp" style="font-size:17px;font-weight:700">{{d.valF}}</span>
+                <span style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;color:#9AADC1"><span>{{d.contact}}</span><span class="{{d.ageCls}}">{{d.days}}d na etapa</span></span>
+              </div>
+            </sc-for>
+            <sc-if value="{{c.hasMore}}"><div style="font-size:12px;color:#7A8EA3;text-align:center;padding:8px">+ {{c.more}} negócios da base de demonstração</div></sc-if>
+            <sc-if value="{{c.empty}}"><div style="font-size:12px;color:#7A8EA3;text-align:center;padding:16px 8px">Sem negócios nesta etapa.</div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <sc-if value="{{hasSel}}">
+      <aside class="glass" style="flex:1 1 340px;max-width:100%;padding:22px;display:flex;flex-direction:column;gap:16px;border-color:rgba(95,224,240,.3)" aria-label="Detalhes do negócio">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div><div class="hud">Negócio · {{sel.stageName}}</div><h2 class="disp" style="margin:4px 0 0;font-size:22px">{{sel.co}}</h2></div>
+          <button class="icob" onClick="{{closeSel}}" aria-label="Fechar detalhes"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:10px"><span class="disp" style="font-size:30px;font-weight:700">{{sel.valF}}</span><span class="chip cy">{{sel.prob}} de chance</span></div>
+        <div style="display:flex;gap:4px" aria-label="Etapa atual">
+          <sc-for list="{{steps}}" as="s"><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="height:4px;border-radius:3px;background:{{s.bg}}"></div><span style="font-size:10.5px;color:{{s.tc}};font-weight:700">{{s.n}}</span></div></sc-for>
+        </div>
+        <sc-if value="{{sel.risk}}">
+          <div style="display:flex;gap:10px;padding:12px;border-radius:12px;background:rgba(255,154,98,.08);border:1px solid rgba(255,154,98,.3);font-size:13px;line-height:1.5"><span class="orb" style="width:18px;height:18px;flex-basis:18px;background:radial-gradient(circle,#FFD2B8,#FF9A62 60%)" aria-hidden="true"></span><span><b>Cosmo:</b> {{sel.days}} dias sem avanço. Sugestão: ligar para {{sel.contact}} hoje.</span></div>
+        </sc-if>
+        <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
+          <dt style="color:#9AADC1">Contato</dt><dd style="margin:0;font-weight:600"><a href="{{sel.contactHref}}" style="text-decoration:none">{{sel.contact}}</a> · {{sel.role}}</dd>
+          <dt style="color:#9AADC1">Responsável</dt><dd style="margin:0;font-weight:600">{{sel.owner}}</dd>
+          <dt style="color:#9AADC1">Próximo passo</dt><dd style="margin:0;font-weight:600">{{sel.next}}</dd>
+          <dt style="color:#9AADC1">Origem</dt><dd style="margin:0;font-weight:600">{{sel.src}}</dd>
+        </dl>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="hud">Linha do tempo</div>
+          <sc-for list="{{sel.tl}}" as="t">
+            <div style="display:flex;gap:10px;font-size:12.5px;line-height:1.45"><span style="width:7px;height:7px;margin-top:6px;border-radius:50%;background:#5FE0F0;flex:0 0 7px"></span><span style="flex:1;color:#C9D5E1">{{t.t}}</span><span style="color:#7A8EA3;white-space:nowrap">{{t.w}}</span></div>
+          </sc-for>
+          <sc-if value="{{sel.noTl}}"><div style="font-size:12.5px;color:#7A8EA3">Nenhuma atividade registrada neste negócio.</div></sc-if>
+        </div>
+        <sc-if value="{{sel.locked}}"><div style="font-size:12.5px;color:#9AADC1">Seu papel só permite consultar este negócio.</div></sc-if>
+        <sc-if value="{{sel.canEdit}}">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto">
+          <sc-if value="{{sel.canAdv}}"><button class="btn pri" onClick="{{advance}}" style="flex:1 1 100%">Avançar para {{sel.nextStage}}{{sel.advXp}}</button></sc-if>
+          <sc-if value="{{sel.isLast}}"><button class="btn pri" onClick="{{win}}" style="flex:1 1 100%;background:#5ADFA4">Marcar como ganho · +{{sel.winXp}} XP</button></sc-if>
+          <button class="btn" onClick="{{openAct}}" style="flex:1">Registrar atividade</button>
+          <button class="btn" onClick="{{openEdit}}">Editar</button>
+          <button class="btn" onClick="{{openLost}}">Perdido</button>
+          <sc-if value="{{canDel}}"><button class="btn ghost" onClick="{{delDeal}}">Excluir</button></sc-if>
+        </div>
+        </sc-if>
+      </aside>
+    </sc-if>
+  </div>
+  </sc-if>
+</main>
+
+<sc-if value="{{formOpen}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nd-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="nd-t" class="disp" style="margin:0;font-size:22px">{{formTitle}}</h2><button class="icob" data-close onClick="{{closeForm}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="nd-co">Empresa</label><input id="nd-co" class="inp" value="{{nCo}}" onChange="{{onCo}}" placeholder="Ex.: Mar Azul Turismo"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:14px">
+          <div><label class="lb" for="nd-v">Valor estimado (R$)</label><input id="nd-v" class="inp" value="{{nVal}}" onChange="{{onVal}}" inputmode="numeric" placeholder="25000"></div>
+          <div><label class="lb" for="nd-o">Responsável</label><select id="nd-o" class="inp" value="{{nOwner}}" onChange="{{onOwner}}"><sc-for list="{{owners}}" as="p"><option value="{{p.i}}">{{p.n}}</option></sc-for></select></div>
+        </div>
+        <div><label class="lb" for="nd-c">Contato principal</label><input id="nd-c" class="inp" value="{{nContact}}" onChange="{{onContact}}" placeholder="Nome do decisor"></div>
+        <sc-if value="{{isNew}}"><div style="font-size:12.5px;color:#9AADC1">Entra em <b style="color:#E7EEF6">Prospecção</b> com 10% de probabilidade. O Cosmo cria a primeira tarefa de contato para amanhã.</div></sc-if>
+        <sc-if value="{{hasFormErr}}"><div class="err" role="alert">{{formErr}}</div></sc-if>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeForm}}">Cancelar</button><button class="btn pri" onClick="{{saveDeal}}">{{formCta}}</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{actOpen}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ac-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="ac-t" class="disp" style="margin:0;font-size:22px">Registrar atividade</h2><button class="icob" data-close onClick="{{closeAct}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="ac-ty">Tipo</label><select id="ac-ty" class="inp" value="{{aType}}" onChange="{{onAType}}"><option value="Ligação">Ligação</option><option value="E-mail">E-mail</option><option value="Reunião">Reunião</option><option value="WhatsApp">WhatsApp</option></select></div>
+        <div><label class="lb" for="ac-n">O que aconteceu?</label><textarea id="ac-n" class="inp" rows="3" value="{{aNote}}" onChange="{{onANote}}" placeholder="Ex.: confirmou reunião para quinta"></textarea></div>
+        <div style="font-size:12.5px;color:#9AADC1">Vale +10 XP nas {{actCap}} primeiras atividades do dia.</div>
+        <sc-if value="{{hasActErr}}"><div class="err" role="alert">Descreva o que aconteceu.</div></sc-if>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeAct}}">Cancelar</button><button class="btn pri" onClick="{{saveAct}}">Registrar</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{lostOpen}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lo-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="lo-t" class="disp" style="margin:0;font-size:22px">Marcar como perdido</h2><button class="icob" data-close onClick="{{closeLost}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="lo-r">Motivo</label><select id="lo-r" class="inp" value="{{lReason}}" onChange="{{onLReason}}"><option value="Preço">Preço</option><option value="Escolheu concorrente">Escolheu concorrente</option><option value="Sem orçamento">Sem orçamento</option><option value="Sem resposta">Sem resposta</option><option value="Fora do perfil">Fora do perfil</option></select></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeLost}}">Cancelar</button><button class="btn pri" onClick="{{saveLost}}">Confirmar perda</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{funnelOpen}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="fu-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="fu-t" class="disp" style="margin:0;font-size:22px">Novo funil</h2><button class="icob" data-close onClick="{{closeFunnel}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="fu-n">Nome do funil</label><input id="fu-n" class="inp" value="{{fName}}" onChange="{{onFName}}" placeholder="Ex.: Parcerias"></div>
+        <div style="font-size:12.5px;color:#9AADC1">Usa as 5 etapas padrão.</div>
+        <sc-if value="{{hasFunnelErr}}"><div class="err" role="alert">{{funnelErr}}</div></sc-if>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeFunnel}}">Cancelar</button><button class="btn pri" onClick="{{saveFunnel}}">Criar funil</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = {
+    orgOpen: false, toast: null, filter: Orb.param('filter') || 'all', fid: Orb.data().funnels[0].id, sel: Orb.param('deal') || (Orb.openDeals().find((d) => d.d >= 10) || {}).id || null,
+    form: null, formErr: '', nCo: '', nVal: '', nOwner: 'CA', nContact: '',
+    actOpen: false, aType: 'Ligação', aNote: '', actErr: false, lostOpen: false, lReason: 'Preço', funnelOpen: false, fName: '', funnelErr: '', over: null
+  };
+  renderVals() {
+    const s = this.state;
+    const O = Orb.data(), S = Orb.SEED;
+    const CC = ['#2BB8CC', '#45CDE0', '#5FE0F0', '#ADA0FF', '#FF9A62'];
+    const NEXT = ['Agendar diagnóstico inicial', 'Reunião de descoberta com decisor', 'Revisar proposta com financeiro', 'Ajustar condições de pagamento', 'Assinatura do contrato'];
+    const T = Orb.totals();
+    const stats = Orb.funnelStats(s.fid);
+    const visible = (d) => (s.filter === 'mine' ? d.o === 'CA' : s.filter === 'risk' ? d.d >= 10 : true);
+    const person = (i) => Orb.person(i);
+    const cols = stats.map((c, i) => {
+      const cards = c.deals.filter(visible).map((d) => ({
+        co: d.co, valF: Orb.brl(d.v), contact: d.c, days: d.d, owner: person(d.o).n, oi: d.o === 'CA' ? Orb.ini(Orb.profile().name) : d.o, oc: person(d.o).c,
+        ageCls: d.d >= 10 ? 'chip or' : '', cls: s.sel === d.id ? 'rowb on' : 'rowb', border: s.sel === d.id ? 'rgba(95,224,240,.45)' : (d.d >= 10 ? 'rgba(255,154,98,.35)' : 'rgba(150,200,255,.1)'),
+        drag: Orb.dealEditable(d) ? 'true' : 'false',
+        open: () => this.setState({ sel: d.id }),
+        start: (e) => { e.dataTransfer.setData('text/plain', d.id); e.dataTransfer.effectAllowed = 'move'; }
+      }));
+      const more = s.filter === 'all' ? c.more : 0;
+      return { name: c.name, count: c.count, val: Orb.mil(c.sum), prob: Math.round(c.prob * 100) + '% prob.', color: CC[i], cards, more, hasMore: more > 0, empty: cards.length === 0 && more === 0,
+        zone: s.over === i ? 'dropzone' : '',
+        over: (e) => { e.preventDefault(); if (s.over !== i) this.setState({ over: i }); },
+        leave: (e) => { if (!e.currentTarget.contains(e.relatedTarget)) this.setState({ over: null }); },
+        drop: (e) => { e.preventDefault(); const r = Orb.moveDeal(e.dataTransfer.getData('text/plain'), i); this.setState({ over: null }); if (r.msg) Orb.flash(this, r.msg); } };
+    });
+
+    const D = O.deals.find((d) => d.id === s.sel && d.status === 'open' && Orb.dealVisible(d));
+    let sel = {}, steps = [];
+    if (D) {
+      const isLast = D.st === 4;
+      const contact = O.contacts.find((c) => c.name === D.c);
+      const editable = Orb.dealEditable(D);
+      sel = { co: D.co, valF: Orb.brl(D.v), prob: Math.round(S.probs[D.st] * 100) + '%', stageName: S.stages[D.st], contact: D.c, role: D.r, owner: person(D.o).n, src: D.src, next: NEXT[D.st], days: D.d, risk: D.d >= 10 && Orb.profile().prefs.cosmo,
+        contactHref: 'Contatos.dc.html' + (contact ? '?c=' + contact.id : ''), canEdit: editable, locked: !editable,
+        canAdv: !isLast, isLast, nextStage: S.stages[D.st + 1] || '', winXp: Orb.winXp(D.v), advXp: D.act ? ' · +25 XP' : ' · sem XP',
+        tl: D.log.map((l) => ({ t: l.t, w: Orb.ago(l.ts) })) };
+      sel.noTl = sel.tl.length === 0;
+      steps = S.stages.map((n, i) => ({ n: n.slice(0, 4) + '.', bg: i <= D.st ? CC[i] : 'rgba(150,200,255,.12)', tc: i === D.st ? '#E7EEF6' : '#7A8EA3' }));
+    }
+    const closed = O.deals.filter((d) => d.status !== 'open' && (d.f || 'b2b') === s.fid && Orb.dealVisible(d)).map((d) => ({ co: d.co, val: Orb.brl(d.v), res: d.status === 'won' ? 'Ganho' : 'Perdido', cls: d.status === 'won' ? 'chip gr' : 'chip rd', reason: d.reason || '—', owner: person(d.o).n, reopen: () => { Orb.reopenDeal(d.id); Orb.flash(this, d.co + ' reaberto'); } }));
+    const closedCount = O.deals.filter((d) => d.status !== 'open' && Orb.dealVisible(d)).length;
+    const funLim = Orb.plan().limits.funnels;
+
+    const openForm = (mode) => {
+      if (mode === 'edit') this.setState({ form: 'edit', formErr: '', nCo: D.co, nVal: String(D.v), nOwner: D.o, nContact: D.c });
+      else this.setState({ form: 'new', formErr: '', nCo: '', nVal: '', nOwner: 'CA', nContact: '' });
+    };
+    const saveDeal = () => {
+      const co = s.nCo.trim(), v = Number(s.nVal), c = s.nContact.trim();
+      if (!co) return this.setState({ formErr: 'Informe a empresa.' });
+      if (!v || v <= 0) return this.setState({ formErr: 'Informe um valor maior que zero.' });
+      if (!c) return this.setState({ formErr: 'Informe o contato principal.' });
+      if (s.form === 'edit') {
+        Object.assign(D, { co, v, o: s.nOwner, c });
+        D.log.unshift({ t: 'Negócio editado', ts: Date.now() });
+        Orb.save();
+        this.setState({ form: null });
+        return Orb.flash(this, 'Negócio atualizado');
+      }
+      const id = 'n' + Date.now();
+      O.deals.unshift({ id, co, v, st: 0, o: s.nOwner, c, r: 'Decisor', d: 0, src: 'Cadastro manual', f: s.fid, status: 'open', log: [{ t: 'Negócio criado', ts: Date.now() }], act: false });
+      O.tasks.push({ id: Date.now(), date: Orb.addDays(1), h: '09:00', t: 'Primeiro contato com ' + c, ctx: co + ' · Prospecção · criada pelo Cosmo', type: 'Ligação', xp: 10, done: false, seedDone: false, hi: false });
+      Orb.award('new-' + id, 10);
+      Orb.count('created');
+      Orb.save();
+      this.setState({ form: null, sel: id, filter: 'all' });
+      Orb.flash(this, co + ' criado em Prospecção · +10 XP · tarefa criada para amanhã');
+    };
+
+    return Object.assign(Orb.shell(this, 'Pipeline.dc.html'), {
+      funnelName: (O.funnels.find((f) => f.id === s.fid) || {}).name, month: Orb.monthName(), goal: Orb.brl(O.k.goal),
+      funnels: O.funnels.map((f) => ({ name: f.name, cls: f.id === s.fid ? 'on' : '', pick: () => this.setState({ fid: f.id }) })), canPipe: Orb.can('pipe'),
+      fAll: s.filter === 'all' ? 'on' : '', fMine: s.filter === 'mine' ? 'on' : '', fRisk: s.filter === 'risk' ? 'on' : '', fClosed: s.filter === 'closed' ? 'on' : '',
+      setAll: () => this.setState({ filter: 'all' }), setMine: () => this.setState({ filter: 'mine' }), setRisk: () => this.setState({ filter: 'risk' }), setClosed: () => this.setState({ filter: 'closed' }),
+      isClosed: s.filter === 'closed', isBoard: s.filter !== 'closed', closed, noClosed: closed.length === 0, closedCount,
+      riskCount: T.risk.length, totOpen: Orb.mil(T.open), totDeals: T.count, weighted: Orb.mil(T.weighted), wonVal: Orb.brl(T.won), wonCount: T.wonCount,
+      cols, hasSel: !!D, sel, steps, closeSel: () => this.setState({ sel: null }), canDel: Orb.can('del'),
+      advance: () => { const r = Orb.moveDeal(D.id, D.st + 1); this.setState({}); Orb.flash(this, r.msg); },
+      win: () => { const xp = Orb.closeDeal(D.id, 'won'); this.setState({ sel: null }); Orb.flash(this, 'Ganho! ' + D.co + ' · ' + Orb.brl(D.v) + ' · +' + xp + ' XP'); },
+      delDeal: () => { if (!window.confirm('Excluir ' + D.co + '? Esta ação não pode ser desfeita.')) return; O.deals = O.deals.filter((d) => d.id !== D.id); Orb.audit('Negócio excluído: ' + D.co); Orb.save(); this.setState({ sel: null }); Orb.flash(this, 'Negócio excluído'); },
+      actCap: 5, actOpen: s.actOpen, aType: s.aType, aNote: s.aNote, hasActErr: s.actErr, openAct: () => this.setState({ actOpen: true, aNote: '', actErr: false }), closeAct: () => this.setState({ actOpen: false }), onAType: (e) => this.setState({ aType: e.target.value }), onANote: (e) => this.setState({ aNote: e.target.value }),
+      saveAct: () => { if (!s.aNote.trim()) return this.setState({ actErr: true }); const xp = Orb.logActivity(D.id, s.aType, s.aNote.trim()); this.setState({ actOpen: false }); Orb.flash(this, xp ? 'Atividade registrada · +' + xp + ' XP' : 'Atividade registrada · limite diário de XP atingido'); },
+      lostOpen: s.lostOpen, lReason: s.lReason, openLost: () => this.setState({ lostOpen: true }), closeLost: () => this.setState({ lostOpen: false }), onLReason: (e) => this.setState({ lReason: e.target.value }),
+      saveLost: () => { Orb.closeDeal(D.id, 'lost', s.lReason); this.setState({ lostOpen: false, sel: null }); Orb.flash(this, D.co + ' marcado como perdido'); },
+      formOpen: !!s.form, isNew: s.form === 'new', formTitle: s.form === 'edit' ? 'Editar negócio' : 'Novo negócio', formCta: s.form === 'edit' ? 'Salvar' : 'Criar negócio · +10 XP', hasFormErr: !!s.formErr, formErr: s.formErr,
+      openNew: () => openForm('new'), openEdit: () => openForm('edit'), closeForm: () => this.setState({ form: null }), saveDeal,
+      owners: O.people.filter((p) => p.role !== 'Suporte' && p.role !== 'Leitor').map((p) => ({ i: p.i, n: person(p.i).n })),
+      nCo: s.nCo, nVal: s.nVal, nOwner: s.nOwner, nContact: s.nContact,
+      onCo: (e) => this.setState({ nCo: e.target.value }), onVal: (e) => this.setState({ nVal: e.target.value.replace(/\D/g, '') }), onOwner: (e) => this.setState({ nOwner: e.target.value }), onContact: (e) => this.setState({ nContact: e.target.value }),
+      funnelOpen: s.funnelOpen, fName: s.fName, hasFunnelErr: !!s.funnelErr, funnelErr: s.funnelErr,
+      openFunnel: () => { if (funLim !== null && O.funnels.length >= funLim) return Orb.flash(this, 'O plano ' + Orb.plan().n + ' permite ' + funLim + ' funil. Veja os planos para ter mais.'); this.setState({ funnelOpen: true, fName: '', funnelErr: '' }); },
+      closeFunnel: () => this.setState({ funnelOpen: false }), onFName: (e) => this.setState({ fName: e.target.value }),
+      saveFunnel: () => { const n = s.fName.trim(); if (!n) return this.setState({ funnelErr: 'Informe o nome.' }); if (O.funnels.some((f) => f.name.toLowerCase() === n.toLowerCase())) return this.setState({ funnelErr: 'Já existe um funil com este nome.' }); const id = 'f' + Date.now(); O.funnels.push({ id, name: n }); Orb.save(); this.setState({ funnelOpen: false, fid: id }); Orb.flash(this, 'Funil ' + n + ' criado'); }
+    });
+  }
+}
+</script>
+</body>
+</html>

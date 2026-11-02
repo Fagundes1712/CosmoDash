@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Contatos</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <a class="org hide-c hide-m" href="Equipe.dc.html" title="Trocar organização">
+    <span class="orgmark" style="background:#5FE0F0">VL</span>
+    <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">Vértice Labs</span><span style="display:block;font-size:11.5px;color:#9AADC1">Admin · Plano Pro</span></span>
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  </a>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Metas.dc.html" class="glass hide-c" style="padding:14px;border-radius:16px;text-decoration:none;color:#E7EEF6;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud" style="color:#ADA0FF">Nível 14 · Estrategista</span><span class="xp">2.340 / 3.000</span></div>
+      <div class="bar vi"><i style="width:78%"></i></div>
+      <div style="font-size:11.5px;color:#9AADC1">Faltam 660 XP para o Nível 15</div>
+    </a>
+    <a href="Perfil.dc.html" class="nav" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">CA</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">Cauã Augusto</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · Vértice Labs</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Comercial · Base de relacionamento</div><h1 class="h1">Contatos &amp; empresas</h1></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn">Importar CSV</button>
+      <button class="btn pri" onClick="{{addContact}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Novo contato</button>
+    </div>
+  </header>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+    <div class="seg" role="group" aria-label="Tipo de registro"><button class="{{tP}}" onClick="{{showP}}">Pessoas · {{nP}}</button><button class="{{tE}}" onClick="{{showE}}">Empresas · 8</button></div>
+    <label class="cmd" style="flex:1 1 280px;min-height:44px;border-radius:12px;padding:0 12px">
+      <svg class="ico s" viewBox="0 0 24 24" style="color:#7A8EA3" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"></path></svg>
+      <input type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Buscar por nome, empresa ou tag" aria-label="Buscar contatos">
+    </label>
+    <div class="seg" role="group" aria-label="Filtro de saúde"><button class="{{hA}}" onClick="{{hAll}}">Todos</button><button class="{{hL}}" onClick="{{hLow}}">Pulso baixo</button></div>
+  </div>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+    <section class="glass" style="flex:999 1 620px;min-width:0;padding:8px 6px">
+      <sc-if value="{{isP}}" hint-placeholder-val="{{true}}">
+        <div class="tblw">
+          <table class="tbl">
+            <thead><tr><th>Contato</th><th>Empresa</th><th>Negócio</th><th>Último contato</th><th>Pulso</th><th>Dono</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+                <tr class="{{r.cls}}" onClick="{{r.pick}}">
+                  <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{r.color}}">{{r.ini}}</span><div><div style="font-weight:700">{{r.name}}</div><div style="font-size:12px;color:#9AADC1">{{r.role}}</div></div></div></td>
+                  <td>{{r.co}}</td>
+                  <td><span class="{{r.stCls}}">{{r.stage}}</span></td>
+                  <td style="color:{{r.ageC}}">{{r.last}}</td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:56px"><i style="width:{{r.pw}};background:{{r.pc}};box-shadow:none"></i></div><span class="disp" style="font-weight:700;color:{{r.pc}}">{{r.p}}</span></div></td>
+                  <td><span class="av sm" style="background:{{r.oc}}" title="{{r.owner}}">{{r.oi}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <sc-if value="{{empty}}" hint-placeholder-val="{{false}}"><div style="padding:40px;text-align:center;color:#9AADC1">Nenhum contato encontrado para “{{q}}”.</div></sc-if>
+      </sc-if>
+      <sc-if value="{{isE}}" hint-placeholder-val="{{false}}">
+        <div class="tblw">
+          <table class="tbl">
+            <thead><tr><th>Empresa</th><th>Setor</th><th>Status</th><th>Contatos</th><th>Em aberto</th><th>Receita 12m</th></tr></thead>
+            <tbody>
+              <sc-for list="{{cos}}" as="c" hint-placeholder-count="8">
+                <tr class="rw"><td><div style="display:flex;align-items:center;gap:10px"><span class="orgmark" style="width:28px;height:28px;flex-basis:28px;font-size:11px;background:{{c.color}}">{{c.mk}}</span><b>{{c.name}}</b></div></td><td style="color:#9AADC1">{{c.sector}}</td><td><span class="{{c.stCls}}">{{c.status}}</span></td><td>{{c.n}}</td><td class="disp" style="font-weight:600">{{c.open}}</td><td class="disp" style="font-weight:600">{{c.rev}}</td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </sc-if>
+    </section>
+
+    <sc-if value="{{hasSel}}" hint-placeholder-val="{{true}}">
+      <aside class="glass" style="flex:1 1 340px;max-width:100%;padding:22px;display:flex;flex-direction:column;gap:16px" aria-label="Ficha do contato">
+        <div style="display:flex;gap:14px;align-items:center">
+          <span class="av lg" style="background:{{s.color}}">{{s.ini}}</span>
+          <div style="flex:1;min-width:0"><h2 class="disp" style="margin:0;font-size:21px">{{s.name}}</h2><div style="font-size:13px;color:#9AADC1">{{s.role}} · {{s.co}}</div></div>
+          <svg width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Pulso do relacionamento {{s.p}} de 100"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(150,200,255,.12)" stroke-width="5"></circle><circle cx="32" cy="32" r="26" fill="none" stroke="{{s.pc}}" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{s.dash}}" transform="rotate(-90 32 32)"></circle><text x="32" y="37" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="16">{{s.p}}</text></svg>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{s.tags}}" as="t" hint-placeholder-count="2"><span class="chip cy">{{t}}</span></sc-for></div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+          <button class="btn sm" onClick="{{act}}">Ligar</button><button class="btn sm" onClick="{{act}}">E-mail</button><button class="btn sm" onClick="{{act}}">WhatsApp</button><a class="btn sm" href="Tarefas.dc.html">Tarefa</a>
+        </div>
+        <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
+          <dt style="color:#9AADC1">E-mail</dt><dd style="margin:0;font-weight:600">{{s.email}}</dd>
+          <dt style="color:#9AADC1">Telefone</dt><dd style="margin:0;font-weight:600">{{s.phone}}</dd>
+          <dt style="color:#9AADC1">Responsável</dt><dd style="margin:0;font-weight:600">{{s.owner}}</dd>
+        </dl>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <a href="Pipeline.dc.html" style="padding:12px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);text-decoration:none;color:#E7EEF6"><div class="hud">Negócio</div><div style="font-weight:700;margin-top:4px">{{s.stage}}</div><div class="disp" style="color:#5FE0F0">{{s.val}}</div></a>
+          <a href="Suporte.dc.html" style="padding:12px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);text-decoration:none;color:#E7EEF6"><div class="hud">Suporte</div><div style="font-weight:700;margin-top:4px">{{s.tk}}</div><div style="font-size:12px;color:#9AADC1">{{s.tkSub}}</div></a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="hud">Interações recentes</div>
+          <sc-for list="{{s.tl}}" as="t" hint-placeholder-count="3"><div style="display:flex;gap:10px;font-size:12.5px;line-height:1.45"><span style="width:7px;height:7px;margin-top:6px;border-radius:50%;background:#5FE0F0;flex:0 0 7px"></span><span style="flex:1;color:#C9D5E1">{{t.t}}</span><span style="color:#7A8EA3;white-space:nowrap">{{t.w}}</span></div></sc-for>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(95,224,240,.06);border:1px solid rgba(95,224,240,.2);font-size:12.5px;line-height:1.5;color:#C9D5E1"><b style="color:#5FE0F0">Orion:</b> {{s.tip}}</div>
+      </aside>
+    </sc-if>
+  </div>
+</main>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { collapsed: false, tab: 'p', q: '', low: false, sel: 'helena', toast: null };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const CUR = 'Contatos.dc.html';
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task','3'],['Atendimento'],['Suporte.dc.html','Suporte interno','sup','23'],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === CUR ? 'nav on' : 'nav' });
+
+    const OW = { CA: ['Cauã Augusto', '#5FE0F0'], ML: ['Marina Lopes', '#FF9A62'], BK: ['Bianca Kato', '#ADA0FF'], LR: ['Lívia Ramos', '#5ADFA4'], RT: ['Rafael Torres', '#FF7A8A'] };
+    const PAL = ['#5FE0F0', '#FF9A62', '#ADA0FF', '#5ADFA4', '#F3D06E', '#FF7A8A'];
+    const C = [
+      ['helena', 'Helena Duarte', 'Dir. Comercial', 'Grupo Lumen', 'Negociação', 'R$ 48.000', 12, 42, 'CA', ['Cliente', 'Expansão'], '2 tickets abertos', 'SLA vence em 52 min', 'Pulso caiu 18 pontos em 2 semanas: 12 dias sem contato e 2 tickets abertos. Resolva o suporte antes de falar de preço.'],
+      ['andre', 'André Ferraz', 'CEO', 'Ferraz Logística', 'Proposta', 'R$ 31.000', 11, 51, 'CA', ['Decisor'], 'Sem tickets', 'Ainda não é cliente', 'Abriu a proposta 3 vezes ontem e não respondeu. Bom momento para uma ligação curta.'],
+      ['paula', 'Dra. Paula Reis', 'Sócia', 'Clínica Viva', 'Proposta', 'R$ 17.000', 14, 38, 'LR', ['Saúde'], 'Sem tickets', 'Ainda não é cliente', 'Maior tempo parado do funil. Ofereça uma demonstração com o caso de outra clínica.'],
+      ['bruno', 'Bruno Atlas', 'Sócio-diretor', 'Atlas Engenharia', 'Fechamento', 'R$ 62.000', 3, 86, 'CA', ['Decisor', 'Evento'], 'Sem tickets', 'Ainda não é cliente', 'Contrato com o jurídico deles desde quinta. Pergunte se falta alguma cláusula.'],
+      ['nina', 'Nina Castro', 'COO', 'Pátio Digital', 'Fechamento', 'R$ 38.000', 2, 81, 'LR', ['Inbound'], 'Sem tickets', 'Ainda não é cliente', 'Pediu início em 15/11. Confirme o onboarding com o time de suporte.'],
+      ['renata', 'Renata Alves', 'CFO', 'Vitta Farma', 'Qualificação', 'R$ 42.000', 3, 67, 'BK', ['Financeiro'], 'Sem tickets', 'Ainda não é cliente', 'Prioriza ROI: envie a calculadora de retorno antes da reunião.'],
+      ['sofia', 'Sofia Lemos', 'VP Digital', 'Banco Ária', 'Qualificação', 'R$ 58.000', 2, 72, 'ML', ['Enterprise'], 'Sem tickets', 'Ainda não é cliente', 'Exige revisão de segurança. Anexe o relatório de conformidade.'],
+      ['ricardo', 'Ricardo Nunes', 'CEO', 'Polo Têxtil', 'Negociação', 'R$ 71.000', 5, 74, 'ML', ['Indicação'], 'Sem tickets', 'Ainda não é cliente', 'Maior negócio aberto. Pediu parcelamento em 6x.'],
+      ['laura', 'Laura Brito', 'Gerente de Compras', 'Solaris Energia', 'Ganho hoje', 'R$ 54.000', 0, 92, 'BK', ['Cliente', 'Novo'], '0 tickets', 'Onboarding agendado', 'Cliente novo. Programe o check-in de 30 dias para garantir a adoção.'],
+      ['carla', 'Carla Menezes', 'Head de TI', 'Meridian Seguros', 'Prospecção', 'R$ 31.000', 1, 58, 'RT', ['Outbound'], 'Sem tickets', 'Ainda não é cliente', 'Respondeu ao 2º e-mail da cadência. Agende o diagnóstico.']
+    ].map((c, i) => ({ id: c[0], name: c[1], role: c[2], co: c[3], stage: c[4], val: c[5], days: c[6], p: c[7], o: c[8], tags: c[9], tk: c[10], tkSub: c[11], tip: c[12], color: PAL[i % 6] }));
+    const ini = (n) => n.replace('Dra. ', '').split(' ').map(w => w[0]).slice(0, 2).join('');
+    const pcol = (p) => p >= 75 ? '#5ADFA4' : p >= 55 ? '#F3D06E' : '#FF9A62';
+    const q = s.q.trim().toLowerCase();
+    const list = C.filter(c => (!q || (c.name + ' ' + c.co + ' ' + c.tags.join(' ')).toLowerCase().includes(q)) && (!s.low || c.p < 55));
+    const rows = list.map(c => ({ name: c.name, role: c.role, co: c.co, ini: ini(c.name), color: c.color, stage: c.stage, stCls: c.stage === 'Ganho hoje' ? 'chip gr' : 'chip cy', last: c.days === 0 ? 'hoje' : 'há ' + c.days + ' dias', ageC: c.days >= 10 ? '#FF9A62' : '#C9D5E1', p: c.p, pw: c.p + '%', pc: pcol(c.p), oi: c.o, oc: OW[c.o][1], owner: OW[c.o][0], cls: s.sel === c.id ? 'rw sel' : 'rw', pick: () => this.setState({ sel: c.id }) }));
+    const S = C.find(c => c.id === s.sel);
+    const sel = S ? { name: S.name, role: S.role, co: S.co, ini: ini(S.name), color: S.color, p: S.p, pc: pcol(S.p), dash: Math.round(S.p / 100 * 163.4) + ' 200', tags: S.tags, email: S.name.toLowerCase().replace('dra. ', '').split(' ')[0].normalize('NFD').replace(/[̀-ͯ]/g, '') + '@' + S.co.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z]/g, '') + '.com.br', phone: '+55 11 9' + (8000 + S.p * 17) + '-' + (1000 + S.p * 31), owner: OW[S.o][0], stage: S.stage, val: S.val, tk: S.tk, tkSub: S.tkSub, tip: S.tip,
+      tl: [{ t: 'E-mail aberto: “Proposta Órbita · ' + S.co + '”', w: S.days === 0 ? 'hoje' : S.days + 'd' }, { t: 'Reunião de 45 min com ' + OW[S.o][0], w: (S.days + 4) + 'd' }, { t: 'Contato criado via ' + (S.tags[1] || S.tags[0]), w: (S.days + 21) + 'd' }] } : {};
+    const COS = [['Grupo Lumen', 'GL', 'Varejo', 'Cliente', 3, 'R$ 48 mil', 'R$ 186 mil'], ['Solaris Energia', 'SE', 'Energia', 'Cliente', 2, '—', 'R$ 54 mil'], ['Atlas Engenharia', 'AE', 'Construção', 'Oportunidade', 2, 'R$ 62 mil', '—'], ['Polo Têxtil', 'PT', 'Indústria', 'Oportunidade', 1, 'R$ 71 mil', '—'], ['Banco Ária', 'BA', 'Financeiro', 'Oportunidade', 3, 'R$ 58 mil', '—'], ['Pátio Digital', 'PD', 'Tecnologia', 'Oportunidade', 1, 'R$ 38 mil', '—'], ['Ferraz Logística', 'FL', 'Logística', 'Oportunidade', 2, 'R$ 31 mil', '—'], ['Clínica Viva', 'CV', 'Saúde', 'Oportunidade', 1, 'R$ 17 mil', '—']]
+      .map((c, i) => ({ name: c[0], mk: c[1], sector: c[2], status: c[3], stCls: c[3] === 'Cliente' ? 'chip gr' : 'chip', n: c[4], open: c[5], rev: c[6], color: PAL[i % 6] }));
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6', toggle: () => this.setState({ collapsed: !s.collapsed }), nav,
+      tP: s.tab === 'p' ? 'on' : '', tE: s.tab === 'e' ? 'on' : '', showP: () => this.setState({ tab: 'p' }), showE: () => this.setState({ tab: 'e' }), isP: s.tab === 'p', isE: s.tab === 'e', nP: '1.284',
+      q: s.q, onQ: (e) => this.setState({ q: e.target.value }), hA: s.low ? '' : 'on', hL: s.low ? 'on' : '', hAll: () => this.setState({ low: false }), hLow: () => this.setState({ low: true }),
+      rows, empty: rows.length === 0, cos: COS, hasSel: !!S && s.tab === 'p', s: sel,
+      act: () => this.flash('Interação registrada com ' + (S ? S.name : '') + ' · +10 XP'),
+      addContact: () => this.flash('Formulário de contato aberto'),
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

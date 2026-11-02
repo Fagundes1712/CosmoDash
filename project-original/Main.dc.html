@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Dashboard</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <div class="hide-c hide-m" style="position:relative">
+    <button class="org" onClick="{{toggleOrg}}" aria-label="Trocar organização">
+      <span class="orgmark" style="background:{{org.color}}">{{org.mark}}</span>
+      <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">{{org.name}}</span><span style="display:block;font-size:11.5px;color:#9AADC1">{{org.role}} · Plano {{org.plan}}</span></span>
+      <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+    </button>
+    <sc-if value="{{orgOpen}}" hint-placeholder-val="{{false}}">
+      <div class="glass" style="position:absolute;left:0;right:0;top:58px;z-index:20;padding:8px;background:#0B1422;display:flex;flex-direction:column;gap:2px">
+        <div class="hud" style="padding:6px 8px">Suas organizações</div>
+        <sc-for list="{{orgList}}" as="o" hint-placeholder-count="3">
+          <button class="{{o.cls}}" onClick="{{o.pick}}" style="padding:8px">
+            <span class="orgmark" style="background:{{o.color}};width:28px;height:28px;flex-basis:28px;font-size:12px">{{o.mark}}</span>
+            <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13px">{{o.name}}</span><span style="display:block;font-size:11px;color:#9AADC1">{{o.role}} · {{o.plan}}</span></span>
+          </button>
+        </sc-for>
+        <a class="btn ghost sm" href="Equipe.dc.html" style="justify-content:flex-start">+ Nova organização</a>
+      </div>
+    </sc-if>
+  </div>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Metas.dc.html" class="glass hide-c" style="padding:14px;border-radius:16px;text-decoration:none;color:#E7EEF6;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud" style="color:#ADA0FF">Nível 14 · Estrategista</span><span class="xp">{{xpLabel}}</span></div>
+      <div class="bar vi"><i style="width:{{xpPct}}"></i></div>
+      <div style="font-size:11.5px;color:#9AADC1">Faltam {{xpLeft}} XP para o Nível 15</div>
+    </a>
+    <a href="Perfil.dc.html" class="nav" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">CA</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">Cauã Augusto</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · {{org.name}}</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top">
+    <div style="flex:0 1 auto;min-width:0">
+      <div class="hud">Sáb · 31 out 2026 · {{org.name}}</div>
+      <h1 class="h1">Boa tarde, Cauã</h1>
+    </div>
+    <label class="cmd" style="cursor:text">
+      <span class="orb" aria-hidden="true"></span>
+      <input type="text" value="{{q}}" onChange="{{onQ}}" onKeyDown="{{onKey}}" placeholder="Pergunte ao Orion — ex.: quais negócios estão em risco?" aria-label="Pergunte ao Orion">
+      <span class="kbd">⌘K</span>
+    </label>
+    <div style="display:flex;gap:10px;align-items:center">
+      <a href="Metas.dc.html" class="glass" style="display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;text-decoration:none;color:#E7EEF6;min-height:44px">
+        <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(150,200,255,.15)" stroke-width="3"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="#ADA0FF" stroke-width="3" stroke-linecap="round" stroke-dasharray="{{ringDash}}" transform="rotate(-90 20 20)"></circle><text x="20" y="25" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="13">14</text></svg>
+        <span style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px"><svg class="ico s" viewBox="0 0 24 24" style="color:#FF9A62" aria-hidden="true"><path d="M12 22c4 0 7-2.7 7-7 0-4-3-6.5-4-9.5-1.5 2-2.5 3-3.5 3C11 6 10 4 10 2 6.5 4.5 5 9 5 13.5 5 18.8 8 22 12 22z"></path></svg>6 dias</span>
+      </a>
+      <button class="icob lg" aria-label="Notificações" style="position:relative"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><span style="position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:#FF9A62;box-shadow:0 0 8px #FF9A62"></span></button>
+    </div>
+  </header>
+
+  <section class="grid-a" aria-label="Indicadores principais">
+    <div class="glass lift scan" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Receita do mês</span><span class="chip gr">{{k.delta}}</span></div>
+      <div class="disp" style="font-size:32px;font-weight:700;letter-spacing:.01em">{{k.rev}}</div>
+      <div class="bar"><i style="width:{{k.pctW}}"></i></div>
+      <div style="font-size:12.5px;color:#9AADC1">{{k.pct}}% {{k.meta}}</div>
+    </div>
+    <a href="Pipeline.dc.html" class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:12px;text-decoration:none;color:#E7EEF6">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Pipeline aberto</span><span class="chip cy">Ver funil</span></div>
+      <div class="disp" style="font-size:32px;font-weight:700">{{k.pipe}}</div>
+      <div style="display:flex;gap:3px;height:6px"><sc-for list="{{funnel}}" as="f" hint-placeholder-count="5"><span style="flex:{{f.n}};border-radius:4px;background:{{f.color}}"></span></sc-for></div>
+      <div style="font-size:12.5px;color:#9AADC1">{{k.deals}}</div>
+    </a>
+    <div class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Taxa de conversão</span><span class="{{k.convCls}}">{{k.convDelta}}</span></div>
+      <div class="disp" style="font-size:32px;font-weight:700">{{k.conv}}</div>
+      <svg viewBox="0 0 200 36" preserveAspectRatio="none" style="width:100%;height:36px" aria-hidden="true"><polyline points="{{k.spark}}" fill="none" stroke="#5FE0F0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline></svg>
+      <div style="font-size:12.5px;color:#9AADC1">Lead → ganho, últimos 90 dias</div>
+    </div>
+    <a href="Suporte.dc.html" class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:12px;text-decoration:none;color:#E7EEF6">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">SLA do suporte</span><span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#5ADFA4;font-weight:700"><span class="live"></span>ao vivo</span></div>
+      <div class="disp" style="font-size:32px;font-weight:700">{{k.sla}}</div>
+      <div class="bar gr"><i style="width:{{k.slaW}}"></i></div>
+      <div style="font-size:12.5px;color:#9AADC1">{{k.tickets}}</div>
+    </a>
+  </section>
+
+  <section class="split">
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div><h2 class="h2">Receita fechada por mês</h2><div style="font-size:12.5px;color:#9AADC1;margin-top:4px">Mai — Out 2026 · linha tracejada = meta mensal ({{k.metaShort}})</div></div>
+        <div style="display:flex;gap:14px;font-size:12px;color:#9AADC1;align-items:center"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#5FE0F0"></span>Mês atual</span><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:rgba(150,200,255,.3)"></span>Meses anteriores</span></div>
+      </div>
+      <div style="position:relative;height:230px;display:flex;align-items:flex-end;gap:18px;padding:0 4px;border-bottom:1px solid rgba(150,200,255,.14)">
+        <div style="position:absolute;left:0;right:0;bottom:{{metaLine}};border-top:1.5px dashed rgba(255,154,98,.7)"><span class="hud" style="position:absolute;right:0;top:-20px;color:#FF9A62">Meta</span></div>
+        <sc-for list="{{bars}}" as="b" hint-placeholder-count="6">
+          <div style="flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px" title="{{b.full}}">
+            <span style="font:600 12px 'Chakra Petch',sans-serif;color:{{b.lc}}">{{b.v}}</span>
+            <div style="width:min(56px,100%);height:{{b.h}};border-radius:10px 10px 4px 4px;background:{{b.bg}};box-shadow:{{b.sh}}"></div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:18px;padding:0 4px;margin-top:-8px"><sc-for list="{{bars}}" as="b" hint-placeholder-count="6"><span class="hud" style="flex:1;text-align:center">{{b.m}}</span></sc-for></div>
+    </div>
+
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(95,224,240,.22),transparent 65%);pointer-events:none"></div>
+      <div style="display:flex;align-items:center;gap:12px"><span class="orb" aria-hidden="true"></span><div><h2 class="h2">Orion</h2><div class="hud" style="font-size:10px">Assistente de vendas · {{org.name}}</div></div></div>
+      <div style="flex:1;min-height:150px;border-radius:14px;background:rgba(4,8,14,.5);border:1px solid rgba(150,200,255,.1);padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div class="hud" style="color:#5FE0F0">{{ans.title}}</div>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#D4DEE9;text-wrap:pretty">{{ans.text}}</p>
+        <sc-if value="{{ans.hasLink}}" hint-placeholder-val="{{true}}"><a class="btn sm" href="{{ans.href}}" style="align-self:flex-start">{{ans.cta}} →</a></sc-if>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{asks}}" as="a" hint-placeholder-count="3"><button class="{{a.cls}}" onClick="{{a.go}}">{{a.label}}</button></sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section class="tri">
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Funil · Vendas B2B</h2><a href="Pipeline.dc.html" style="font-size:12.5px;font-weight:700;text-decoration:none">Abrir →</a></div>
+      <sc-for list="{{funnel}}" as="f" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:600">{{f.stage}}</span><span style="color:#9AADC1">{{f.n}} · <span style="color:#E7EEF6;font-weight:700">{{f.val}}</span></span></div>
+          <div style="height:10px;border-radius:6px;background:rgba(150,200,255,.07)"><div style="height:100%;width:{{f.w}};border-radius:6px;background:{{f.color}}"></div></div>
+        </div>
+      </sc-for>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#9AADC1;padding-top:6px;border-top:1px solid rgba(150,200,255,.08)"><span>Ciclo médio 18 dias</span><span>Ticket médio R$ 27.490</span></div>
+    </div>
+
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Missões de hoje</h2><span class="hud">Renova às 00:00</span></div>
+      <sc-for list="{{missions}}" as="m" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.08)">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px"><span style="font-weight:600">{{m.t}}</span><span style="color:#9AADC1;white-space:nowrap">{{m.p}}</span></div>
+            <div class="bar or"><i style="width:{{m.w}}"></i></div>
+          </div>
+          <sc-if value="{{m.canClaim}}" hint-placeholder-val="{{false}}"><button class="btn sm pri" onClick="{{m.claim}}">+{{m.xp}} XP</button></sc-if>
+          <sc-if value="{{m.claimed}}" hint-placeholder-val="{{false}}"><span class="chip gr">Resgatado</span></sc-if>
+          <sc-if value="{{m.open}}" hint-placeholder-val="{{true}}"><span class="xp" style="min-width:58px;text-align:right">+{{m.xp}} XP</span></sc-if>
+        </div>
+      </sc-for>
+      <a href="Metas.dc.html" style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;border:1px dashed rgba(173,160,255,.35);text-decoration:none;color:#E7EEF6">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px"><span class="hud" style="color:#ADA0FF">Desafio de equipe · semana</span><span style="color:#9AADC1">74%</span></div>
+        <div style="font-size:13px;font-weight:600">Squad Ômega · R$ 120 mil em fechamentos</div>
+        <div class="bar vi"><i style="width:74%"></i></div>
+      </a>
+    </div>
+
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 class="h2">Ranking · Temporada Q4</h2>
+        <div class="seg"><button class="{{rkInd}}" onClick="{{showInd}}">Pessoas</button><button class="{{rkTeam}}" onClick="{{showTeam}}">Equipes</button></div>
+      </div>
+      <sc-for list="{{ranking}}" as="r" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:12px;background:{{r.bg}}">
+          <span class="disp" style="width:22px;font-weight:700;color:{{r.pc}}">{{r.pos}}</span>
+          <span class="av sm" style="background:{{r.color}}">{{r.ini}}</span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13px">{{r.name}}</span><span style="display:block;font-size:11.5px;color:#9AADC1">{{r.sub}}</span></span>
+          <span class="disp" style="font-weight:700;font-size:14px">{{r.xp}}</span>
+        </div>
+      </sc-for>
+      <div style="font-size:12px;color:#9AADC1;margin-top:auto">XP por resultado: negócios ganhos, SLA cumprido e atividades registradas. Visível apenas para sua organização.</div>
+    </div>
+  </section>
+
+  <section class="split">
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h2 class="h2">Atividade da equipe</h2><span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9AADC1"><span class="live"></span>tempo real</span></div>
+      <sc-for list="{{feed}}" as="f" hint-placeholder-count="5">
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(150,200,255,.06)">
+          <span class="av sm" style="background:{{f.color}}">{{f.ini}}</span>
+          <div style="flex:1;min-width:0;font-size:13.5px;line-height:1.45"><span style="font-weight:700">{{f.who}}</span> <span style="color:#B7C5D4">{{f.what}}</span></div>
+          <sc-if value="{{f.hasXp}}" hint-placeholder-val="{{false}}"><span class="xp">{{f.xp}}</span></sc-if>
+          <span style="font-size:12px;color:#7A8EA3;white-space:nowrap">{{f.when}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Próximas tarefas</h2><a href="Tarefas.dc.html" style="font-size:12.5px;font-weight:700;text-decoration:none">5 de 8 feitas →</a></div>
+      <sc-for list="{{tasks}}" as="t" hint-placeholder-count="3">
+        <a href="Tarefas.dc.html" class="rowb" style="text-decoration:none">
+          <span class="disp" style="font-size:13px;color:#5FE0F0;width:44px">{{t.h}}</span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-weight:600;font-size:13.5px">{{t.t}}</span><span style="display:block;font-size:12px;color:#9AADC1">{{t.s}}</span></span>
+          <span class="xp">+{{t.xp}}</span>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+</main>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { collapsed: false, org: 'v', orgOpen: false, ask: 'risco', q: '', claimed: {}, rank: 'ind', toast: null, bonus: 0 };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const CUR = 'Main.dc.html';
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task','3'],['Atendimento'],['Suporte.dc.html','Suporte interno','sup','23'],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === CUR ? 'nav on' : 'nav' });
+
+    const ORGS = {
+      v: { name: 'Vértice Labs', mark: 'VL', color: '#5FE0F0', role: 'Admin', plan: 'Pro',
+        k: { rev: 'R$ 412.380', meta: 'da meta de R$ 500.000', metaShort: 'R$ 500 mil', pct: 82, delta: '+11,2% vs set', pipe: 'R$ 1,07 mi', deals: '36 negócios abertos em 5 etapas', conv: '24,6%', convDelta: '+2,1 pp', up: true, sla: '94%', tickets: '23 tickets abertos · CSAT 4,7', spark: '0,30 33,28 66,29 100,22 133,20 166,14 200,8' },
+        bars: [268, 301, 287, 344, 371, 412], goal: 500, scale: 520,
+        fun: [['Prospecção', 12, 186], ['Qualificação', 9, 214], ['Proposta', 7, 298], ['Negociação', 5, 241], ['Fechamento', 3, 132]] },
+      n: { name: 'Nordtech Soluções', mark: 'NT', color: '#FF9A62', role: 'Gestor', plan: 'Business',
+        k: { rev: 'R$ 186.900', meta: 'da meta de R$ 240.000', metaShort: 'R$ 240 mil', pct: 78, delta: '+9,9% vs set', pipe: 'R$ 642 mil', deals: '21 negócios abertos em 5 etapas', conv: '19,8%', convDelta: '−0,7 pp', up: false, sla: '97%', tickets: '9 tickets abertos · CSAT 4,8', spark: '0,14 33,16 66,12 100,18 133,20 166,19 200,21' },
+        bars: [131, 142, 155, 149, 170, 187], goal: 240, scale: 250,
+        fun: [['Prospecção', 8, 118], ['Qualificação', 5, 142], ['Proposta', 4, 171], ['Negociação', 3, 129], ['Fechamento', 1, 82]] },
+      a: { name: 'Aurora Franquias', mark: 'AF', color: '#ADA0FF', role: 'Membro', plan: 'Starter',
+        k: { rev: 'R$ 98.450', meta: 'da meta de R$ 150.000', metaShort: 'R$ 150 mil', pct: 66, delta: '+8,2% vs set', pipe: 'R$ 310 mil', deals: '14 negócios abertos em 5 etapas', conv: '28,3%', convDelta: '+4,0 pp', up: true, sla: '89%', tickets: '31 tickets abertos · CSAT 4,4', spark: '0,32 33,30 66,26 100,24 133,18 166,15 200,10' },
+        bars: [61, 70, 74, 82, 91, 98], goal: 150, scale: 160,
+        fun: [['Prospecção', 5, 72], ['Qualificação', 4, 81], ['Proposta', 2, 66], ['Negociação', 2, 58], ['Fechamento', 1, 33]] }
+    };
+    const O = ORGS[s.org];
+    const k = Object.assign({}, O.k, { pctW: O.k.pct + '%', slaW: O.k.sla, convCls: O.k.up ? 'chip gr' : 'chip rd' });
+    const M = ['Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out'];
+    const bars = O.bars.map((v, i) => { const cur = i === 5; return { m: M[i], v: v + 'k', full: 'R$ ' + v + ' mil', h: Math.round(v / O.scale * 190) + 'px', bg: cur ? 'linear-gradient(180deg,#9CF4FB,#2BB8CC)' : 'rgba(150,200,255,.22)', sh: cur ? '0 0 24px rgba(95,224,240,.5)' : 'none', lc: cur ? '#5FE0F0' : '#9AADC1' }; });
+    const metaLine = Math.round(O.goal / O.scale * 190 + 0) + 'px';
+    const FC = ['#2BB8CC', '#45CDE0', '#5FE0F0', '#ADA0FF', '#FF9A62'];
+    const maxV = Math.max(...O.fun.map(f => f[2]));
+    const funnel = O.fun.map((f, i) => ({ stage: f[0], n: f[1], val: 'R$ ' + f[2] + ' mil', w: Math.round(f[2] / maxV * 100) + '%', color: FC[i] }));
+
+    const ANS = {
+      risco: { title: 'Negócios em risco', text: '3 negócios estão sem interação há mais de 10 dias e somam R$ 96 mil: Grupo Lumen (R$ 48 mil, Negociação, 12 dias), Ferraz Logística (R$ 31 mil, Proposta, 11 dias) e Clínica Viva (R$ 17 mil, Proposta, 14 dias). Sugiro um follow-up hoje para os três.', href: 'Pipeline.dc.html', cta: 'Abrir funil' },
+      semana: { title: 'Resumo da semana', text: '4 negócios ganhos (R$ 118 mil), 37 atividades registradas e 1ª resposta média de 11 min. A Squad Ômega subiu para o 2º lugar e está a 26% do desafio semanal.', href: 'Metas.dc.html', cta: 'Ver metas' },
+      prev: { title: 'Fechamento de outubro', text: 'O mês fecha hoje e faltam R$ 87.620 para a meta. Em Fechamento há 3 negócios somando R$ 132 mil: Atlas Engenharia (R$ 62 mil), Pátio Digital (R$ 38 mil) e Nobre Alimentos (R$ 32 mil). Fechar Atlas e Pátio já bate a meta.', href: 'Pipeline.dc.html', cta: 'Priorizar no funil' },
+      sup: { title: 'Suporte', text: '23 tickets abertos, 2 com SLA vencendo em menos de 1 hora (#4830 e #4827, ambos de Grupo Lumen). Vale alinhar com o Diego antes do follow-up comercial.', href: 'Suporte.dc.html', cta: 'Abrir fila' }
+    };
+    const ans = Object.assign({ hasLink: true }, ANS[s.ask] || ANS.risco);
+    const asks = [['risco', 'Negócios em risco'], ['prev', 'Previsão do mês'], ['semana', 'Resumo da semana'], ['sup', 'Status do suporte']].map(([id, label]) => ({ label, cls: s.ask === id ? 'btn sm pri' : 'btn sm', go: () => this.setState({ ask: id }) }));
+
+    const MS = [{ id: 'a', t: 'Avançar 2 negócios de etapa', p: '1/2', w: '50%', xp: 40, done: false }, { id: 'b', t: 'Registrar 5 atividades', p: '5/5', w: '100%', xp: 25, done: true }, { id: 'c', t: 'Responder leads em até 15 min', p: '4/4', w: '100%', xp: 30, done: true }];
+    const missions = MS.map(m => { const cl = !!s.claimed[m.id]; return Object.assign({}, m, { claimed: cl, canClaim: m.done && !cl, open: !m.done, claim: () => { this.setState({ claimed: Object.assign({}, s.claimed, { [m.id]: true }), bonus: s.bonus + m.xp }); this.flash('+' + m.xp + ' XP · missão concluída'); } }); });
+
+    const xp = 2340 + s.bonus;
+    const IND = [['Marina Lopes', 'ML', '#FF9A62', 'Head de Vendas · Squad Alfa', '9.870'], ['Bianca Kato', 'BK', '#ADA0FF', 'Closer · Squad Alfa', '8.420'], ['Cauã Augusto', 'CA', '#5FE0F0', 'Você · Squad Ômega', (7960 + s.bonus).toLocaleString('pt-BR')], ['Lívia Ramos', 'LR', '#5ADFA4', 'Closer · Squad Ômega', '7.110'], ['Diego Almeida', 'DA', '#F3D06E', 'Suporte · Atendimento', '6.880']];
+    const TEAM = [['Squad Alfa', 'SA', '#FF9A62', 'Marina, Bianca, Rafael', '24.820'], ['Squad Ômega', 'SΩ', '#5FE0F0', 'Cauã, Lívia, Thiago', (20310 + s.bonus).toLocaleString('pt-BR')], ['Atendimento', 'AT', '#F3D06E', 'Diego, Júlia', '12.640']];
+    const ranking = (s.rank === 'ind' ? IND : TEAM).map((r, i) => { const me = r[0] === 'Cauã Augusto' || r[0] === 'Squad Ômega'; return { pos: i + 1, name: r[0], ini: r[1], color: r[2], sub: r[3], xp: r[4], bg: me ? 'rgba(95,224,240,.08)' : 'transparent', pc: i === 0 ? '#F3D06E' : '#7A8EA3' }; });
+
+    const feed = [['BK', '#ADA0FF', 'Bianca Kato', 'ganhou Solaris Energia · R$ 54.000', '+180 XP', 'há 12 min'], ['DA', '#F3D06E', 'Diego Almeida', 'resolveu o ticket #4821 dentro do SLA', '+20 XP', 'há 26 min'], ['RT', '#FF7A8A', 'Rafael Torres', 'agendou reunião com Ferraz Logística', '', 'há 1 h'], ['ML', '#FF9A62', 'Marina Lopes', 'desbloqueou a conquista Fechadora de Elite', '', 'há 2 h'], ['CA', '#5FE0F0', 'Você', 'moveu Atlas Engenharia para Fechamento', '+25 XP', 'há 3 h']].map(f => ({ ini: f[0], color: f[1], who: f[2], what: f[3], xp: f[4], hasXp: !!f[4], when: f[5] }));
+    const tasks = [['17:00', 'Enviar proposta revisada', 'Ferraz Logística · Proposta', 15], ['17:30', 'Follow-up por WhatsApp', 'Clínica Viva · Proposta', 10], ['18:00', 'Revisar contrato', 'Atlas Engenharia · Fechamento', 20]].map(t => ({ h: t[0], t: t[1], s: t[2], xp: t[3] }));
+
+    const orgList = Object.keys(ORGS).map(id => ({ name: ORGS[id].name, mark: ORGS[id].mark, color: ORGS[id].color, role: ORGS[id].role, plan: ORGS[id].plan, cls: id === s.org ? 'rowb on' : 'rowb', pick: () => { this.setState({ org: id, orgOpen: false }); this.flash('Você está em ' + ORGS[id].name); } }));
+
+    const pick = (txt) => { const t = (txt || '').toLowerCase(); if (t.includes('risco') || t.includes('parad')) return 'risco'; if (t.includes('seman') || t.includes('resumo')) return 'semana'; if (t.includes('suporte') || t.includes('ticket')) return 'sup'; return 'prev'; };
+
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6',
+      toggle: () => this.setState({ collapsed: !s.collapsed }), toggleOrg: () => this.setState({ orgOpen: !s.orgOpen }),
+      nav, org: O, orgOpen: s.orgOpen, orgList, k, bars, metaLine, funnel, ans, asks, missions, ranking, feed, tasks,
+      rkInd: s.rank === 'ind' ? 'on' : '', rkTeam: s.rank === 'team' ? 'on' : '',
+      showInd: () => this.setState({ rank: 'ind' }), showTeam: () => this.setState({ rank: 'team' }),
+      xpLabel: xp.toLocaleString('pt-BR') + ' / 3.000', xpPct: Math.min(100, xp / 30) + '%', xpLeft: Math.max(0, 3000 - xp), ringDash: Math.round(xp / 3000 * 100.5) + ' 200',
+      q: s.q, onQ: (e) => this.setState({ q: e.target.value }), onKey: (e) => { if (e.key === 'Enter') this.setState({ ask: pick(s.q), q: '' }); },
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

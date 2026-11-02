@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Órbita CRM · Contatos</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Comercial · Base de relacionamento</div><h1 class="h1">Contatos &amp; empresas</h1></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <sc-if value="{{canExp}}"><button class="btn" onClick="{{exportCsv}}">Exportar CSV</button></sc-if>
+      <label class="btn" for="csv" style="cursor:pointer">Importar CSV</label>
+      <input id="csv" type="file" accept=".csv,text/csv" onChange="{{importCsv}}" style="position:absolute;width:1px;height:1px;opacity:0" aria-label="Importar arquivo CSV de contatos">
+      <button class="btn pri" onClick="{{openNew}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Novo contato</button>
+    </div>
+  </header>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+    <div class="seg" role="group" aria-label="Tipo de registro"><button class="{{tP}}" onClick="{{showP}}">Pessoas · {{nP}}</button><button class="{{tE}}" onClick="{{showE}}">Empresas · {{nE}}</button></div>
+    <label class="cmd" style="flex:1 1 280px;min-height:44px;border-radius:12px;padding:0 12px">
+      <svg class="ico s" viewBox="0 0 24 24" style="color:#7A8EA3" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"></path></svg>
+      <input type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Buscar por nome, empresa ou tag" aria-label="Buscar contatos">
+    </label>
+    <div class="seg" role="group" aria-label="Filtro de saúde"><button class="{{hA}}" onClick="{{hAll}}">Todos</button><button class="{{hL}}" onClick="{{hLow}}">Pulso baixo</button></div>
+  </div>
+
+  <sc-if value="{{hasImportErr}}">
+    <div class="err" role="alert"><b>{{importSummary}}</b><sc-for list="{{importErrs}}" as="x"><div>{{x}}</div></sc-for></div>
+  </sc-if>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+    <section class="glass" style="flex:999 1 620px;min-width:0;padding:8px 6px">
+      <sc-if value="{{isP}}">
+        <div class="tblw">
+          <table class="tbl">
+            <thead><tr><th>Contato</th><th>Empresa</th><th>Negócio</th><th>Último contato</th><th>Pulso</th><th>Dono</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r">
+                <tr class="{{r.cls}}" tabindex="0" onClick="{{r.pick}}">
+                  <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{r.color}}">{{r.ini}}</span><div><div style="font-weight:700">{{r.name}}</div><div style="font-size:12px;color:#9AADC1">{{r.role}}</div></div></div></td>
+                  <td>{{r.co}}</td>
+                  <td><span class="{{r.stCls}}">{{r.stage}}</span></td>
+                  <td style="color:{{r.ageC}}">{{r.last}}</td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:56px"><i style="width:{{r.pw}};background:{{r.pc}};box-shadow:none"></i></div><span class="disp" style="font-weight:700;color:{{r.pc}}">{{r.p}}</span></div></td>
+                  <td><span class="av sm" style="background:{{r.oc}}" title="{{r.owner}}">{{r.oi}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <sc-if value="{{empty}}"><div style="padding:40px;text-align:center;color:#9AADC1">Nenhum contato encontrado.</div></sc-if>
+        <sc-if value="{{hasBase}}"><div style="padding:12px 14px;font-size:12px;color:#7A8EA3">Mostrando {{shown}} de {{nP}}. Os outros {{base}} contatos são a base simulada desta demonstração.</div></sc-if>
+      </sc-if>
+      <sc-if value="{{isE}}">
+        <div class="tblw">
+          <table class="tbl">
+            <thead><tr><th>Empresa</th><th>Setor</th><th>Status</th><th>Contatos</th><th>Em aberto</th><th>Receita 12m</th></tr></thead>
+            <tbody>
+              <sc-for list="{{cos}}" as="c">
+                <tr class="{{c.cls}}" tabindex="0" onClick="{{c.pick}}"><td><div style="display:flex;align-items:center;gap:10px"><span class="orgmark" style="width:28px;height:28px;flex-basis:28px;font-size:11px;background:{{c.color}}">{{c.mk}}</span><b>{{c.name}}</b></div></td><td style="color:#9AADC1">{{c.sector}}</td><td><span class="{{c.stCls}}">{{c.status}}</span></td><td>{{c.n}}</td><td class="disp" style="font-weight:600">{{c.open}}</td><td class="disp" style="font-weight:600">{{c.rev}}</td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <sc-if value="{{noCos}}"><div style="padding:40px;text-align:center;color:#9AADC1">Nenhuma empresa encontrada.</div></sc-if>
+      </sc-if>
+    </section>
+
+    <sc-if value="{{hasSel}}">
+      <aside class="glass" style="flex:1 1 340px;max-width:100%;padding:22px;display:flex;flex-direction:column;gap:16px" aria-label="Ficha do contato">
+        <div style="display:flex;gap:14px;align-items:center">
+          <span class="av lg" style="background:{{s.color}}">{{s.ini}}</span>
+          <div style="flex:1;min-width:0"><h2 class="disp" style="margin:0;font-size:21px">{{s.name}}</h2><div style="font-size:13px;color:#9AADC1">{{s.role}} · {{s.co}}</div></div>
+          <svg width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Pulso do relacionamento {{s.p}} de 100"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(150,200,255,.12)" stroke-width="5"></circle><circle cx="32" cy="32" r="26" fill="none" stroke="{{s.pc}}" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{s.dash}}" transform="rotate(-90 32 32)"></circle><text x="32" y="37" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="16">{{s.p}}</text></svg>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{s.tags}}" as="t"><span class="chip cy">{{t}}</span></sc-for></div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+          <button class="btn sm" onClick="{{callIt}}">Ligar</button><button class="btn sm" onClick="{{mailIt}}">E-mail</button><button class="btn sm" onClick="{{zapIt}}">WhatsApp</button><a class="btn sm" href="{{s.taskHref}}">Tarefa</a>
+        </div>
+        <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
+          <dt style="color:#9AADC1">E-mail</dt><dd style="margin:0;font-weight:600;word-break:break-all">{{s.email}}</dd>
+          <dt style="color:#9AADC1">Telefone</dt><dd style="margin:0;font-weight:600">{{s.phone}}</dd>
+          <dt style="color:#9AADC1">Responsável</dt><dd style="margin:0;font-weight:600">{{s.owner}}</dd>
+        </dl>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <a href="{{s.dealHref}}" style="padding:12px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);text-decoration:none;color:#E7EEF6"><div class="hud">Negócio</div><div style="font-weight:700;margin-top:4px">{{s.stage}}</div><div class="disp" style="color:#5FE0F0">{{s.val}}</div></a>
+          <a href="Suporte.dc.html" style="padding:12px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);text-decoration:none;color:#E7EEF6"><div class="hud">Suporte</div><div style="font-weight:700;margin-top:4px">{{s.tk}}</div><div style="font-size:12px;color:#9AADC1">{{s.tkSub}}</div></a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="hud">Interações recentes</div>
+          <sc-for list="{{s.tl}}" as="t"><div style="display:flex;gap:10px;font-size:12.5px;line-height:1.45"><span style="width:7px;height:7px;margin-top:6px;border-radius:50%;background:#5FE0F0;flex:0 0 7px"></span><span style="flex:1;color:#C9D5E1">{{t.t}}</span><span style="color:#7A8EA3;white-space:nowrap">{{t.w}}</span></div></sc-for>
+          <sc-if value="{{s.noTl}}"><div style="font-size:12.5px;color:#7A8EA3">Nenhuma interação registrada.</div></sc-if>
+        </div>
+        <sc-if value="{{s.showTip}}"><div style="padding:12px;border-radius:12px;background:rgba(95,224,240,.06);border:1px solid rgba(95,224,240,.2);font-size:12.5px;line-height:1.5;color:#C9D5E1"><b style="color:#5FE0F0">Cosmo:</b> {{s.tip}}</div></sc-if>
+        <div style="display:flex;gap:8px"><button class="btn sm" onClick="{{openEdit}}">Editar</button><sc-if value="{{canDel}}"><button class="btn sm ghost" onClick="{{delIt}}">Excluir</button></sc-if></div>
+      </aside>
+    </sc-if>
+  </div>
+</main>
+
+<sc-if value="{{formOpen}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nc-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="nc-t" class="disp" style="margin:0;font-size:22px">{{formTitle}}</h2><button class="icob" data-close onClick="{{closeForm}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="nc-n">Nome</label><input id="nc-n" class="inp" value="{{fName}}" onChange="{{onF.name}}"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:14px">
+          <div><label class="lb" for="nc-e">E-mail</label><input id="nc-e" class="inp" type="email" value="{{fEmail}}" onChange="{{onF.email}}"></div>
+          <div><label class="lb" for="nc-p">Telefone</label><input id="nc-p" class="inp" value="{{fPhone}}" onChange="{{onF.phone}}" placeholder="+55 11 90000-0000"></div>
+          <div><label class="lb" for="nc-c">Empresa</label><input id="nc-c" class="inp" value="{{fCo}}" onChange="{{onF.co}}"></div>
+          <div><label class="lb" for="nc-r">Cargo</label><input id="nc-r" class="inp" value="{{fRole}}" onChange="{{onF.role}}"></div>
+        </div>
+        <sc-if value="{{hasFormErr}}"><div class="err" role="alert">{{formErr}}</div></sc-if>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeForm}}">Cancelar</button><button class="btn pri" onClick="{{saveContact}}">Salvar</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null, tab: 'p', q: '', low: false, co: '', sel: Orb.param('c') || (Orb.data().contacts[0] || {}).id || null, form: null, f: {}, formErr: '', impOk: 0, impFail: [] };
+  renderVals() {
+    const s = this.state;
+    const O = Orb.data();
+    const PAL = ['#5FE0F0', '#FF9A62', '#ADA0FF', '#5ADFA4', '#F3D06E', '#FF7A8A'];
+    const deals = O.deals;
+    const dealOf = (c) => deals.find((d) => d.status === 'open' && (d.c === c.name || d.co === c.co));
+    const view = (c, i) => {
+      const d = dealOf(c);
+      return Object.assign({}, c, { color: PAL[i % 6], stage: d ? Orb.SEED.stages[d.st] : c.stage || 'Sem negócio', val: d ? Orb.brl(d.v) : '—', deal: d });
+    };
+    const pcol = (p) => (p >= 75 ? '#5ADFA4' : p >= 55 ? '#F3D06E' : '#FF9A62');
+    const C = O.contacts.map(view);
+    const q = s.q.trim().toLowerCase();
+    const matchQ = (c) => !q || (c.name + ' ' + c.co + ' ' + c.tags.join(' ')).toLowerCase().includes(q);
+    const list = C.filter((c) => matchQ(c) && (!s.low || c.p < 55) && (!s.co || c.co === s.co));
+    const rows = list.map((c) => ({ name: c.name, role: c.role, co: c.co, ini: Orb.ini(c.name), color: c.color, stage: c.stage, stCls: c.stage === 'Cliente' ? 'chip gr' : c.stage === 'Sem negócio' ? 'chip' : 'chip cy', last: c.days === 0 ? 'hoje' : 'há ' + c.days + ' dias', ageC: c.days >= 10 ? '#FF9A62' : '#C9D5E1', p: c.p, pw: c.p + '%', pc: pcol(c.p), oi: c.o === 'CA' ? Orb.ini(Orb.profile().name) : c.o, oc: Orb.person(c.o).c, owner: Orb.person(c.o).n, cls: s.sel === c.id ? 'rw sel' : 'rw', pick: () => this.setState({ sel: c.id }) }));
+    const S = list.find((c) => c.id === s.sel);
+    let sel = {};
+    if (S) {
+      const tickets = O.tickets.filter((t) => t.status === 'open' && t.org.split(' · ')[0] === S.co);
+      const next = tickets.map((t) => Orb.slaInfo(t)).sort((a, b) => a.min - b.min)[0];
+      sel = { name: S.name, role: S.role, co: S.co, ini: Orb.ini(S.name), color: S.color, p: S.p, pc: pcol(S.p), dash: Math.round(S.p / 100 * 163.4) + ' 200', tags: S.tags, email: S.email, phone: S.phone || '—', owner: Orb.person(S.o).n, stage: S.stage, val: S.val,
+        dealHref: 'Pipeline.dc.html' + (S.deal ? '?deal=' + S.deal.id : ''), taskHref: 'Tarefas.dc.html?new=' + encodeURIComponent('Falar com ' + S.name),
+        tk: tickets.length ? tickets.length + (tickets.length > 1 ? ' tickets abertos' : ' ticket aberto') : 'Sem tickets', tkSub: next ? 'SLA: ' + next.txt : 'Nada pendente',
+        tip: S.tip, showTip: Orb.profile().prefs.cosmo, tl: S.tl.map((t) => ({ t: t.t, w: Orb.ago(t.ts) })) };
+      sel.noTl = sel.tl.length === 0;
+    }
+    const interact = (type) => {
+      S.days = 0; S.p = Math.min(100, S.p + 3);
+      const raw = O.contacts.find((c) => c.id === S.id);
+      raw.days = 0; raw.p = S.p; raw.tl.unshift({ t: type + ' registrado(a)', ts: Date.now() });
+      if (S.deal) { S.deal.d = 0; S.deal.act = true; S.deal.log.unshift({ t: type + ' com ' + S.name, ts: Date.now() }); }
+      const xp = Orb.activityXp();
+      Orb.save();
+      Orb.flash(this, 'Interação registrada com ' + S.name + (xp ? ' · +' + xp + ' XP' : ' · limite diário de XP atingido'));
+    };
+    // Contatos de demonstração têm número fictício: só registra, sem abrir link para um número que pode existir.
+    const reach = (type, url) => { if (S && !S.seed && url) window.open(url, '_blank', 'noopener'); interact(type); };
+    const digits = S ? (S.phone || '').replace(/\D/g, '') : '';
+
+    const names = [...new Set(O.companies.map((c) => c[0]).concat(C.map((c) => c.co)))].filter((n) => n !== 'Sem empresa');
+    const COS = names.filter((n) => !q || n.toLowerCase().includes(q)).map((n, i) => {
+      const seed = O.companies.find((c) => c[0] === n) || [n, '—', 'Oportunidade', '—'];
+      const open = deals.filter((d) => d.status === 'open' && d.co === n).reduce((a, d) => a + d.v, 0);
+      return { name: n, mk: Orb.ini(n), sector: seed[1], status: seed[2], stCls: seed[2] === 'Cliente' ? 'chip gr' : 'chip', n: C.filter((c) => c.co === n).length, open: open ? Orb.mil(open) : '—', rev: seed[3], color: PAL[i % 6], cls: 'rw', pick: () => this.setState({ tab: 'p', co: n, q: '', low: false, sel: (C.find((c) => c.co === n) || {}).id || null }) };
+    });
+    const openForm = (mode) => this.setState({ form: mode, formErr: '', f: mode === 'edit' ? { name: S.name, email: S.email, phone: S.phone, co: S.co, role: S.role } : {} });
+    const onF = {};
+    ['name', 'email', 'phone', 'co', 'role'].forEach((k) => { onF[k] = (e) => this.setState({ f: Object.assign({}, s.f, { [k]: e.target.value }) }); });
+    const saveContact = () => {
+      if (s.form === 'edit') {
+        if (!(s.f.name || '').trim()) return this.setState({ formErr: 'Informe o nome.' });
+        if (!Orb.validEmail(s.f.email)) return this.setState({ formErr: 'Informe um e-mail válido.' });
+        const raw = O.contacts.find((c) => c.id === S.id);
+        Object.assign(raw, { name: s.f.name.trim(), email: s.f.email.trim(), phone: (s.f.phone || '').trim(), co: (s.f.co || '').trim() || 'Sem empresa', role: (s.f.role || '').trim() || '—' });
+        Orb.save();
+        this.setState({ form: null });
+        return Orb.flash(this, 'Contato atualizado');
+      }
+      const r = Orb.addContact(s.f);
+      if (r.errors.length) return this.setState({ formErr: r.errors[0] });
+      this.setState({ form: null, sel: r.contact.id, q: '', low: false, co: '' });
+      Orb.flash(this, r.contact.name + ' adicionado');
+    };
+    const download = (name, text) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + text], { type: 'text/csv' })); a.download = name; a.click(); URL.revokeObjectURL(a.href); };
+    const csvCell = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+
+    return Object.assign(Orb.shell(this, 'Contatos.dc.html'), {
+      tP: s.tab === 'p' ? 'on' : '', tE: s.tab === 'e' ? 'on' : '', showP: () => this.setState({ tab: 'p', co: '' }), showE: () => this.setState({ tab: 'e' }), isP: s.tab === 'p', isE: s.tab === 'e',
+      nP: Orb.num(Orb.contactsCount()), nE: names.length, shown: rows.length, base: Orb.num(O.contactsBase || 0), hasBase: (O.contactsBase || 0) > 0,
+      q: s.q, onQ: (e) => this.setState({ q: e.target.value }), hA: s.low ? '' : 'on', hL: s.low ? 'on' : '', hAll: () => this.setState({ low: false }), hLow: () => this.setState({ low: true }),
+      rows, empty: rows.length === 0, cos: COS, noCos: COS.length === 0, hasSel: !!S && s.tab === 'p', s: sel, canDel: Orb.can('del'), canExp: Orb.can('exp'),
+      callIt: () => reach('Ligação', digits ? 'tel:+' + digits : ''), mailIt: () => reach('E-mail', S ? 'mailto:' + S.email : ''), zapIt: () => reach('WhatsApp', digits ? 'https://wa.me/' + digits : ''),
+      delIt: () => { if (!window.confirm('Excluir ' + S.name + '? Esta ação não pode ser desfeita.')) return; O.contacts = O.contacts.filter((c) => c.id !== S.id); Orb.audit('Contato excluído: ' + S.name); Orb.save(); this.setState({ sel: null }); Orb.flash(this, 'Contato excluído'); },
+      formOpen: !!s.form, formTitle: s.form === 'edit' ? 'Editar contato' : 'Novo contato', hasFormErr: !!s.formErr, formErr: s.formErr, openNew: () => openForm('new'), openEdit: () => openForm('edit'), closeForm: () => this.setState({ form: null }), saveContact, onF,
+      fName: s.f.name || '', fEmail: s.f.email || '', fPhone: s.f.phone || '', fCo: s.f.co || '', fRole: s.f.role || '',
+      importCsv: async (e) => { const file = e.target.files[0]; if (!file) return; const r = Orb.importCSV(await file.text()); e.target.value = ''; this.setState({ impOk: r.ok, impFail: r.fail }); Orb.flash(this, r.ok + ' contatos importados' + (r.fail.length ? ' · ' + r.fail.length + ' com erro' : '')); },
+      hasImportErr: s.impFail.length > 0, importSummary: s.impOk + ' importados, ' + s.impFail.length + ' com erro. A primeira linha do CSV precisa ter as colunas nome e email.', importErrs: s.impFail.slice(0, 5),
+      exportCsv: () => { download('contatos.csv', ['nome,email,telefone,empresa,cargo'].concat(O.contacts.map((c) => [c.name, c.email, c.phone, c.co, c.role].map(csvCell).join(','))).join('\n')); Orb.flash(this, 'Exportação concluída'); }
+    });
+  }
+}
+</script>
+</body>
+</html>

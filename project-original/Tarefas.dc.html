@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Tarefas</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <a class="org hide-c hide-m" href="Equipe.dc.html" title="Trocar organização">
+    <span class="orgmark" style="background:#5FE0F0">VL</span>
+    <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">Vértice Labs</span><span style="display:block;font-size:11.5px;color:#9AADC1">Admin · Plano Pro</span></span>
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  </a>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Metas.dc.html" class="glass hide-c" style="padding:14px;border-radius:16px;text-decoration:none;color:#E7EEF6;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud" style="color:#ADA0FF">Nível 14 · Estrategista</span><span class="xp">{{xpLabel}}</span></div>
+      <div class="bar vi"><i style="width:{{xpPct}}"></i></div>
+      <div style="font-size:11.5px;color:#9AADC1">Faltam {{xpLeft}} XP para o Nível 15</div>
+    </a>
+    <a href="Perfil.dc.html" class="nav" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">CA</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">Cauã Augusto</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · Vértice Labs</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Comercial · Sáb, 31 out</div><h1 class="h1">Tarefas</h1></div>
+    <div class="seg" role="group" aria-label="Período"><button class="{{vH}}" onClick="{{setH}}">Hoje</button><button class="{{vS}}" onClick="{{setS}}">Próximos dias</button><button class="{{vA}}" onClick="{{setA}}">Atrasadas · 1</button></div>
+  </header>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+    <section style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:16px">
+      <form class="glass" onSubmit="{{add}}" style="display:flex;gap:10px;padding:10px;border-radius:16px;align-items:center;flex-wrap:wrap">
+        <label for="nt" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nova tarefa</label>
+        <input id="nt" class="inp" style="flex:1 1 240px;border:0;background:transparent" value="{{draft}}" onChange="{{onDraft}}" placeholder="Adicionar tarefa — ex.: ligar para Sofia Lemos amanhã às 10h">
+        <select class="inp" style="width:auto;flex:0 0 auto" value="{{dType}}" onChange="{{onType}}" aria-label="Tipo"><option value="Ligação">Ligação</option><option value="E-mail">E-mail</option><option value="Reunião">Reunião</option><option value="Follow-up">Follow-up</option></select>
+        <button class="btn pri" type="submit">Adicionar</button>
+      </form>
+
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+        <div class="glass" style="padding:16px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 10px"><span class="hud" style="color:{{g.c}}">{{g.name}}</span><span style="font-size:12px;color:#9AADC1">{{g.sum}}</span></div>
+          <sc-for list="{{g.items}}" as="t" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:14px;opacity:{{t.op}}">
+              <button class="{{t.chk}}" onClick="{{t.flip}}" aria-label="{{t.aria}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></button>
+              <span class="disp" style="font-size:13px;color:#5FE0F0;width:44px">{{t.h}}</span>
+              <span style="flex:1;min-width:0"><span style="display:block;font-weight:600;font-size:14px;text-decoration:{{t.td}}">{{t.t}}</span><span style="display:block;font-size:12px;color:#9AADC1">{{t.ctx}}</span></span>
+              <span class="{{t.typeCls}}">{{t.type}}</span>
+              <sc-if value="{{t.hi}}" hint-placeholder-val="{{false}}"><span class="chip or">Alta</span></sc-if>
+              <span class="xp" style="width:52px;text-align:right">+{{t.xp}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </section>
+
+    <aside style="flex:1 1 300px;display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="glass scan" style="padding:22px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+        <div class="hud">Progresso de hoje</div>
+        <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="{{doneN}} de {{totalN}} tarefas concluídas">
+          <circle cx="75" cy="75" r="62" fill="none" stroke="rgba(150,200,255,.1)" stroke-width="10"></circle>
+          <circle cx="75" cy="75" r="62" fill="none" stroke="#5FE0F0" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{dash}}" transform="rotate(-90 75 75)" style="filter:drop-shadow(0 0 8px rgba(95,224,240,.6));transition:stroke-dasharray .4s"></circle>
+          <circle cx="75" cy="75" r="48" fill="none" stroke="rgba(150,200,255,.08)" stroke-width="1" stroke-dasharray="2 5"></circle>
+          <text x="75" y="80" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="32">{{doneN}}/{{totalN}}</text>
+          <text x="75" y="102" text-anchor="middle" fill="#9AADC1" font-family="Manrope" font-weight="600" font-size="12">concluídas</text>
+        </svg>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%">
+          <div style="padding:12px;border-radius:12px;background:rgba(4,8,14,.45)"><div class="xp" style="font-size:20px">+{{xpToday}}</div><div style="font-size:11.5px;color:#9AADC1">XP hoje</div></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(4,8,14,.45)"><div class="disp" style="font-size:20px;font-weight:700;color:#FF9A62">6 dias</div><div style="font-size:11.5px;color:#9AADC1">sequência</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#9AADC1;line-height:1.5">{{hint}}</div>
+      </div>
+
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+        <h2 class="h2">Equipe hoje</h2>
+        <sc-for list="{{team}}" as="m" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="font-weight:600">{{m.n}}</span><span style="color:#9AADC1">{{m.p}}</span></div><div class="bar"><i style="width:{{m.w}}"></i></div></div></div>
+        </sc-for>
+      </div>
+
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:#C9D5E1;line-height:1.5">
+        <h2 class="h2" style="margin-bottom:4px">Como as tarefas pontuam</h2>
+        <div style="display:flex;justify-content:space-between"><span>Ligação ou e-mail registrado</span><span class="xp">+10</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Reunião realizada</span><span class="xp">+15</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Tarefa de alta prioridade no prazo</span><span class="xp">+20</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Fechar o dia com tudo concluído</span><span class="xp">+30</span></div>
+        <div style="color:#7A8EA3;font-size:11.5px">Tarefas concluídas com atraso valem metade. Tarefas apagadas não somam.</div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = {
+    collapsed: false, view: 'h', draft: '', dType: 'Ligação', toast: null, bonus: 0,
+    tasks: [
+      { id: 1, day: 'h', p: 'Manhã', h: '09:00', t: 'Daily comercial', ctx: 'Squad Ômega · 15 min', type: 'Reunião', xp: 5, done: true },
+      { id: 2, day: 'h', p: 'Manhã', h: '09:30', t: 'Ligar para Bruno Atlas — status do contrato', ctx: 'Atlas Engenharia · Fechamento', type: 'Ligação', xp: 10, done: true },
+      { id: 3, day: 'h', p: 'Manhã', h: '11:00', t: 'Responder 4 leads novos do site', ctx: 'Fila de inbound · SLA 15 min', type: 'E-mail', xp: 30, done: true, hi: true },
+      { id: 4, day: 'h', p: 'Tarde', h: '14:00', t: 'Reunião de descoberta com Rafael', ctx: 'Meridian Seguros · Prospecção', type: 'Reunião', xp: 15, done: true },
+      { id: 5, day: 'h', p: 'Tarde', h: '15:30', t: 'Atualizar previsão de outubro', ctx: 'Relatório para Marina Lopes', type: 'Follow-up', xp: 5, done: true },
+      { id: 6, day: 'h', p: 'Fim do dia', h: '17:00', t: 'Enviar proposta revisada', ctx: 'Ferraz Logística · Proposta', type: 'E-mail', xp: 15, done: false, hi: true },
+      { id: 7, day: 'h', p: 'Fim do dia', h: '17:30', t: 'Follow-up por WhatsApp', ctx: 'Clínica Viva · apoio à Lívia', type: 'Follow-up', xp: 10, done: false },
+      { id: 8, day: 'h', p: 'Fim do dia', h: '18:00', t: 'Revisar contrato', ctx: 'Atlas Engenharia · Fechamento', type: 'Follow-up', xp: 20, done: false, hi: true },
+      { id: 9, day: 's', p: 'Seg, 2 nov', h: '09:30', t: 'Ligar para Helena Duarte', ctx: 'Grupo Lumen · Negociação · após resolver tickets', type: 'Ligação', xp: 10, done: false, hi: true },
+      { id: 10, day: 's', p: 'Seg, 2 nov', h: '11:00', t: 'Kickoff de onboarding', ctx: 'Solaris Energia · com Diego (suporte)', type: 'Reunião', xp: 15, done: false },
+      { id: 11, day: 's', p: 'Ter, 3 nov', h: '15:00', t: 'Apresentar proposta final', ctx: 'Pátio Digital · com Lívia', type: 'Reunião', xp: 15, done: false },
+      { id: 12, day: 'a', p: 'Venceu em 29 out', h: '—', t: 'Enviar pesquisa NPS trimestral', ctx: 'Grupo Lumen · Cliente', type: 'E-mail', xp: 5, done: false }
+    ]
+  };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const today = s.tasks.filter(t => t.day === 'h');
+    const doneN = today.filter(t => t.done).length, totalN = today.length, pending = totalN - doneN;
+    const CUR = 'Tarefas.dc.html';
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task',pending ? String(pending) : ''],['Atendimento'],['Suporte.dc.html','Suporte interno','sup','23'],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === CUR ? 'nav on' : 'nav' });
+
+    const TC = { 'Ligação': 'chip cy', 'E-mail': 'chip vi', 'Reunião': 'chip yl', 'Follow-up': 'chip' };
+    const vis = s.tasks.filter(t => t.day === s.view);
+    const order = []; vis.forEach(t => { if (!order.includes(t.p)) order.push(t.p); });
+    const groups = order.map(p => {
+      const items = vis.filter(t => t.p === p);
+      const d = items.filter(t => t.done).length;
+      return { name: p, c: s.view === 'a' ? '#FF9A62' : '#7A8EA3', sum: d + ' de ' + items.length + ' concluídas', items: items.map(t => ({
+        h: t.h, t: t.t, ctx: t.ctx, type: t.type, typeCls: TC[t.type], xp: t.xp, hi: !!t.hi && !t.done,
+        chk: t.done ? 'chk on' : 'chk', op: t.done ? '.55' : '1', td: t.done ? 'line-through' : 'none', aria: (t.done ? 'Desmarcar ' : 'Concluir ') + t.t,
+        flip: () => {
+          const tasks = s.tasks.map(x => x.id === t.id ? Object.assign({}, x, { done: !x.done }) : x);
+          const nowDone = !t.done;
+          const allDone = tasks.filter(x => x.day === 'h').every(x => x.done);
+          const gain = nowDone ? t.xp + (allDone && t.day === 'h' ? 30 : 0) : -t.xp;
+          this.setState({ tasks, bonus: s.bonus + gain });
+          if (nowDone) this.flash(allDone && t.day === 'h' ? 'Dia completo! +' + t.xp + ' XP e bônus de +30 XP' : 'Tarefa concluída · +' + t.xp + ' XP');
+        }
+      })) };
+    });
+    const xpToday = 65 + s.bonus;
+    const xp = 2340 + s.bonus;
+    const C = 2 * Math.PI * 62;
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6', toggle: () => this.setState({ collapsed: !s.collapsed }), nav,
+      xpLabel: xp.toLocaleString('pt-BR') + ' / 3.000', xpPct: Math.min(100, xp / 30) + '%', xpLeft: Math.max(0, 3000 - xp),
+      vH: s.view === 'h' ? 'on' : '', vS: s.view === 's' ? 'on' : '', vA: s.view === 'a' ? 'on' : '',
+      setH: () => this.setState({ view: 'h' }), setS: () => this.setState({ view: 's' }), setA: () => this.setState({ view: 'a' }),
+      groups, doneN, totalN, dash: Math.round(doneN / totalN * C) + ' 400', xpToday,
+      hint: pending ? 'Conclua as ' + pending + ' tarefas restantes para fechar o dia e ganhar +30 XP de bônus.' : 'Dia completo. Sua sequência sobe para 7 dias à meia-noite.',
+      team: [['Marina Lopes', 'ML', '#FF9A62', 7, 7], ['Bianca Kato', 'BK', '#ADA0FF', 6, 8], ['Lívia Ramos', 'LR', '#5ADFA4', 4, 6], ['Rafael Torres', 'RT', '#FF7A8A', 9, 11], ['Diego Almeida', 'DA', '#F3D06E', 12, 14]].map(m => ({ n: m[0], i: m[1], c: m[2], p: m[3] + '/' + m[4], w: Math.round(m[3] / m[4] * 100) + '%' })),
+      draft: s.draft, dType: s.dType, onDraft: (e) => this.setState({ draft: e.target.value }), onType: (e) => this.setState({ dType: e.target.value }),
+      add: (e) => { e.preventDefault(); const t = s.draft.trim(); if (!t) return; const nt = { id: Date.now(), day: 'h', p: 'Fim do dia', h: '19:00', t, ctx: 'Criada agora · sem vínculo', type: s.dType, xp: 10, done: false }; this.setState({ tasks: s.tasks.concat([nt]), draft: '', view: 'h' }); this.flash('Tarefa adicionada para hoje'); },
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Órbita CRM · Equipe &amp; acessos</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Administração · {{org.name}}</div><h1 class="h1">Equipe &amp; acessos</h1></div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div class="glass" style="padding:8px 14px;border-radius:12px;display:flex;align-items:center;gap:12px;min-width:220px">
+        <div style="flex:1"><div style="font-size:12px;color:#9AADC1;margin-bottom:6px">Assentos · Plano {{org.planName}}</div><div class="{{seatBar}}"><i style="width:{{seatW}}"></i></div></div>
+        <span class="disp" style="font-weight:700">{{seatsLabel}}</span>
+      </div>
+      <sc-if value="{{canUsers}}"><button class="btn pri" onClick="{{openInv}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6"></path></svg>Convidar pessoas</button></sc-if>
+    </div>
+  </header>
+
+  <sc-if value="{{readOnly}}"><div style="padding:12px 14px;border-radius:12px;background:rgba(243,208,110,.08);border:1px solid rgba(243,208,110,.3);font-size:13px">Seu papel nesta organização é {{org.role}}: você pode consultar a equipe, mas só quem tem a permissão Gerenciar usuários altera acessos.</div></sc-if>
+
+  <div class="seg" role="group" aria-label="Seções" style="align-self:flex-start;flex-wrap:wrap">
+    <button class="{{tM}}" onClick="{{setM}}">Membros · {{memberN}}</button>
+    <button class="{{tC}}" onClick="{{setC}}">Convites · {{invN}}</button>
+    <button class="{{tP}}" onClick="{{setP}}">Permissões</button>
+    <button class="{{tA}}" onClick="{{setA}}">Auditoria</button>
+    <button class="{{tO}}" onClick="{{setO}}">Organizações · {{orgN}}</button>
+  </div>
+
+  <sc-if value="{{isM}}">
+    <section class="glass" style="padding:8px 6px">
+      <div class="tblw"><table class="tbl">
+        <thead><tr><th>Pessoa</th><th>Papel</th><th>Squad</th><th>Nível</th><th>Último acesso</th><th>2FA</th><th></th></tr></thead>
+        <tbody>
+          <sc-for list="{{members}}" as="m">
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div><div style="font-weight:700">{{m.n}}</div><div style="font-size:12px;color:#9AADC1">{{m.e}}</div></div></div></td>
+              <td><sc-if value="{{m.locked}}"><span class="chip cy">{{m.roleLabel}}</span></sc-if><sc-if value="{{m.editable}}"><select class="inp" style="height:36px;width:140px;font-size:13px" value="{{m.role}}" onChange="{{m.setRole}}" aria-label="Papel de {{m.n}}"><option value="Admin">Admin</option><option value="Gestor">Gestor</option><option value="Vendedor">Vendedor</option><option value="Suporte">Suporte</option><option value="Leitor">Leitor</option></select></sc-if></td>
+              <td style="color:#C9D5E1">{{m.sq}}</td>
+              <td><span class="disp" style="font-weight:700;color:#ADA0FF">Nv {{m.lv}}</span></td>
+              <td style="color:#9AADC1">{{m.last}}</td>
+              <td><span class="{{m.tfaCls}}">{{m.tfa}}</span></td>
+              <td style="text-align:right"><sc-if value="{{m.editable}}"><button class="btn sm ghost" onClick="{{m.remove}}">Remover</button></sc-if></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table></div>
+      <sc-if value="{{hidMembers}}"><div style="padding:12px 14px;font-size:12px;color:#7A8EA3">Mais {{hidMembers}} pessoas na base simulada desta demonstração.</div></sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{isC}}">
+    <section class="glass" style="padding:18px;display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{invites}}" as="v">
+        <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);flex-wrap:wrap">
+          <span class="av sm" style="background:rgba(150,200,255,.2);color:#E7EEF6">@</span>
+          <div style="flex:1 1 220px;min-width:0"><div style="font-weight:700">{{v.e}}</div><div style="font-size:12px;color:#9AADC1">{{v.role}} · {{v.sq}} · enviado {{v.sent}}</div></div>
+          <span class="chip yl">Expira em {{v.exp}}</span>
+          <sc-if value="{{canUsers}}"><button class="btn sm" onClick="{{v.resend}}">Reenviar</button><button class="btn sm ghost" onClick="{{v.cancel}}">Cancelar</button></sc-if>
+        </div>
+      </sc-for>
+      <sc-if value="{{noInv}}"><div style="padding:30px;text-align:center;color:#9AADC1">Nenhum convite pendente.</div></sc-if>
+      <div style="font-size:12.5px;color:#9AADC1;padding:4px">Convites pendentes ocupam um assento até expirarem (7 dias). Demonstração: nenhum e-mail é enviado de verdade.</div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{isP}}">
+    <section class="glass" style="padding:8px 6px">
+      <sc-if value="{{permLocked}}"><div style="margin:8px;padding:12px 14px;border-radius:12px;background:rgba(255,154,98,.08);border:1px solid rgba(255,154,98,.3);font-size:13px">{{permMsg}} <sc-if value="{{showUpsell}}"><a href="Planos.dc.html" style="font-weight:700">Ver planos →</a></sc-if></div></sc-if>
+      <div class="tblw"><table class="tbl">
+        <thead><tr><th>Permissão</th><sc-for list="{{roles}}" as="r"><th style="text-align:center">{{r}}</th></sc-for></tr></thead>
+        <tbody>
+          <sc-for list="{{matrix}}" as="p">
+            <tr><td><div style="font-weight:600">{{p.n}}</div><div style="font-size:12px;color:#9AADC1">{{p.d}}</div></td>
+              <sc-for list="{{p.cells}}" as="c"><td style="text-align:center"><button class="{{c.cls}}" onClick="{{c.flip}}" aria-label="{{c.aria}}" aria-pressed="{{c.on}}" disabled="{{c.dis}}" style="margin:0 auto;opacity:{{c.op}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></button></td></sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table></div>
+      <div style="font-size:12.5px;color:#9AADC1;padding:12px 14px">Admin tem acesso total e não pode ser editado.</div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{isA}}">
+    <section class="glass" style="padding:8px 6px">
+      <sc-if value="{{auditLocked}}"><div style="margin:8px;padding:12px 14px;border-radius:12px;background:rgba(255,154,98,.08);border:1px solid rgba(255,154,98,.3);font-size:13px">O log de auditoria faz parte do plano Business. <a href="Planos.dc.html" style="font-weight:700">Ver planos →</a></div></sc-if>
+      <sc-if value="{{auditOpen}}">
+        <div class="tblw"><table class="tbl"><thead><tr><th>Quando</th><th>Quem</th><th>Ação</th></tr></thead><tbody><sc-for list="{{audit}}" as="a"><tr><td style="color:#9AADC1;white-space:nowrap">{{a.when}}</td><td>{{a.who}}</td><td>{{a.text}}</td></tr></sc-for></tbody></table></div>
+        <sc-if value="{{noAudit}}"><div style="padding:30px;text-align:center;color:#9AADC1">Nenhuma ação registrada ainda.</div></sc-if>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{isO}}">
+    <section class="grid-a">
+      <sc-for list="{{orgs}}" as="o">
+        <div class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:14px;border-color:{{o.bd}}">
+          <div style="display:flex;gap:12px;align-items:center"><span class="orgmark" style="background:{{o.color}};width:44px;height:44px;flex-basis:44px;font-size:16px">{{o.mark}}</span><div><div style="font-weight:700;font-size:15px">{{o.name}}</div><div style="font-size:12px;color:#9AADC1">{{o.role}} · Plano {{o.plan}}</div></div></div>
+          <div style="display:flex;gap:16px;font-size:12.5px;color:#9AADC1"><span><b style="color:#E7EEF6">{{o.members}}</b> membros</span><span><b style="color:#E7EEF6">{{o.deals}}</b> negócios abertos</span></div>
+          <sc-if value="{{o.isCur}}"><span class="chip gr" style="align-self:flex-start">Organização atual</span></sc-if>
+          <sc-if value="{{o.canEnter}}"><button class="btn sm" onClick="{{o.enter}}" style="align-self:flex-start">Entrar nesta organização</button></sc-if>
+        </div>
+      </sc-for>
+      <button class="glass" onClick="{{openOrg}}" style="padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;border-style:dashed;color:#9AADC1;cursor:pointer;min-height:170px;font:inherit">
+        <span class="icob" style="border-radius:50%"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span>
+        <span style="font-weight:700;color:#E7EEF6">Criar organização</span><span style="font-size:12px">Dados, equipe e cobrança separados</span>
+      </button>
+    </section>
+  </sc-if>
+</main>
+
+<sc-if value="{{invOpen}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="inv-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="inv-t" class="disp" style="margin:0;font-size:22px">Convidar para {{org.name}}</h2><button class="icob" data-close onClick="{{closeInv}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="iv-e">E-mails (separe por vírgula)</label><input id="iv-e" class="inp" value="{{ivE}}" onChange="{{onIvE}}" placeholder="nome@empresa.com.br"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:14px">
+          <div><label class="lb" for="iv-r">Papel</label><select id="iv-r" class="inp" value="{{ivR}}" onChange="{{onIvR}}"><option value="Vendedor">Vendedor</option><option value="Gestor">Gestor</option><option value="Suporte">Suporte</option><option value="Leitor">Leitor</option></select></div>
+          <div><label class="lb" for="iv-s">Squad</label><select id="iv-s" class="inp" value="{{ivS}}" onChange="{{onIvS}}"><sc-for list="{{squadList}}" as="q"><option value="{{q}}">{{q}}</option></sc-for></select></div>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(95,224,240,.06);border:1px solid rgba(95,224,240,.2);font-size:12.5px;line-height:1.5;color:#C9D5E1">{{ivHint}}</div>
+        <sc-if value="{{hasInvErr}}"><div class="err" role="alert">{{invErr}}</div></sc-if>
+        <sc-if value="{{full}}"><a href="Planos.dc.html" style="font-size:13px;font-weight:700">Assentos esgotados: ver planos com mais assentos →</a></sc-if>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeInv}}">Cancelar</button><button class="btn pri" onClick="{{sendInv}}">Enviar convite</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{orgFormOpen}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="no-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="no-t" class="disp" style="margin:0;font-size:22px">Nova organização</h2><button class="icob" data-close onClick="{{closeOrg}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="no-n">Nome</label><input id="no-n" class="inp" value="{{orgName}}" onChange="{{onOrgName}}" placeholder="Ex.: Mar Azul Turismo"></div>
+        <div style="font-size:12.5px;color:#9AADC1">Começa vazia, no plano Starter, com você como Admin.</div>
+        <sc-if value="{{hasOrgErr}}"><div class="err" role="alert">Informe o nome da organização.</div></sc-if>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeOrg}}">Cancelar</button><button class="btn pri" onClick="{{createOrg}}">Criar</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null, tab: Orb.param('tab') || 'm', invOpen: false, ivE: '', ivR: 'Vendedor', ivS: Orb.data().squads[0], invErr: '', orgForm: Orb.param('new') === '1', orgName: '', orgErr: false };
+  renderVals() {
+    const s = this.state;
+    const O = Orb.data(), S = Orb.SEED, db = Orb.db();
+    const canUsers = Orb.can('users');
+    const name = (p) => Orb.person(p.i).n;
+    const members = O.people.map((m) => ({ i: m.i === 'CA' ? Orb.ini(Orb.profile().name) : m.i, n: name(m), e: m.e, sq: m.sq, lv: m.i === 'CA' ? Orb.level().lvl : m.lv, last: m.last, tfa: m.tfa ? 'Ativo' : 'Pendente', tfaCls: m.tfa ? 'chip gr' : 'chip or', c: m.c, role: m.role,
+      locked: m.i === 'CA' || !canUsers, editable: m.i !== 'CA' && canUsers, roleLabel: m.role + (m.i === 'CA' ? ' · você' : ''),
+      setRole: (e) => {
+        const v = e.target.value;
+        if (m.role === 'Admin' && v !== 'Admin' && O.people.filter((p) => p.role === 'Admin').length === 1) { this.setState({}); return Orb.flash(this, 'A organização precisa ter ao menos um Admin'); }
+        Orb.audit(name(m) + ': papel de ' + m.role + ' para ' + v); m.role = v; Orb.save(); Orb.flash(this, name(m) + ' agora é ' + v);
+      },
+      remove: () => {
+        if (m.role === 'Admin' && O.people.filter((p) => p.role === 'Admin').length === 1) return Orb.flash(this, 'A organização precisa ter ao menos um Admin');
+        if (!window.confirm('Remover ' + name(m) + ' de ' + O.name + '? Os negócios continuam registrados em nome dessa pessoa.')) return;
+        O.people = O.people.filter((p) => p.i !== m.i); Orb.audit(name(m) + ' removido(a) da organização'); Orb.save(); Orb.flash(this, name(m) + ' removido(a) · assento liberado');
+      } }));
+    const seats = Orb.seatsUsed();
+    const lim = Orb.plan().limits.seats;
+    const full = lim !== null && seats >= lim;
+    const business = Orb.isBusiness();
+    const permEditable = business && canUsers;
+    const matrix = S.permissions.map((p) => ({ n: p[1], d: p[2], cells: O.perms[p[0]].map((v, i) => ({ cls: v ? 'chk on' : 'chk', on: v ? 'true' : 'false', dis: i === 0 || !permEditable, op: i === 0 ? '.6' : permEditable ? '1' : '.75', aria: (v ? 'Remover ' : 'Conceder ') + p[1] + ' para ' + S.roles[i],
+      flip: () => { const row = O.perms[p[0]]; row[i] = row[i] ? 0 : 1; Orb.audit(S.roles[i] + ': ' + p[1] + (row[i] ? ' concedido' : ' removido')); Orb.save(); Orb.flash(this, S.roles[i] + ': ' + p[1] + (row[i] ? ' concedido' : ' removido')); } })) }));
+    const invites = O.invites.map((v) => Object.assign({}, v, { resend: () => { v.exp = '7 dias'; v.sent = 'hoje'; Orb.save(); Orb.flash(this, 'Convite reenviado para ' + v.e); }, cancel: () => { O.invites = O.invites.filter((x) => x.id !== v.id); Orb.audit('Convite cancelado: ' + v.e); Orb.save(); Orb.flash(this, 'Convite cancelado · assento liberado'); } }));
+    const orgs = Object.keys(db.orgs).map((id) => { const o = db.orgs[id]; return { name: o.name, mark: o.mark, color: o.color, role: o.role, plan: S.plans[o.plan].n, members: Orb.orgMembers(o), deals: o.deals.filter((d) => d.status === 'open').length + Object.values(o.hid).flat().reduce((a, h) => a + h[0], 0), isCur: id === db.org, canEnter: id !== db.org, bd: id === db.org ? 'rgba(95,224,240,.35)' : 'rgba(150,200,255,.12)', enter: () => { Orb.setOrg(id); location.href = 'Equipe.dc.html?tab=o'; } }; });
+    const tab = (t) => () => this.setState({ tab: t });
+    return Object.assign(Orb.shell(this, 'Equipe.dc.html'), {
+      canUsers, readOnly: !canUsers, seatsLabel: lim === null ? seats + ' · ilimitado' : seats + '/' + lim, seatW: lim === null ? '100%' : Math.min(100, seats / lim * 100) + '%', seatBar: full ? 'bar or' : 'bar',
+      tM: s.tab === 'm' ? 'on' : '', tC: s.tab === 'c' ? 'on' : '', tP: s.tab === 'p' ? 'on' : '', tA: s.tab === 'a' ? 'on' : '', tO: s.tab === 'o' ? 'on' : '',
+      setM: tab('m'), setC: tab('c'), setP: tab('p'), setA: tab('a'), setO: tab('o'), isM: s.tab === 'm', isC: s.tab === 'c', isP: s.tab === 'p', isA: s.tab === 'a', isO: s.tab === 'o',
+      memberN: O.people.length + (O.hidMembers || 0), hidMembers: O.hidMembers || 0, invN: O.invites.length, orgN: orgs.length, members, invites, noInv: O.invites.length === 0, roles: S.roles, matrix, orgs,
+      permLocked: !permEditable, showUpsell: canUsers && !business, permMsg: !canUsers ? 'Só quem gerencia usuários pode alterar permissões.' : 'Editar permissões por papel faz parte do plano Business. No plano ' + Orb.plan().n + ' valem as permissões padrão abaixo.',
+      auditLocked: !business, auditOpen: business, noAudit: O.audit.length === 0, audit: O.audit.slice(0, 50).map((a) => ({ when: Orb.ago(a.ts), who: a.who, text: a.text })),
+      invOpen: s.invOpen, openInv: () => this.setState({ invOpen: true, invErr: '' }), closeInv: () => this.setState({ invOpen: false }),
+      squadList: O.squads, ivE: s.ivE, ivR: s.ivR, ivS: s.ivS, onIvE: (e) => this.setState({ ivE: e.target.value }), onIvR: (e) => this.setState({ ivR: e.target.value }), onIvS: (e) => this.setState({ ivS: e.target.value }),
+      ivHint: 'A pessoa entra como ' + s.ivR + ' em ' + s.ivS + ' e começa no Nível 1.', full, hasInvErr: !!s.invErr, invErr: s.invErr,
+      sendInv: () => {
+        const list = [...new Set(s.ivE.split(',').map((x) => x.trim().toLowerCase()).filter(Boolean))];
+        if (!list.length) return this.setState({ invErr: 'Informe pelo menos um e-mail.' });
+        const bad = list.filter((e) => !Orb.validEmail(e));
+        if (bad.length) return this.setState({ invErr: 'E-mail inválido: ' + bad.join(', ') });
+        const dup = list.filter((e) => O.people.some((p) => p.e.toLowerCase() === e) || O.invites.some((v) => v.e.toLowerCase() === e));
+        if (dup.length) return this.setState({ invErr: 'Já faz parte ou já foi convidado: ' + dup.join(', ') });
+        if (lim !== null && seats + list.length > lim) return this.setState({ invErr: 'O plano ' + Orb.plan().n + ' tem ' + (lim - seats) + ' assentos livres e você convidou ' + list.length + '.' });
+        list.forEach((e, k) => O.invites.push({ id: Date.now() + k, e, role: s.ivR, sq: s.ivS, sent: 'hoje', exp: '7 dias' }));
+        Orb.audit('Convite enviado: ' + list.join(', ')); Orb.save();
+        this.setState({ invOpen: false, ivE: '', invErr: '', tab: 'c' });
+        Orb.flash(this, list.length > 1 ? list.length + ' convites registrados' : 'Convite registrado');
+      },
+      orgFormOpen: s.orgForm, orgName: s.orgName, hasOrgErr: s.orgErr, openOrg: () => this.setState({ orgForm: true, orgName: '', orgErr: false }), closeOrg: () => this.setState({ orgForm: false }), onOrgName: (e) => this.setState({ orgName: e.target.value }),
+      createOrg: () => { if (!s.orgName.trim()) return this.setState({ orgErr: true }); Orb.createOrg(s.orgName); location.href = 'Main.dc.html'; }
+    });
+  }
+}
+</script>
+</body>
+</html>

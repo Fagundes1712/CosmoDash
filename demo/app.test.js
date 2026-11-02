@@ -1,0 +1,157 @@
+// Uso: node --test demo/
+const test = require('node:test');
+const assert = require('node:assert');
+const Orb = require('../project/app.js');
+
+const fresh = (org = 'v') => { Orb.reset(); Orb.db().org = org; return Orb.data(); };
+
+test('desmarcar e marcar a última tarefa não gera XP infinito', () => {
+  const O = fresh();
+  Orb.toggleTask(6); Orb.toggleTask(7); Orb.toggleTask(8);
+  const full = Orb.bonus();
+  assert.strictEqual(full, 15 + 10 + 20 + 30);
+  for (let i = 0; i < 5; i++) { Orb.toggleTask(8); Orb.toggleTask(8); }
+  assert.strictEqual(Orb.bonus(), full);
+  assert.ok(O);
+});
+
+test('desmarcar tarefa que já veio concluída desconta e remarcar devolve', () => {
+  fresh();
+  Orb.toggleTask(1);
+  assert.strictEqual(Orb.bonus(), -5);
+  Orb.toggleTask(1);
+  assert.strictEqual(Orb.bonus(), 0);
+});
+
+test('tarefa atrasada vale metade', () => {
+  fresh();
+  Orb.toggleTask(12);
+  assert.strictEqual(Orb.bonus(), 3);
+});
+
+test('avanço só pontua com atividade e uma vez por etapa', () => {
+  fresh();
+  assert.strictEqual(Orb.moveDeal('orla', 1).xp, 0);
+  Orb.logActivity('orla', 'Ligação', 'ok');
+  assert.strictEqual(Orb.moveDeal('orla', 2).xp, 25);
+  Orb.moveDeal('orla', 1);
+  Orb.logActivity('orla', 'Ligação', 'ok');
+  assert.strictEqual(Orb.moveDeal('orla', 2).xp, 0);
+});
+
+test('XP de atividades tem limite diário', () => {
+  fresh();
+  const got = [];
+  for (let i = 0; i < 7; i++) got.push(Orb.activityXp());
+  assert.deepStrictEqual(got, [10, 10, 10, 10, 10, 0, 0]);
+});
+
+test('reduzir para Starter é bloqueado com 9 assentos', () => {
+  const O = fresh();
+  assert.strictEqual(Orb.seatsUsed(), 9);
+  const r = Orb.changePlan('starter');
+  assert.strictEqual(r.ok, false);
+  assert.strictEqual(O.plan, 'pro');
+  assert.match(r.blockers[0], /Remova 6/);
+});
+
+test('upgrade para Business cobra por assento usado e gera fatura', () => {
+  const O = fresh();
+  const before = O.invoices.length;
+  assert.ok(Orb.changePlan('business').ok);
+  assert.strictEqual(Orb.monthly(), 169 * 9);
+  assert.strictEqual(O.invoices.length, before + 1);
+});
+
+test('Aurora respeita o limite do Starter e o papel existe na matriz', () => {
+  fresh('a');
+  assert.ok(Orb.seatsUsed() <= Orb.plan().limits.seats);
+  assert.ok(Orb.SEED.roles.includes(Orb.role()));
+  assert.strictEqual(Orb.can('users'), false);
+});
+
+test('Cosmo usa dados da organização atual', () => {
+  fresh('a');
+  const r = Orb.cosmo({ id: 'risco', count: false });
+  assert.match(r.text, /Franquia Norte/);
+  assert.doesNotMatch(r.text, /Grupo Lumen/);
+});
+
+test('vendedor sem permissão só vê os próprios negócios', () => {
+  fresh('a');
+  assert.ok(Orb.openDeals().every((d) => d.o === 'CA'));
+});
+
+test('Cosmo não inventa resposta e encontra contato pelo nome', () => {
+  fresh();
+  assert.strictEqual(Orb.cosmo({ text: 'qual a capital da França?', count: false }).title, 'Não entendi');
+  assert.strictEqual(Orb.cosmo({ text: 'qual o telefone da Helena?', count: false }).title, 'Helena Duarte');
+});
+
+test('SLA de 1h40 não aparece como vencendo em menos de 1 hora', () => {
+  fresh();
+  const r = Orb.cosmo({ id: 'sup', count: false });
+  assert.match(r.text, /#4830/);
+  assert.doesNotMatch(r.text, /#4827/);
+});
+
+test('números do funil batem com o que o seed prometia', () => {
+  const t = (fresh(), Orb.totals());
+  assert.strictEqual(t.open, 1071000);
+  assert.strictEqual(t.count, 36);
+  assert.strictEqual(t.risk.length, 3);
+});
+
+test('ranking e distância entre squads saem dos dados', () => {
+  fresh();
+  const q = Orb.squads();
+  assert.strictEqual(q[0].season - q[1].season, 4510);
+  assert.strictEqual(Orb.myRank(), 3);
+});
+
+test('nova tarefa entende data e hora do texto', () => {
+  fresh();
+  const p = Orb.parseTask('ligar para Sofia Lemos amanhã às 10h');
+  assert.strictEqual(p.title, 'ligar para Sofia Lemos');
+  assert.strictEqual(p.date, Orb.addDays(1));
+  assert.strictEqual(p.h, '10:00');
+  assert.strictEqual(Orb.parseTask('enviar proposta 14:30').h, '14:30');
+  assert.strictEqual(Orb.parseTask('enviar proposta').h, '19:00');
+});
+
+test('e-mail inválido é recusado', () => {
+  fresh();
+  assert.strictEqual(Orb.validEmail('isso-nao-e-email'), false);
+  assert.strictEqual(Orb.validEmail('a@b.com.br'), true);
+  assert.ok(Orb.addContact({ name: 'X', email: 'ruim' }).errors.length);
+});
+
+test('CSV aceita ; e aspas, e informa as linhas com erro', () => {
+  const O = fresh();
+  const before = O.contacts.length;
+  const r = Orb.importCSV('nome;email;empresa\n"Silva; Ana";ana@x.com;Acme\nSem Email;;Acme\n');
+  assert.strictEqual(r.ok, 1);
+  assert.strictEqual(r.fail.length, 1);
+  assert.match(r.fail[0], /Linha 3/);
+  assert.strictEqual(O.contacts.length, before + 1);
+  assert.strictEqual(O.contacts[0].name, 'Silva; Ana');
+});
+
+test('nível sobe ao passar de 3.000 XP', () => {
+  fresh();
+  Orb.award('t', 700);
+  const l = Orb.level();
+  assert.strictEqual(l.lvl, 15);
+  assert.strictEqual(l.xp, 40);
+});
+
+test('negócio ganho soma na receita e reabrir desfaz', () => {
+  fresh();
+  const base = Orb.totals().won;
+  const xp = Orb.closeDeal('atlas', 'won');
+  assert.strictEqual(xp, 62 * 3 + 50);
+  assert.strictEqual(Orb.totals().won, base + 62000);
+  Orb.reopenDeal('atlas');
+  assert.strictEqual(Orb.totals().won, base);
+  assert.strictEqual(Orb.bonus(), 0);
+});

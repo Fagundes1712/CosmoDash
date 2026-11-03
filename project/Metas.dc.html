@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Órbita CRM · Metas &amp; conquistas</title>
+<title>CosmoDash · Metas &amp; conquistas</title>
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
@@ -150,7 +150,7 @@ class Component extends DCLogic {
     const challenges = CH.map((c) => { const j = c.joined || !!O.joined[c.id]; return Object.assign({}, c, { joined: j, canJoin: !j, canLeave: !c.joined && j, bd: c.kind === 'Aberto' && !j ? 'rgba(255,154,98,.35)' : 'rgba(150,200,255,.1)', join: () => { O.joined[c.id] = true; Orb.save(); Orb.flash(this, 'Você entrou no desafio ' + c.t); }, leave: () => { delete O.joined[c.id]; Orb.save(); Orb.flash(this, 'Você saiu do desafio ' + c.t); } }); });
     const totalWins = O.k.wonCount + myWins.length;
     const B = [
-      ['first', 'Primeiro fechamento', 'M4 13l5 5L22 6', totalWins > 0, '', 'Seu primeiro negócio ganho no Órbita.', '92%', 50, '#5ADFA4'],
+      ['first', 'Primeiro fechamento', 'M4 13l5 5L22 6', totalWins > 0, '', 'Seu primeiro negócio ganho no CosmoDash.', '92%', 50, '#5ADFA4'],
       ['flash', 'Resposta relâmpago', 'M13 2L4 14h7l-1 8 9-12h-7z', true, '', '50 leads respondidos em menos de 15 minutos.', '31%', 150, '#5FE0F0'],
       ['marathon', 'Maratonista', 'M3 12h4l3-8 4 16 3-8h4', true, '', '100 tarefas concluídas no prazo em um mês.', '24%', 200, '#5FE0F0'],
       ['streak', 'Sequência de 7 dias', 'M12 22c4 0 7-2.7 7-7 0-4-3-6.5-4-9.5-1.5 2-2.5 3-3.5 3C11 6 10 4 10 2 6.5 4.5 5 9 5 13.5 5 18.8 8 22 12 22z', me.streak >= 7, Math.min(7, me.streak) + '/7', 'Bata a meta diária de atividades por 7 dias seguidos.', '18%', 120, '#FF9A62'],

@@ -11,7 +11,7 @@
   const MONTHS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
   const WEEK = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   const unaccent = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const TIERS = [['Operador', 1, 5, 'Painel pessoal e missões diárias', '#9AADC1'], ['Especialista', 6, 10, 'Desafios semanais e mentoria', '#5ADFA4'], ['Estrategista', 11, 15, 'Acesso antecipado a leads inbound', '#ADA0FF'], ['Elite', 16, 20, 'Destaque mensal na organização', '#5FE0F0'], ['Vanguarda', 21, 25, 'Participa da definição de metas', '#FF9A62'], ['Órbita', 26, 30, 'Recompensa definida pela empresa', '#F3D06E']];
+  const TIERS = [['Operador', 1, 5, 'Painel pessoal e missões diárias', '#9AADC1'], ['Especialista', 6, 10, 'Desafios semanais e mentoria', '#5ADFA4'], ['Estrategista', 11, 15, 'Acesso antecipado a leads inbound', '#ADA0FF'], ['Elite', 16, 20, 'Destaque mensal na organização', '#5FE0F0'], ['Vanguarda', 21, 25, 'Participa da definição de metas', '#FF9A62'], ['Cosmos', 26, 30, 'Recompensa definida pela empresa', '#F3D06E']];
   const XP_PER_LEVEL = 3000;
   const ACTIVITY_CAP = 5;
 
@@ -38,7 +38,7 @@
   }
 
   function load() {
-    try { const raw = g.localStorage && g.localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) { /* dado corrompido ou bloqueado: recomeça do seed */ }
+    try { const raw = g.localStorage && g.localStorage.getItem(KEY); if (raw) return JSON.parse(raw.replace(/Órbita/g, 'CosmoDash')); } catch (e) { /* dado corrompido ou bloqueado: recomeça do seed */ }
     return fresh();
   }
 
@@ -369,7 +369,7 @@
       sidebar: `<aside class="side">
   <div class="side-head">
     <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
-    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Cosmo IA</div></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:15px;font-weight:700;letter-spacing:.1em">COSMODASH</div><div class="hud" style="font-size:9.5px">CRM · Cosmo IA</div></div>
     <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
   </div>
   <div class="orgwrap">

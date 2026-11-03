@@ -1,4 +1,4 @@
-# Órbita CRM (projeto CosmoDash)
+# CosmoDash
 
 Protótipo navegável de CRM com 9 telas: Dashboard, Funis de vendas, Contatos, Tarefas, Suporte interno, Metas e conquistas, Equipe e acessos, Perfil, Planos e pagamentos. O assistente se chama Cosmo.
 

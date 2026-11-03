@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Funis de vendas</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <a class="org hide-c hide-m" href="Equipe.dc.html" title="Trocar organização">
+    <span class="orgmark" style="background:#5FE0F0">VL</span>
+    <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">Vértice Labs</span><span style="display:block;font-size:11.5px;color:#9AADC1">Admin · Plano Pro</span></span>
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  </a>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Metas.dc.html" class="glass hide-c" style="padding:14px;border-radius:16px;text-decoration:none;color:#E7EEF6;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud" style="color:#ADA0FF">Nível 14 · Estrategista</span><span class="xp">{{xpLabel}}</span></div>
+      <div class="bar vi"><i style="width:{{xpPct}}"></i></div>
+      <div style="font-size:11.5px;color:#9AADC1">Faltam {{xpLeft}} XP para o Nível 15</div>
+    </a>
+    <a href="Perfil.dc.html" class="nav" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">CA</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">Cauã Augusto</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · Vértice Labs</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div>
+      <div class="hud">Comercial · Funil Vendas B2B</div>
+      <h1 class="h1">Funis de vendas</h1>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div class="seg" role="group" aria-label="Filtro de negócios">
+        <button class="{{fAll}}" onClick="{{setAll}}">Todos</button>
+        <button class="{{fMine}}" onClick="{{setMine}}">Meus</button>
+        <button class="{{fRisk}}" onClick="{{setRisk}}">Em risco · {{riskCount}}</button>
+      </div>
+      <button class="btn pri" onClick="{{openNew}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Novo negócio</button>
+    </div>
+  </header>
+
+  <section class="grid-a" style="grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr))">
+    <div class="glass" style="padding:16px 18px"><div class="hud">Valor aberto</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px">{{totOpen}}</div><div style="font-size:12px;color:#9AADC1">{{totDeals}} negócios</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Valor ponderado</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px">{{weighted}}</div><div style="font-size:12px;color:#9AADC1">pela probabilidade de cada etapa</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Ganhos em outubro</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px;color:#5ADFA4">{{wonVal}}</div><div style="font-size:12px;color:#9AADC1">{{wonCount}} negócios · meta R$ 500.000</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Parados +10 dias</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px;color:#FF9A62">{{riskCount}}</div><div style="font-size:12px;color:#9AADC1">sinalizados pelo Orion</div></div>
+  </section>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+    <section style="flex:999 1 640px;min-width:0;overflow-x:auto;padding-bottom:8px" aria-label="Quadro do funil">
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;min-width:1090px">
+        <sc-for list="{{cols}}" as="c" hint-placeholder-count="5">
+          <div style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:18px;background:rgba(148,197,255,.03);border:1px solid rgba(150,200,255,.08);min-height:560px">
+            <div style="display:flex;flex-direction:column;gap:8px;padding:2px 4px 6px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:13.5px">{{c.name}}</span><span class="chip">{{c.count}}</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#9AADC1"><span class="disp" style="color:#E7EEF6;font-size:14px;font-weight:600">{{c.val}}</span><span>{{c.prob}}</span></div>
+              <div style="height:3px;border-radius:3px;background:{{c.color}};box-shadow:0 0 10px {{c.color}}"></div>
+            </div>
+            <sc-for list="{{c.cards}}" as="d" hint-placeholder-count="3">
+              <button class="{{d.cls}}" onClick="{{d.open}}" style="flex-direction:column;align-items:stretch;gap:10px;padding:14px;background:rgba(11,20,34,.85);border-color:{{d.border}}">
+                <span style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-weight:700;font-size:13.5px;line-height:1.3">{{d.co}}</span><span class="av sm" style="background:{{d.oc}}" title="{{d.owner}}">{{d.oi}}</span></span>
+                <span class="disp" style="font-size:17px;font-weight:700">{{d.valF}}</span>
+                <span style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;color:#9AADC1"><span>{{d.contact}}</span><span class="{{d.ageCls}}">{{d.days}}d na etapa</span></span>
+              </button>
+            </sc-for>
+            <sc-if value="{{c.hasMore}}" hint-placeholder-val="{{true}}"><div style="font-size:12px;color:#7A8EA3;text-align:center;padding:8px">+ {{c.more}} negócios nesta etapa</div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <sc-if value="{{hasSel}}" hint-placeholder-val="{{true}}">
+      <aside class="glass" style="flex:1 1 340px;max-width:100%;padding:22px;display:flex;flex-direction:column;gap:16px;border-color:rgba(95,224,240,.3)" aria-label="Detalhes do negócio">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div><div class="hud">Negócio · {{sel.stageName}}</div><h2 class="disp" style="margin:4px 0 0;font-size:22px">{{sel.co}}</h2></div>
+          <button class="icob" onClick="{{closeSel}}" aria-label="Fechar detalhes"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:10px"><span class="disp" style="font-size:30px;font-weight:700">{{sel.valF}}</span><span class="chip cy">{{sel.prob}} de chance</span></div>
+        <div style="display:flex;gap:4px" aria-label="Etapa atual">
+          <sc-for list="{{steps}}" as="s" hint-placeholder-count="5"><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="height:4px;border-radius:3px;background:{{s.bg}}"></div><span style="font-size:10.5px;color:{{s.tc}};font-weight:700">{{s.n}}</span></div></sc-for>
+        </div>
+        <sc-if value="{{sel.risk}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;gap:10px;padding:12px;border-radius:12px;background:rgba(255,154,98,.08);border:1px solid rgba(255,154,98,.3);font-size:13px;line-height:1.5"><span class="orb" style="width:18px;height:18px;flex-basis:18px;background:radial-gradient(circle,#FFD2B8,#FF9A62 60%)" aria-hidden="true"></span><span><b>Orion:</b> {{sel.days}} dias sem avanço. Negócios assim têm 40% menos chance de fechar. Sugestão: ligar para {{sel.contact}} hoje.</span></div>
+        </sc-if>
+        <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
+          <dt style="color:#9AADC1">Contato</dt><dd style="margin:0;font-weight:600"><a href="Contatos.dc.html" style="text-decoration:none">{{sel.contact}}</a> · {{sel.role}}</dd>
+          <dt style="color:#9AADC1">Responsável</dt><dd style="margin:0;font-weight:600">{{sel.owner}}</dd>
+          <dt style="color:#9AADC1">Próximo passo</dt><dd style="margin:0;font-weight:600">{{sel.next}}</dd>
+          <dt style="color:#9AADC1">Origem</dt><dd style="margin:0;font-weight:600">{{sel.src}}</dd>
+        </dl>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="hud">Linha do tempo</div>
+          <sc-for list="{{sel.tl}}" as="t" hint-placeholder-count="3">
+            <div style="display:flex;gap:10px;font-size:12.5px;line-height:1.45"><span style="width:7px;height:7px;margin-top:6px;border-radius:50%;background:#5FE0F0;flex:0 0 7px"></span><span style="flex:1;color:#C9D5E1">{{t.t}}</span><span style="color:#7A8EA3;white-space:nowrap">{{t.w}}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto">
+          <sc-if value="{{sel.canAdv}}" hint-placeholder-val="{{true}}"><button class="btn pri" onClick="{{advance}}" style="flex:1">Avançar para {{sel.nextStage}} · +25 XP</button></sc-if>
+          <sc-if value="{{sel.isLast}}" hint-placeholder-val="{{false}}"><button class="btn pri" onClick="{{win}}" style="flex:1;background:#5ADFA4">Marcar como ganho · +{{sel.winXp}} XP</button></sc-if>
+          <button class="btn" onClick="{{logAct}}">Registrar atividade</button>
+        </div>
+      </aside>
+    </sc-if>
+  </div>
+</main>
+
+<sc-if value="{{newOpen}}" hint-placeholder-val="{{false}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nd-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="nd-t" class="disp" style="margin:0;font-size:22px">Novo negócio</h2><button class="icob" onClick="{{closeNew}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="nd-co">Empresa</label><input id="nd-co" class="inp" value="{{nCo}}" onChange="{{onCo}}" placeholder="Ex.: Mar Azul Turismo"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:14px">
+          <div><label class="lb" for="nd-v">Valor estimado (R$)</label><input id="nd-v" class="inp" value="{{nVal}}" onChange="{{onVal}}" inputmode="numeric" placeholder="25000"></div>
+          <div><label class="lb" for="nd-o">Responsável</label><select id="nd-o" class="inp" value="{{nOwner}}" onChange="{{onOwner}}"><option value="CA">Cauã Augusto</option><option value="ML">Marina Lopes</option><option value="BK">Bianca Kato</option><option value="LR">Lívia Ramos</option><option value="RT">Rafael Torres</option><option value="TN">Thiago Nunes</option></select></div>
+        </div>
+        <div><label class="lb" for="nd-c">Contato principal</label><input id="nd-c" class="inp" value="{{nContact}}" onChange="{{onContact}}" placeholder="Nome do decisor"></div>
+        <div style="font-size:12.5px;color:#9AADC1">Entra em <b style="color:#E7EEF6">Prospecção</b> com 10% de probabilidade. O Orion cria a primeira tarefa de contato automaticamente.</div>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeNew}}">Cancelar</button><button class="btn pri" onClick="{{createDeal}}">Criar negócio · +10 XP</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = {
+    collapsed: false, filter: 'all', sel: 'lumen', newOpen: false, toast: null, bonus: 0, wonVal: 412380, wonCount: 15,
+    nCo: '', nVal: '', nOwner: 'CA', nContact: '',
+    deals: [
+      { id: 'orla', co: 'Orla Hotéis', v: 22000, st: 0, o: 'RT', c: 'Paula Siqueira', r: 'Dir. de Operações', d: 2, src: 'Inbound · site' },
+      { id: 'grao', co: 'Grão Café', v: 9500, st: 0, o: 'TN', c: 'Rodrigo Pires', r: 'Sócio', d: 4, src: 'Indicação' },
+      { id: 'meri', co: 'Meridian Seguros', v: 31000, st: 0, o: 'RT', c: 'Carla Menezes', r: 'Head de TI', d: 1, src: 'Outbound' },
+      { id: 'tece', co: 'Tecelagem Sul', v: 14000, st: 0, o: 'TN', c: 'Joel Bastos', r: 'Gerente Comercial', d: 6, src: 'Evento' },
+      { id: 'vitta', co: 'Vitta Farma', v: 42000, st: 1, o: 'BK', c: 'Renata Alves', r: 'CFO', d: 3, src: 'Inbound · webinar' },
+      { id: 'puls', co: 'Rede Pulsar', v: 26000, st: 1, o: 'LR', c: 'Igor Matos', r: 'Diretor', d: 5, src: 'Indicação' },
+      { id: 'aria', co: 'Banco Ária', v: 58000, st: 1, o: 'ML', c: 'Sofia Lemos', r: 'VP Digital', d: 2, src: 'Outbound' },
+      { id: 'ferraz', co: 'Ferraz Logística', v: 31000, st: 2, o: 'CA', c: 'André Ferraz', r: 'CEO', d: 11, src: 'Inbound · site' },
+      { id: 'viva', co: 'Clínica Viva', v: 17000, st: 2, o: 'LR', c: 'Dra. Paula Reis', r: 'Sócia', d: 14, src: 'Indicação' },
+      { id: 'hori', co: 'Horizonte Educação', v: 64000, st: 2, o: 'BK', c: 'Marcos Leal', r: 'Dir. Acadêmico', d: 4, src: 'Evento' },
+      { id: 'kaete', co: 'Kaeté Bebidas', v: 45000, st: 2, o: 'ML', c: 'Tânia Rocha', r: 'Gerente de Marketing', d: 3, src: 'Outbound' },
+      { id: 'lumen', co: 'Grupo Lumen', v: 48000, st: 3, o: 'CA', c: 'Helena Duarte', r: 'Dir. Comercial', d: 12, src: 'Inbound · site' },
+      { id: 'polo', co: 'Polo Têxtil', v: 71000, st: 3, o: 'ML', c: 'Ricardo Nunes', r: 'CEO', d: 5, src: 'Indicação' },
+      { id: 'navi', co: 'Navi Telecom', v: 39000, st: 3, o: 'BK', c: 'Fernanda Luz', r: 'Compras', d: 2, src: 'Outbound' },
+      { id: 'atlas', co: 'Atlas Engenharia', v: 62000, st: 4, o: 'CA', c: 'Bruno Atlas', r: 'Sócio-diretor', d: 3, src: 'Evento' },
+      { id: 'patio', co: 'Pátio Digital', v: 38000, st: 4, o: 'LR', c: 'Nina Castro', r: 'COO', d: 2, src: 'Inbound · site' },
+      { id: 'nobre', co: 'Nobre Alimentos', v: 32000, st: 4, o: 'BK', c: 'Otávio Nobre', r: 'Diretor', d: 1, src: 'Indicação' }
+    ]
+  };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const CUR = 'Pipeline.dc.html';
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task','3'],['Atendimento'],['Suporte.dc.html','Suporte interno','sup','23'],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === CUR ? 'nav on' : 'nav' });
+
+    const brl = (v) => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+    const mil = (v) => v >= 1000000 ? 'R$ ' + (v / 1000000).toFixed(2).replace('.', ',') + ' mi' : 'R$ ' + Math.round(v / 1000) + ' mil';
+    const OW = { CA: ['Cauã Augusto', '#5FE0F0'], ML: ['Marina Lopes', '#FF9A62'], BK: ['Bianca Kato', '#ADA0FF'], LR: ['Lívia Ramos', '#5ADFA4'], RT: ['Rafael Torres', '#FF7A8A'], TN: ['Thiago Nunes', '#F3D06E'] };
+    const ST = ['Prospecção', 'Qualificação', 'Proposta', 'Negociação', 'Fechamento'];
+    const PR = [0.1, 0.25, 0.5, 0.7, 0.9];
+    const CC = ['#2BB8CC', '#45CDE0', '#5FE0F0', '#ADA0FF', '#FF9A62'];
+    const HID = [[8, 109500], [6, 88000], [3, 141000], [2, 83000], [0, 0]];
+    const NEXT = ['Agendar diagnóstico inicial', 'Reunião de descoberta com decisor', 'Revisar proposta com financeiro', 'Ajustar condições de pagamento', 'Assinatura do contrato'];
+
+    const visible = (d) => s.filter === 'mine' ? d.o === 'CA' : s.filter === 'risk' ? d.d >= 10 : true;
+    let totOpen = 0, totDeals = 0, weighted = 0;
+    const cols = ST.map((name, i) => {
+      const all = s.deals.filter(d => d.st === i);
+      const sum = all.reduce((a, d) => a + d.v, 0) + HID[i][1];
+      const count = all.length + HID[i][0];
+      totOpen += sum; totDeals += count; weighted += sum * PR[i];
+      const cards = all.filter(visible).map(d => ({
+        co: d.co, valF: brl(d.v), contact: d.c, days: d.d, owner: OW[d.o][0], oi: d.o, oc: OW[d.o][1],
+        ageCls: d.d >= 10 ? 'chip or' : '', cls: s.sel === d.id ? 'rowb on' : 'rowb', border: s.sel === d.id ? 'rgba(95,224,240,.45)' : (d.d >= 10 ? 'rgba(255,154,98,.35)' : 'rgba(150,200,255,.1)'),
+        open: () => this.setState({ sel: d.id })
+      }));
+      const more = s.filter === 'all' ? HID[i][0] : 0;
+      return { name, count, val: mil(sum), prob: Math.round(PR[i] * 100) + '% prob.', color: CC[i], cards, more, hasMore: more > 0 };
+    });
+
+    const D = s.deals.find(d => d.id === s.sel);
+    let sel = null, steps = [];
+    if (D) {
+      const isLast = D.st === 4;
+      sel = { co: D.co, valF: brl(D.v), prob: Math.round(PR[D.st] * 100) + '%', stageName: ST[D.st], contact: D.c, role: D.r, owner: OW[D.o][0], src: D.src, next: NEXT[D.st], days: D.d, risk: D.d >= 10,
+        canAdv: !isLast, isLast, nextStage: ST[D.st + 1] || '', winXp: Math.round(D.v / 1000) * 3 + 50,
+        tl: [{ t: 'Etapa alterada para ' + ST[D.st] + ' por ' + OW[D.o][0], w: D.d + 'd' }, { t: 'E-mail enviado: proposta e cases do setor', w: (D.d + 2) + 'd' }, { t: 'Reunião de descoberta com ' + D.c, w: (D.d + 6) + 'd' }] };
+      steps = ST.map((n, i) => ({ n: n.slice(0, 4) + '.', bg: i <= D.st ? CC[i] : 'rgba(150,200,255,.12)', tc: i === D.st ? '#E7EEF6' : '#7A8EA3' }));
+    }
+    const upd = (fn) => this.setState({ deals: s.deals.map(d => d.id === s.sel ? fn(d) : d) });
+    const xp = 2340 + s.bonus;
+    const riskCount = s.deals.filter(d => d.d >= 10).length;
+
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6', toggle: () => this.setState({ collapsed: !s.collapsed }), nav,
+      xpLabel: xp.toLocaleString('pt-BR') + ' / 3.000', xpPct: Math.min(100, xp / 30) + '%', xpLeft: Math.max(0, 3000 - xp),
+      fAll: s.filter === 'all' ? 'on' : '', fMine: s.filter === 'mine' ? 'on' : '', fRisk: s.filter === 'risk' ? 'on' : '',
+      setAll: () => this.setState({ filter: 'all' }), setMine: () => this.setState({ filter: 'mine' }), setRisk: () => this.setState({ filter: 'risk' }),
+      riskCount, totOpen: mil(totOpen), totDeals, weighted: mil(weighted), wonVal: brl(s.wonVal), wonCount: s.wonCount,
+      cols, hasSel: !!sel, sel: sel || {}, steps, closeSel: () => this.setState({ sel: null }),
+      advance: () => { if (!D) return; upd(d => Object.assign({}, d, { st: d.st + 1, d: 0 })); this.setState({ bonus: s.bonus + 25 }); this.flash(D.co + ' → ' + ST[D.st + 1] + ' · +25 XP'); },
+      win: () => { if (!D) return; const gain = Math.round(D.v / 1000) * 3 + 50; this.setState({ deals: s.deals.filter(d => d.id !== D.id), sel: null, wonVal: s.wonVal + D.v, wonCount: s.wonCount + 1, bonus: s.bonus + gain }); this.flash('Ganho! ' + D.co + ' · ' + brl(D.v) + ' · +' + gain + ' XP'); },
+      logAct: () => { if (!D) return; upd(d => Object.assign({}, d, { d: 0 })); this.setState({ bonus: s.bonus + 10 }); this.flash('Atividade registrada · +10 XP'); },
+      newOpen: s.newOpen, openNew: () => this.setState({ newOpen: true }), closeNew: () => this.setState({ newOpen: false }),
+      nCo: s.nCo, nVal: s.nVal, nOwner: s.nOwner, nContact: s.nContact,
+      onCo: (e) => this.setState({ nCo: e.target.value }), onVal: (e) => this.setState({ nVal: e.target.value.replace(/\D/g, '') }), onOwner: (e) => this.setState({ nOwner: e.target.value }), onContact: (e) => this.setState({ nContact: e.target.value }),
+      createDeal: () => { const co = s.nCo.trim() || 'Nova empresa'; const id = 'n' + Date.now(); const nd = { id, co, v: Number(s.nVal) || 15000, st: 0, o: s.nOwner, c: s.nContact.trim() || 'A definir', r: 'Decisor', d: 0, src: 'Cadastro manual' }; this.setState({ deals: [nd].concat(s.deals), newOpen: false, sel: id, filter: 'all', nCo: '', nVal: '', nContact: '', bonus: s.bonus + 10 }); this.flash(co + ' criado em Prospecção · +10 XP'); },
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

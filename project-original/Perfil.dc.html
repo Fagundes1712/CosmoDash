@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Perfil</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <a class="org hide-c hide-m" href="Equipe.dc.html" title="Trocar organização">
+    <span class="orgmark" style="background:#5FE0F0">VL</span>
+    <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">Vértice Labs</span><span style="display:block;font-size:11.5px;color:#9AADC1">Admin · Plano Pro</span></span>
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  </a>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Perfil.dc.html" class="nav on" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">{{ini}}</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">{{saved.name}}</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · Vértice Labs</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Conta · Configurações pessoais</div><h1 class="h1">Meu perfil</h1></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <sc-if value="{{dirty}}" hint-placeholder-val="{{false}}"><span style="font-size:12.5px;color:#F3D06E">Alterações não salvas</span><button class="btn ghost" onClick="{{discard}}">Descartar</button></sc-if>
+      <button class="{{saveCls}}" onClick="{{save}}">Salvar alterações</button>
+    </div>
+  </header>
+
+  <section class="glass" style="padding:24px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden">
+    <div style="position:relative">
+      <span class="av" style="width:92px;height:92px;font-size:30px;background:radial-gradient(circle at 35% 30%,#B8F7FC,#5FE0F0 55%,#1E9AAB);box-shadow:0 0 0 4px rgba(173,160,255,.35),0 0 30px rgba(95,224,240,.35)">{{ini}}</span>
+      <button class="icob" style="position:absolute;right:-4px;bottom:-4px;border-radius:50%;background:#0B1422" onClick="{{photo}}" aria-label="Trocar foto"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v13H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path></svg></button>
+    </div>
+    <div style="flex:1 1 240px;min-width:0">
+      <div class="disp" style="font-size:28px;font-weight:700">{{saved.name}}</div>
+      <div style="font-size:14px;color:#9AADC1;margin-top:2px">{{saved.title}} · Vértice Labs · Squad Ômega</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><span class="chip vi">Nível 14 · Estrategista</span><span class="chip or">6 dias de sequência</span><span class="chip cy">Resposta relâmpago</span><span class="chip">Membro desde mar 2025</span></div>
+    </div>
+    <a href="Metas.dc.html" class="btn">Ver conquistas</a>
+  </section>
+
+  <div class="split">
+    <section class="glass" style="padding:24px;display:flex;flex-direction:column;gap:18px">
+      <h2 class="h2">Dados pessoais</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:16px">
+        <div><label class="lb" for="pf-n">Nome completo</label><input id="pf-n" class="inp" value="{{f.name}}" onChange="{{on.name}}"></div>
+        <div><label class="lb" for="pf-t">Cargo</label><input id="pf-t" class="inp" value="{{f.title}}" onChange="{{on.title}}"></div>
+        <div><label class="lb" for="pf-e">E-mail</label><input id="pf-e" class="inp" type="email" value="{{f.email}}" onChange="{{on.email}}"></div>
+        <div><label class="lb" for="pf-p">Telefone / WhatsApp</label><input id="pf-p" class="inp" value="{{f.phone}}" onChange="{{on.phone}}" placeholder="+55 11 90000-0000"></div>
+        <div><label class="lb" for="pf-z">Fuso horário</label><select id="pf-z" class="inp" value="{{f.tz}}" onChange="{{on.tz}}"><option value="sp">São Paulo (GMT−3)</option><option value="ma">Manaus (GMT−4)</option><option value="li">Lisboa (GMT+0)</option></select></div>
+        <div><label class="lb" for="pf-l">Idioma</label><select id="pf-l" class="inp" value="{{f.lang}}" onChange="{{on.lang}}"><option value="pt">Português (Brasil)</option><option value="en">English</option><option value="es">Español</option></select></div>
+      </div>
+      <div><label class="lb" for="pf-s">Assinatura de e-mail</label><textarea id="pf-s" class="inp" rows="3" value="{{f.sig}}" onChange="{{on.sig}}"></textarea></div>
+
+      <h2 class="h2" style="margin-top:6px">Notificações</h2>
+      <div class="tblw"><table class="tbl" style="min-width:460px">
+        <thead><tr><th>Evento</th><th style="text-align:center">App</th><th style="text-align:center">E-mail</th><th style="text-align:center">WhatsApp</th></tr></thead>
+        <tbody>
+          <sc-for list="{{notif}}" as="r" hint-placeholder-count="5">
+            <tr><td style="font-weight:600">{{r.n}}</td><sc-for list="{{r.c}}" as="c" hint-placeholder-count="3"><td style="text-align:center"><button class="{{c.cls}}" onClick="{{c.flip}}" aria-label="{{c.aria}}" style="margin:0 auto"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></button></td></sc-for></tr>
+          </sc-for>
+        </tbody>
+      </table></div>
+    </section>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:4px">
+        <h2 class="h2" style="margin-bottom:8px">Experiência</h2>
+        <sc-for list="{{prefs}}" as="p" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(150,200,255,.07)">
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px">{{p.n}}</div><div style="font-size:12px;color:#9AADC1">{{p.d}}</div></div>
+            <button class="{{p.cls}}" onClick="{{p.flip}}" role="switch" aria-checked="{{p.on}}" aria-label="{{p.n}}"></button>
+          </div>
+        </sc-for>
+        <div style="display:flex;align-items:center;gap:14px;padding:12px 0 2px">
+          <div style="flex:1"><div style="font-weight:600;font-size:13.5px">Meta diária de atividades</div><div style="font-size:12px;color:#9AADC1">Base da sua sequência</div></div>
+          <div class="seg"><sc-for list="{{goalOpts}}" as="g" hint-placeholder-count="3"><button class="{{g.cls}}" onClick="{{g.pick}}">{{g.v}}</button></sc-for></div>
+        </div>
+      </section>
+
+      <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+        <h2 class="h2">Segurança</h2>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:rgba(90,223,164,.07);border:1px solid rgba(90,223,164,.25)"><svg class="ico" viewBox="0 0 24 24" style="color:#5ADFA4" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4"></path></svg><div style="flex:1"><div style="font-weight:700;font-size:13.5px">Autenticação em 2 fatores ativa</div><div style="font-size:12px;color:#9AADC1">App autenticador · desde mar 2025</div></div></div>
+        <div class="hud" style="margin-top:4px">Sessões ativas</div>
+        <sc-for list="{{sessions}}" as="x" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;gap:12px;font-size:13px"><span style="flex:1"><b>{{x.d}}</b><br><span style="color:#9AADC1;font-size:12px">{{x.w}}</span></span><sc-if value="{{x.cur}}" hint-placeholder-val="{{true}}"><span class="chip gr">Esta sessão</span></sc-if><sc-if value="{{x.other}}" hint-placeholder-val="{{false}}"><button class="btn sm ghost" onClick="{{x.end}}">Encerrar</button></sc-if></div>
+        </sc-for>
+        <button class="btn" onClick="{{pwd}}" style="align-self:flex-start;margin-top:6px">Alterar senha</button>
+      </section>
+    </div>
+  </div>
+</main>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = {
+    collapsed: false, toast: null, goal: 8,
+    saved: { name: 'Cauã Augusto', title: 'Head de Novos Negócios', email: 'caua@verticelabs.com.br', phone: '', tz: 'sp', lang: 'pt', sig: 'Cauã Augusto\nHead de Novos Negócios · Vértice Labs' },
+    f: null,
+    prefs: { orion: true, compact: false, motion: true, showLvl: true, peers: true },
+    notif: { won: [1, 1, 0], risk: [1, 1, 1], tk: [1, 0, 0], ach: [1, 0, 0], dig: [0, 1, 0] },
+    sessions: [{ id: 1, d: 'Chrome · macOS', w: 'São Paulo · agora', cur: true }, { id: 2, d: 'App Órbita · iPhone', w: 'São Paulo · há 2 h', cur: false }]
+  };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task','3'],['Atendimento'],['Suporte.dc.html','Suporte interno','sup','23'],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: 'nav' });
+    const f = s.f || s.saved;
+    const dirty = !!s.f && JSON.stringify(s.f) !== JSON.stringify(s.saved);
+    const on = {}; ['name', 'title', 'email', 'phone', 'tz', 'lang', 'sig'].forEach(k => { on[k] = (e) => this.setState({ f: Object.assign({}, f, { [k]: e.target.value }) }); });
+    const PR = [['orion', 'Orion proativo', 'Sugestões automáticas no dashboard e nos negócios'], ['compact', 'Modo compacto', 'Mais linhas por tela em tabelas e quadros'], ['motion', 'Animações de interface', 'Brilhos e transições; desative para foco total'], ['showLvl', 'Mostrar meu nível no ranking', 'Desativado, você aparece como anônimo'], ['peers', 'Conquistas de colegas', 'Ver no feed quando alguém desbloqueia algo']];
+    const prefs = PR.map(p => { const v = !!s.prefs[p[0]]; return { n: p[1], d: p[2], on: v ? 'true' : 'false', cls: v ? 'tog on' : 'tog', flip: () => this.setState({ prefs: Object.assign({}, s.prefs, { [p[0]]: !v }) }) }; });
+    const CH = ['app', 'e-mail', 'WhatsApp'];
+    const NT = [['won', 'Negócio ganho na equipe'], ['risk', 'Negócio meu em risco'], ['tk', 'Ticket do meu cliente'], ['ach', 'Conquista ou nível novo'], ['dig', 'Resumo semanal do Orion']];
+    const notif = NT.map(n => ({ n: n[1], c: s.notif[n[0]].map((v, i) => ({ cls: v ? 'chk on' : 'chk', aria: n[1] + ' por ' + CH[i], flip: () => { const r = s.notif[n[0]].slice(); r[i] = r[i] ? 0 : 1; this.setState({ notif: Object.assign({}, s.notif, { [n[0]]: r }) }); } })) }));
+    const ini = s.saved.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6', toggle: () => this.setState({ collapsed: !s.collapsed }), nav,
+      saved: s.saved, f, on, dirty, ini, prefs, notif,
+      saveCls: dirty ? 'btn pri' : 'btn', save: () => { if (!dirty) { this.flash('Nada para salvar'); return; } this.setState({ saved: f, f: null }); this.flash('Perfil atualizado'); },
+      discard: () => this.setState({ f: null }),
+      goalOpts: [6, 8, 10].map(v => ({ v, cls: s.goal === v ? 'on' : '', pick: () => { this.setState({ goal: v }); this.flash('Meta diária: ' + v + ' atividades'); } })),
+      sessions: s.sessions.map(x => ({ d: x.d, w: x.w, cur: x.cur, other: !x.cur, end: () => { this.setState({ sessions: s.sessions.filter(y => y.id !== x.id) }); this.flash('Sessão encerrada'); } })),
+      photo: () => this.flash('Seletor de imagem aberto'), pwd: () => this.flash('Link para nova senha enviado ao seu e-mail'),
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

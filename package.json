@@ -1,0 +1,15 @@
+{
+  "name": "cosmodash",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CosmoDash: SaaS de CRM com assistente de IA Cosmo. Hoje é um protótipo estático, sem dependências.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node demo/serve.js",
+    "lint": "node scripts/check.js",
+    "test": "node --test",
+    "build": "node scripts/build.js",
+    "smoke": "node scripts/smoke.js",
+    "verify": "npm run lint && npm test && npm run build"
+  }
+}

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CosmoDash · Perfil</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Conta · Configurações pessoais</div><h1 class="h1">Meu perfil</h1></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <sc-if value="{{dirty}}"><span style="font-size:12.5px;color:#F3D06E">Alterações não salvas</span><button class="btn ghost" onClick="{{discard}}">Descartar</button></sc-if>
+      <button class="{{saveCls}}" onClick="{{save}}">Salvar alterações</button>
+    </div>
+  </header>
+
+  <sc-if value="{{hasErr}}"><div class="err" role="alert">{{err}}</div></sc-if>
+
+  <section class="glass" style="padding:24px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden">
+    <div style="position:relative">
+      <span class="av" style="width:92px;height:92px;font-size:30px;background:radial-gradient(circle at 35% 30%,#B8F7FC,#5FE0F0 55%,#1E9AAB);box-shadow:0 0 0 4px rgba(173,160,255,.35),0 0 30px rgba(95,224,240,.35);{{userPhoto}}">{{userIni}}</span>
+      <label class="icob" for="pf-photo" style="position:absolute;right:-4px;bottom:-4px;border-radius:50%;background:#0B1422" aria-label="Trocar foto" title="Trocar foto"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v13H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path></svg></label>
+      <input id="pf-photo" type="file" accept="image/*" onChange="{{photo}}" style="position:absolute;width:1px;height:1px;opacity:0" aria-label="Escolher foto de perfil">
+    </div>
+    <div style="flex:1 1 240px;min-width:0">
+      <div class="disp" style="font-size:28px;font-weight:700">{{saved.name}}</div>
+      <div style="font-size:14px;color:#9AADC1;margin-top:2px">{{saved.title}} · {{org.name}} · {{squad}}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><span class="chip vi">{{xpTier}}</span><span class="chip or">{{streak}} dias de sequência</span></div>
+    </div>
+    <a href="Metas.dc.html" class="btn">Ver conquistas</a>
+  </section>
+
+  <div class="split">
+    <section class="glass" style="padding:24px;display:flex;flex-direction:column;gap:18px">
+      <h2 class="h2">Dados pessoais</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:16px">
+        <div><label class="lb" for="pf-n">Nome completo</label><input id="pf-n" class="inp" value="{{f.name}}" onChange="{{on.name}}"></div>
+        <div><label class="lb" for="pf-t">Cargo</label><input id="pf-t" class="inp" value="{{f.title}}" onChange="{{on.title}}"></div>
+        <div><label class="lb" for="pf-e">E-mail</label><input id="pf-e" class="inp" type="email" value="{{f.email}}" onChange="{{on.email}}"></div>
+        <div><label class="lb" for="pf-p">Telefone / WhatsApp</label><input id="pf-p" class="inp" value="{{f.phone}}" onChange="{{on.phone}}" placeholder="+55 11 90000-0000"></div>
+        <div><label class="lb" for="pf-z">Fuso horário</label><select id="pf-z" class="inp" value="{{f.tz}}" onChange="{{on.tz}}"><option value="America/Sao_Paulo">São Paulo (GMT−3)</option><option value="America/Manaus">Manaus (GMT−4)</option><option value="Europe/Lisbon">Lisboa (GMT+0)</option></select></div>
+        <div><label class="lb" for="pf-l">Idioma</label><select id="pf-l" class="inp" value="{{f.lang}}" onChange="{{on.lang}}"><option value="pt">Português (Brasil)</option><option value="en" disabled>English (em breve)</option><option value="es" disabled>Español (em breve)</option></select></div>
+      </div>
+      <div><label class="lb" for="pf-s">Assinatura de e-mail</label><textarea id="pf-s" class="inp" rows="3" value="{{f.sig}}" onChange="{{on.sig}}"></textarea></div>
+
+      <h2 class="h2" style="margin-top:6px">Notificações</h2>
+      <div class="tblw"><table class="tbl" style="min-width:460px">
+        <thead><tr><th>Evento</th><th style="text-align:center">App</th><th style="text-align:center">E-mail</th><th style="text-align:center">WhatsApp</th></tr></thead>
+        <tbody>
+          <sc-for list="{{notif}}" as="r">
+            <tr><td style="font-weight:600">{{r.n}}</td><sc-for list="{{r.c}}" as="c"><td style="text-align:center"><button class="{{c.cls}}" onClick="{{c.flip}}" aria-label="{{c.aria}}" aria-pressed="{{c.on}}" style="margin:0 auto"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></button></td></sc-for></tr>
+          </sc-for>
+        </tbody>
+      </table></div>
+    </section>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:4px">
+        <h2 class="h2" style="margin-bottom:8px">Experiência</h2>
+        <sc-for list="{{prefs}}" as="p">
+          <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(150,200,255,.07)">
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px">{{p.n}}</div><div style="font-size:12px;color:#9AADC1">{{p.d}}</div></div>
+            <button class="{{p.cls}}" onClick="{{p.flip}}" role="switch" aria-checked="{{p.on}}" aria-label="{{p.n}}"></button>
+          </div>
+        </sc-for>
+        <div style="display:flex;align-items:center;gap:14px;padding:12px 0 2px">
+          <div style="flex:1"><div style="font-weight:600;font-size:13.5px">Meta diária de atividades</div><div style="font-size:12px;color:#9AADC1">Base da sua sequência</div></div>
+          <div class="seg"><sc-for list="{{goalOpts}}" as="g"><button class="{{g.cls}}" onClick="{{g.pick}}">{{g.v}}</button></sc-for></div>
+        </div>
+      </section>
+
+      <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+        <h2 class="h2">Segurança</h2>
+        <div style="padding:12px;border-radius:12px;background:rgba(243,208,110,.08);border:1px solid rgba(243,208,110,.3);font-size:12.5px;line-height:1.5">Demonstração sem login real: senha, 2FA e sessões passam a valer quando a autenticação for criada.</div>
+        <div class="hud" style="margin-top:4px">Sessões ativas</div>
+        <sc-for list="{{sessions}}" as="x">
+          <div style="display:flex;align-items:center;gap:12px;font-size:13px"><span style="flex:1"><b>{{x.d}}</b><br><span style="color:#9AADC1;font-size:12px">{{x.w}}</span></span><sc-if value="{{x.cur}}"><span class="chip gr">Esta sessão</span></sc-if><sc-if value="{{x.other}}"><button class="btn sm ghost" onClick="{{x.end}}">Encerrar</button></sc-if></div>
+        </sc-for>
+      </section>
+
+      <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+        <h2 class="h2">Dados da demonstração</h2>
+        <div style="font-size:12.5px;color:#9AADC1;line-height:1.5">As alterações ficam salvas neste navegador. Restaurar apaga tudo o que você mudou em todas as organizações.</div>
+        <button class="btn" onClick="{{resetAll}}" style="align-self:flex-start">Restaurar dados originais</button>
+      </section>
+    </div>
+  </div>
+</main>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null, f: null, err: '' };
+  renderVals() {
+    const s = this.state;
+    const P = Orb.profile();
+    const FIELDS = ['name', 'title', 'email', 'phone', 'tz', 'lang', 'sig'];
+    const saved = {}; FIELDS.forEach((k) => { saved[k] = P[k]; });
+    const f = s.f || saved;
+    const dirty = !!s.f && JSON.stringify(s.f) !== JSON.stringify(saved);
+    const on = {}; FIELDS.forEach((k) => { on[k] = (e) => this.setState({ f: Object.assign({}, f, { [k]: e.target.value }), err: '' }); });
+    const PR = [['cosmo', 'Cosmo proativo', 'Sugestões automáticas nos negócios e contatos'], ['compact', 'Modo compacto', 'Mais linhas por tela em tabelas e listas'], ['motion', 'Animações de interface', 'Brilhos e transições; desative para foco total'], ['showLvl', 'Mostrar meu nome no ranking', 'Desativado, você aparece como anônimo'], ['peers', 'Conquistas de colegas', 'Ver no feed quando alguém desbloqueia algo']];
+    const prefs = PR.map((p) => { const v = !!P.prefs[p[0]]; return { n: p[1], d: p[2], on: v ? 'true' : 'false', cls: v ? 'tog on' : 'tog', flip: () => { P.prefs[p[0]] = !v; Orb.save(); Orb.applyPrefs(); this.setState({}); } }; });
+    const CH = ['app', 'e-mail', 'WhatsApp'];
+    const NT = [['won', 'Negócio ganho na equipe'], ['risk', 'Negócio meu em risco'], ['tk', 'Ticket do meu cliente'], ['ach', 'Conquista ou nível novo'], ['dig', 'Resumo semanal do Cosmo']];
+    const notif = NT.map((n) => ({ n: n[1], c: P.notif[n[0]].map((v, i) => ({ cls: v ? 'chk on' : 'chk', on: v ? 'true' : 'false', aria: n[1] + ' por ' + CH[i], flip: () => { P.notif[n[0]][i] = v ? 0 : 1; Orb.save(); this.setState({}); } })) }));
+    return Object.assign(Orb.shell(this, 'Perfil.dc.html'), {
+      saved, f, on, dirty, prefs, notif, hasErr: !!s.err, err: s.err, streak: Orb.data().me.streak, squad: Orb.data().me.squad,
+      saveCls: dirty ? 'btn pri' : 'btn',
+      save: () => {
+        if (!dirty) return Orb.flash(this, 'Nada para salvar');
+        if (!f.name.trim()) return this.setState({ err: 'Informe seu nome.' });
+        if (!Orb.validEmail(f.email)) return this.setState({ err: 'Informe um e-mail válido.' });
+        Object.assign(P, f, { name: f.name.trim(), email: f.email.trim() });
+        Orb.save();
+        this.setState({ f: null, err: '' });
+        Orb.flash(this, 'Perfil atualizado');
+      },
+      discard: () => this.setState({ f: null, err: '' }),
+      goalOpts: [6, 8, 10].map((v) => ({ v, cls: P.goal === v ? 'on' : '', pick: () => { P.goal = v; Orb.save(); Orb.flash(this, 'Meta diária: ' + v + ' atividades'); } })),
+      sessions: P.sessions.map((x) => ({ d: x.d, w: x.w, cur: x.cur, other: !x.cur, end: () => { P.sessions = P.sessions.filter((y) => y.id !== x.id); Orb.save(); Orb.flash(this, 'Sessão encerrada'); } })),
+      photo: (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        e.target.value = '';
+        if (!file.type.startsWith('image/')) return this.setState({ err: 'Escolha um arquivo de imagem.' });
+        if (file.size > 300 * 1024) return this.setState({ err: 'A foto precisa ter até 300 KB.' });
+        const r = new FileReader();
+        r.onload = () => { P.photo = r.result; if (!Orb.save()) { P.photo = ''; return this.setState({ err: 'Sem espaço para salvar a foto neste navegador.' }); } this.setState({ err: '' }); Orb.flash(this, 'Foto atualizada'); };
+        r.readAsDataURL(file);
+      },
+      resetAll: () => { if (!window.confirm('Restaurar os dados originais? Tudo o que você alterou será apagado.')) return; Orb.reset(); location.reload(); }
+    });
+  }
+}
+</script>
+</body>
+</html>

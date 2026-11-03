@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Equipe e acessos</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <button class="org hide-c hide-m" onClick="{{goOrgs}}" title="Trocar organização">
+    <span class="orgmark" style="background:{{curOrg.color}}">{{curOrg.mark}}</span>
+    <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">{{curOrg.name}}</span><span style="display:block;font-size:11.5px;color:#9AADC1">{{curOrg.role}} · Plano {{curOrg.plan}}</span></span>
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  </button>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Perfil.dc.html" class="nav" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">CA</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">Cauã Augusto</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · {{curOrg.name}}</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Administração · {{curOrg.name}}</div><h1 class="h1">Equipe &amp; acessos</h1></div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div class="glass" style="padding:8px 14px;border-radius:12px;display:flex;align-items:center;gap:12px;min-width:220px">
+        <div style="flex:1"><div style="font-size:12px;color:#9AADC1;margin-bottom:6px">Assentos · Plano Pro</div><div class="{{seatBar}}"><i style="width:{{seatW}}"></i></div></div>
+        <span class="disp" style="font-weight:700">{{seats}}/10</span>
+      </div>
+      <button class="btn pri" onClick="{{openInv}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6"></path></svg>Convidar pessoas</button>
+    </div>
+  </header>
+
+  <div class="seg" role="tablist" aria-label="Seções" style="align-self:flex-start;flex-wrap:wrap">
+    <button class="{{tM}}" onClick="{{setM}}">Membros · {{memberN}}</button>
+    <button class="{{tC}}" onClick="{{setC}}">Convites · {{invN}}</button>
+    <button class="{{tP}}" onClick="{{setP}}">Permissões</button>
+    <button class="{{tO}}" onClick="{{setO}}">Organizações · 3</button>
+  </div>
+
+  <sc-if value="{{isM}}" hint-placeholder-val="{{true}}">
+    <section class="glass" style="padding:8px 6px">
+      <div class="tblw"><table class="tbl">
+        <thead><tr><th>Pessoa</th><th>Papel</th><th>Squad</th><th>Nível</th><th>Último acesso</th><th>2FA</th></tr></thead>
+        <tbody>
+          <sc-for list="{{members}}" as="m" hint-placeholder-count="8">
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div><div style="font-weight:700">{{m.n}}</div><div style="font-size:12px;color:#9AADC1">{{m.e}}</div></div></div></td>
+              <td><sc-if value="{{m.locked}}" hint-placeholder-val="{{false}}"><span class="chip cy">Admin · você</span></sc-if><sc-if value="{{m.editable}}" hint-placeholder-val="{{true}}"><select class="inp" style="height:36px;width:140px;font-size:13px" value="{{m.role}}" onChange="{{m.setRole}}" aria-label="Papel de {{m.n}}"><option value="Admin">Admin</option><option value="Gestor">Gestor</option><option value="Vendedor">Vendedor</option><option value="Suporte">Suporte</option><option value="Leitor">Leitor</option></select></sc-if></td>
+              <td style="color:#C9D5E1">{{m.sq}}</td>
+              <td><span class="disp" style="font-weight:700;color:#ADA0FF">Nv {{m.lv}}</span></td>
+              <td style="color:#9AADC1">{{m.last}}</td>
+              <td><span class="{{m.tfaCls}}">{{m.tfa}}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table></div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{isC}}" hint-placeholder-val="{{false}}">
+    <section class="glass" style="padding:18px;display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{invites}}" as="v" hint-placeholder-count="2">
+        <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);flex-wrap:wrap">
+          <span class="av sm" style="background:rgba(150,200,255,.2);color:#E7EEF6">@</span>
+          <div style="flex:1 1 220px;min-width:0"><div style="font-weight:700">{{v.e}}</div><div style="font-size:12px;color:#9AADC1">{{v.role}} · {{v.sq}} · enviado {{v.sent}} por Cauã</div></div>
+          <span class="chip yl">Expira em {{v.exp}}</span>
+          <button class="btn sm" onClick="{{v.resend}}">Reenviar</button>
+          <button class="btn sm ghost" onClick="{{v.cancel}}">Cancelar</button>
+        </div>
+      </sc-for>
+      <sc-if value="{{noInv}}" hint-placeholder-val="{{false}}"><div style="padding:30px;text-align:center;color:#9AADC1">Nenhum convite pendente.</div></sc-if>
+      <div style="font-size:12.5px;color:#9AADC1;padding:4px">Convites pendentes ocupam um assento até expirarem (7 dias). Link de convite também pode ser restrito ao domínio @verticelabs.com.br.</div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{isP}}" hint-placeholder-val="{{false}}">
+    <section class="glass" style="padding:8px 6px">
+      <div class="tblw"><table class="tbl">
+        <thead><tr><th>Permissão</th><sc-for list="{{roles}}" as="r" hint-placeholder-count="5"><th style="text-align:center">{{r}}</th></sc-for></tr></thead>
+        <tbody>
+          <sc-for list="{{matrix}}" as="p" hint-placeholder-count="9">
+            <tr><td><div style="font-weight:600">{{p.n}}</div><div style="font-size:12px;color:#9AADC1">{{p.d}}</div></td>
+              <sc-for list="{{p.cells}}" as="c" hint-placeholder-count="5"><td style="text-align:center"><button class="{{c.cls}}" onClick="{{c.flip}}" aria-label="{{c.aria}}" style="margin:0 auto;opacity:{{c.op}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></button></td></sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table></div>
+      <div style="font-size:12.5px;color:#9AADC1;padding:12px 14px">Admin tem acesso total e não pode ser editado. Mudanças valem no próximo login de cada pessoa e ficam no log de auditoria.</div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{isO}}" hint-placeholder-val="{{false}}">
+    <section class="grid-a">
+      <sc-for list="{{orgs}}" as="o" hint-placeholder-count="3">
+        <div class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:14px;border-color:{{o.bd}}">
+          <div style="display:flex;gap:12px;align-items:center"><span class="orgmark" style="background:{{o.color}};width:44px;height:44px;flex-basis:44px;font-size:16px">{{o.mark}}</span><div><div style="font-weight:700;font-size:15px">{{o.name}}</div><div style="font-size:12px;color:#9AADC1">{{o.role}} · Plano {{o.plan}}</div></div></div>
+          <div style="display:flex;gap:16px;font-size:12.5px;color:#9AADC1"><span><b style="color:#E7EEF6">{{o.members}}</b> membros</span><span><b style="color:#E7EEF6">{{o.deals}}</b> negócios abertos</span></div>
+          <sc-if value="{{o.isCur}}" hint-placeholder-val="{{false}}"><span class="chip gr" style="align-self:flex-start">Organização atual</span></sc-if>
+          <sc-if value="{{o.canEnter}}" hint-placeholder-val="{{true}}"><button class="btn sm" onClick="{{o.enter}}" style="align-self:flex-start">Entrar nesta organização</button></sc-if>
+        </div>
+      </sc-for>
+      <button class="glass" onClick="{{newOrg}}" style="padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;border-style:dashed;color:#9AADC1;cursor:pointer;min-height:170px;font:inherit">
+        <span class="icob" style="border-radius:50%"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span>
+        <span style="font-weight:700;color:#E7EEF6">Criar organização</span><span style="font-size:12px">Dados, equipe e cobrança separados</span>
+      </button>
+    </section>
+  </sc-if>
+</main>
+
+<sc-if value="{{invOpen}}" hint-placeholder-val="{{false}}">
+  <div class="ov">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="inv-t">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="inv-t" class="disp" style="margin:0;font-size:22px">Convidar para {{curOrg.name}}</h2><button class="icob" onClick="{{closeInv}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lb" for="iv-e">E-mails (separe por vírgula)</label><input id="iv-e" class="inp" value="{{ivE}}" onChange="{{onIvE}}" placeholder="nome@verticelabs.com.br"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:14px">
+          <div><label class="lb" for="iv-r">Papel</label><select id="iv-r" class="inp" value="{{ivR}}" onChange="{{onIvR}}"><option value="Vendedor">Vendedor</option><option value="Gestor">Gestor</option><option value="Suporte">Suporte</option><option value="Leitor">Leitor</option></select></div>
+          <div><label class="lb" for="iv-s">Squad</label><select id="iv-s" class="inp" value="{{ivS}}" onChange="{{onIvS}}"><option value="Squad Alfa">Squad Alfa</option><option value="Squad Ômega">Squad Ômega</option><option value="Atendimento">Atendimento</option></select></div>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(95,224,240,.06);border:1px solid rgba(95,224,240,.2);font-size:12.5px;line-height:1.5;color:#C9D5E1">{{ivHint}}</div>
+        <sc-if value="{{full}}" hint-placeholder-val="{{false}}"><a href="Planos.dc.html" style="font-size:13px;font-weight:700">Assentos esgotados — ver planos com mais assentos →</a></sc-if>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeInv}}">Cancelar</button><button class="btn pri" onClick="{{sendInv}}">Enviar convite</button></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = {
+    collapsed: false, tab: 'm', invOpen: false, ivE: '', ivR: 'Vendedor', ivS: 'Squad Ômega', toast: null, org: 'v',
+    roles: { ML: 'Gestor', BK: 'Vendedor', LR: 'Vendedor', RT: 'Vendedor', TN: 'Vendedor', DA: 'Suporte', JP: 'Suporte' },
+    invites: [{ id: 1, e: 'pedro.sales@verticelabs.com.br', role: 'Vendedor', sq: 'Squad Alfa', sent: '29/10', exp: '5 dias' }],
+    perms: {
+      all: [1, 1, 0, 1, 1], edit: [1, 1, 0, 0, 0], del: [1, 0, 0, 0, 0], exp: [1, 1, 0, 0, 0], pipe: [1, 1, 0, 0, 0],
+      users: [1, 0, 0, 0, 0], bill: [1, 0, 0, 0, 0], game: [1, 1, 0, 0, 0], sup: [1, 1, 1, 1, 0]
+    }
+  };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const CUR = 'Equipe.dc.html';
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task','3'],['Atendimento'],['Suporte.dc.html','Suporte interno','sup','23'],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === CUR ? 'nav on' : 'nav' });
+
+    const ORGS = { v: { name: 'Vértice Labs', mark: 'VL', color: '#5FE0F0', role: 'Admin', plan: 'Pro', members: 8, deals: 36 }, n: { name: 'Nordtech Soluções', mark: 'NT', color: '#FF9A62', role: 'Gestor', plan: 'Business', members: 23, deals: 21 }, a: { name: 'Aurora Franquias', mark: 'AF', color: '#ADA0FF', role: 'Membro', plan: 'Starter', members: 4, deals: 14 } };
+    const M = [['CA', 'Cauã Augusto', 'caua@verticelabs.com.br', 'Squad Ômega', 14, 'agora', true, '#5FE0F0'], ['ML', 'Marina Lopes', 'marina@verticelabs.com.br', 'Squad Alfa', 19, 'há 4 min', true, '#FF9A62'], ['BK', 'Bianca Kato', 'bianca@verticelabs.com.br', 'Squad Alfa', 17, 'há 12 min', true, '#ADA0FF'], ['LR', 'Lívia Ramos', 'livia@verticelabs.com.br', 'Squad Ômega', 15, 'há 1 h', true, '#5ADFA4'], ['RT', 'Rafael Torres', 'rafael@verticelabs.com.br', 'Squad Alfa', 12, 'há 1 h', false, '#FF7A8A'], ['TN', 'Thiago Nunes', 'thiago@verticelabs.com.br', 'Squad Ômega', 9, 'ontem', true, '#F3D06E'], ['DA', 'Diego Almeida', 'diego@verticelabs.com.br', 'Atendimento', 15, 'há 26 min', true, '#F3D06E'], ['JP', 'Júlia Prado', 'julia@verticelabs.com.br', 'Atendimento', 13, 'há 3 min', true, '#5ADFA4']];
+    const members = M.map(m => ({ i: m[0], n: m[1], e: m[2], sq: m[3], lv: m[4], last: m[5], tfa: m[6] ? 'Ativo' : 'Pendente', tfaCls: m[6] ? 'chip gr' : 'chip or', c: m[7], locked: m[0] === 'CA', editable: m[0] !== 'CA', role: s.roles[m[0]] || 'Admin',
+      setRole: (e) => { const v = e.target.value; this.setState({ roles: Object.assign({}, s.roles, { [m[0]]: v }) }); this.flash(m[1] + ' agora é ' + v); } }));
+    const seats = M.length + s.invites.length;
+    const RL = ['Admin', 'Gestor', 'Vendedor', 'Suporte', 'Leitor'];
+    const P = [['all', 'Ver todos os negócios', 'Sem isso, vê só os próprios'], ['edit', 'Editar negócios de outros', 'Mover etapa, valor e dono'], ['del', 'Excluir registros', 'Contatos, empresas e negócios'], ['exp', 'Exportar dados', 'CSV e relatórios completos'], ['pipe', 'Gerenciar funis', 'Criar etapas e regras'], ['users', 'Gerenciar usuários', 'Convidar, remover e mudar papéis'], ['bill', 'Plano e cobrança', 'Faturas e forma de pagamento'], ['game', 'Configurar gamificação', 'Metas, desafios e recompensas'], ['sup', 'Atender tickets', 'Responder e resolver no suporte']];
+    const matrix = P.map(p => ({ n: p[1], d: p[2], cells: s.perms[p[0]].map((v, i) => ({ cls: v ? 'chk on' : 'chk', op: i === 0 ? '.6' : '1', aria: (v ? 'Remover ' : 'Conceder ') + p[1] + ' para ' + RL[i],
+      flip: () => { if (i === 0) { this.flash('Admin tem acesso total'); return; } const row = s.perms[p[0]].slice(); row[i] = row[i] ? 0 : 1; this.setState({ perms: Object.assign({}, s.perms, { [p[0]]: row }) }); this.flash(RL[i] + ': ' + p[1] + (row[i] ? ' concedido' : ' removido')); } })) }));
+    const invites = s.invites.map(v => Object.assign({}, v, { resend: () => this.flash('Convite reenviado para ' + v.e), cancel: () => { this.setState({ invites: s.invites.filter(x => x.id !== v.id) }); this.flash('Convite cancelado · assento liberado'); } }));
+    const orgs = Object.keys(ORGS).map(id => Object.assign({}, ORGS[id], { isCur: id === s.org, canEnter: id !== s.org, bd: id === s.org ? 'rgba(95,224,240,.35)' : 'rgba(150,200,255,.12)', enter: () => { this.setState({ org: id }); this.flash('Você entrou em ' + ORGS[id].name); } }));
+    const full = seats >= 10;
+    const tab = (t) => () => this.setState({ tab: t });
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6', toggle: () => this.setState({ collapsed: !s.collapsed }), nav,
+      curOrg: ORGS[s.org], goOrgs: tab('o'),
+      seats, seatW: seats * 10 + '%', seatBar: full ? 'bar or' : 'bar',
+      tM: s.tab === 'm' ? 'on' : '', tC: s.tab === 'c' ? 'on' : '', tP: s.tab === 'p' ? 'on' : '', tO: s.tab === 'o' ? 'on' : '',
+      setM: tab('m'), setC: tab('c'), setP: tab('p'), setO: tab('o'), isM: s.tab === 'm', isC: s.tab === 'c', isP: s.tab === 'p', isO: s.tab === 'o',
+      memberN: M.length, invN: s.invites.length, members, invites, noInv: s.invites.length === 0, roles: RL, matrix, orgs,
+      newOrg: () => this.flash('Assistente de nova organização iniciado'),
+      invOpen: s.invOpen, openInv: () => this.setState({ invOpen: true }), closeInv: () => this.setState({ invOpen: false }),
+      ivE: s.ivE, ivR: s.ivR, ivS: s.ivS, onIvE: (e) => this.setState({ ivE: e.target.value }), onIvR: (e) => this.setState({ ivR: e.target.value }), onIvS: (e) => this.setState({ ivS: e.target.value }),
+      ivHint: 'A pessoa entra como ' + s.ivR + ' na ' + s.ivS + ', começa no Nível 1 e recebe a trilha de missões de boas-vindas (5 missões, +150 XP).', full,
+      sendInv: () => { const list = s.ivE.split(',').map(x => x.trim()).filter(Boolean); if (!list.length) { this.flash('Informe pelo menos um e-mail'); return; } const room = 10 - seats; if (room <= 0) { this.flash('Sem assentos livres no Plano Pro'); return; } const add = list.slice(0, room).map((e, k) => ({ id: Date.now() + k, e, role: s.ivR, sq: s.ivS, sent: 'hoje', exp: '7 dias' })); this.setState({ invites: s.invites.concat(add), invOpen: false, ivE: '', tab: 'c' }); this.flash(add.length + (add.length > 1 ? ' convites enviados' : ' convite enviado') + (list.length > room ? ' · ' + (list.length - room) + ' sem assento' : '')); },
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

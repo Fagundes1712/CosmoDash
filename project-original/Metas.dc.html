@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Órbita CRM · Metas &amp; conquistas</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#5FE0F0}a:hover{color:#9CEFF8}
+</style>
+</helmet>
+<div class="app {{shell}}">
+
+<aside class="side">
+  <div class="side-head">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:18px;font-weight:700;letter-spacing:.16em">ÓRBITA</div><div class="hud" style="font-size:9.5px">CRM · Orion IA</div></div>
+    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+  </div>
+  <a class="org hide-c hide-m" href="Equipe.dc.html" title="Trocar organização">
+    <span class="orgmark" style="background:#5FE0F0">VL</span>
+    <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">Vértice Labs</span><span style="display:block;font-size:11.5px;color:#9AADC1">Admin · Plano Pro</span></span>
+    <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  </a>
+  <nav style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="12">
+      <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}"><div class="navh">{{n.label}}</div></sc-if>
+      <sc-if value="{{n.link}}" hint-placeholder-val="{{true}}">
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div class="hide-m" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <a href="Perfil.dc.html" class="nav" title="Meu perfil" style="min-height:52px">
+      <span class="av" style="background:#5FE0F0">CA</span>
+      <span class="hide-c" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">Cauã Augusto</span><span style="display:block;font-size:11.5px;font-weight:500">Admin · Vértice Labs</span></span>
+    </a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Performance · Temporada Q4 · termina em 61 dias</div><h1 class="h1">Metas &amp; conquistas</h1></div>
+    <div class="seg" role="group" aria-label="Visão"><button class="{{vI}}" onClick="{{setI}}">Individual</button><button class="{{vE}}" onClick="{{setE}}">Squad Ômega</button></div>
+  </header>
+
+  <section class="glass scan" style="padding:24px;display:flex;gap:28px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:auto -80px -120px auto;width:360px;height:360px;border-radius:50%;border:1px solid rgba(173,160,255,.18);pointer-events:none"></div>
+    <div style="position:absolute;inset:auto -20px -60px auto;width:240px;height:240px;border-radius:50%;border:1px dashed rgba(95,224,240,.18);pointer-events:none"></div>
+    <svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="{{hero.aria}}">
+      <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(150,200,255,.1)" stroke-width="8"></circle>
+      <circle cx="70" cy="70" r="60" fill="none" stroke="{{hero.color}}" stroke-width="8" stroke-linecap="round" stroke-dasharray="{{hero.dash}}" transform="rotate(-90 70 70)" style="filter:drop-shadow(0 0 10px {{hero.color}})"></circle>
+      <text x="70" y="66" text-anchor="middle" fill="#9AADC1" font-family="JetBrains Mono" font-size="10" letter-spacing="2">NÍVEL</text>
+      <text x="70" y="96" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="38">{{hero.lvl}}</text>
+    </svg>
+    <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:10px;min-width:0">
+      <div class="hud" style="color:{{hero.color}}">{{hero.tier}}</div>
+      <div class="disp" style="font-size:30px;font-weight:700">{{hero.name}}</div>
+      <div class="bar vi" style="height:8px;max-width:520px"><i style="width:{{hero.pct}}"></i></div>
+      <div style="font-size:13px;color:#9AADC1">{{hero.sub}}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(90px,auto));gap:12px">
+      <sc-for list="{{hero.stats}}" as="x" hint-placeholder-count="3"><div style="padding:14px 16px;border-radius:14px;background:rgba(4,8,14,.5);border:1px solid rgba(150,200,255,.1)"><div class="disp" style="font-size:22px;font-weight:700;color:{{x.c}}">{{x.v}}</div><div style="font-size:11.5px;color:#9AADC1">{{x.l}}</div></div></sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:6px">
+    <div class="hud" style="padding-left:4px">Trilha de progressão</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px">
+      <sc-for list="{{tiers}}" as="t" hint-placeholder-count="6">
+        <div style="padding:14px;border-radius:16px;border:1px solid {{t.bd}};background:{{t.bg}};display:flex;flex-direction:column;gap:6px;opacity:{{t.op}}">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span class="disp" style="font-weight:700;color:{{t.c}}">{{t.n}}</span><span class="hud" style="font-size:10px">Nv {{t.r}}</span></div>
+          <div style="font-size:12px;color:#B7C5D4;line-height:1.45">{{t.perk}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="split">
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Metas de outubro · {{goalOwner}}</h2><span class="hud">Fecha hoje 23:59</span></div>
+      <sc-for list="{{goals}}" as="g" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px;flex-wrap:wrap"><span style="font-weight:600">{{g.t}}</span><span><span class="disp" style="font-weight:700;color:#E7EEF6">{{g.v}}</span> <span style="color:#9AADC1">/ {{g.goal}}</span></span></div>
+          <div class="{{g.barCls}}" style="height:8px"><i style="width:{{g.w}}"></i></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#9AADC1"><span>{{g.note}}</span><span style="color:{{g.pc}};font-weight:700">{{g.pct}}</span></div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+      <h2 class="h2">Desafios ativos</h2>
+      <sc-for list="{{challenges}}" as="c" hint-placeholder-count="4">
+        <div style="padding:14px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid {{c.bd}};display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="{{c.kCls}}">{{c.kind}}</span><span style="font-size:11.5px;color:#9AADC1">{{c.ends}}</span></div>
+          <div style="font-weight:700;font-size:14px">{{c.t}}</div>
+          <div style="font-size:12.5px;color:#9AADC1;line-height:1.45">{{c.d}}</div>
+          <sc-if value="{{c.joined}}" hint-placeholder-val="{{true}}"><div style="display:flex;align-items:center;gap:10px"><div class="bar or" style="flex:1"><i style="width:{{c.w}}"></i></div><span style="font-size:12px;font-weight:700">{{c.p}}</span></div></sc-if>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span class="xp">{{c.reward}}</span><sc-if value="{{c.canJoin}}" hint-placeholder-val="{{false}}"><button class="btn sm pri" onClick="{{c.join}}">Participar</button></sc-if></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h2 class="h2">Conquistas · {{unlocked}} de {{badgeN}}</h2><span style="font-size:12px;color:#9AADC1">A raridade mostra quantos usuários da plataforma já desbloquearam.</span></div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:stretch">
+      <div style="flex:999 1 520px;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px">
+        <sc-for list="{{badges}}" as="b" hint-placeholder-count="8">
+          <button class="{{b.cls}}" onClick="{{b.pick}}" style="flex-direction:column;gap:8px;padding:14px 8px;text-align:center;opacity:{{b.op}}" aria-label="{{b.n}}">
+            <svg width="54" height="60" viewBox="0 0 54 60" aria-hidden="true"><path d="M27 3l22 12.5v29L27 57 5 44.5v-29z" fill="{{b.fill}}" stroke="{{b.c}}" stroke-width="1.6"></path><path d="{{b.icon}}" fill="none" stroke="{{b.c}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(15 18)"></path></svg>
+            <span style="font-size:12px;font-weight:700;line-height:1.3">{{b.n}}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="flex:1 1 260px;padding:18px;border-radius:16px;background:rgba(4,8,14,.5);border:1px solid rgba(150,200,255,.12);display:flex;flex-direction:column;gap:10px">
+        <div class="hud" style="color:{{bd.c}}">{{bd.state}}</div>
+        <div class="disp" style="font-size:22px;font-weight:700">{{bd.n}}</div>
+        <div style="font-size:13px;color:#C9D5E1;line-height:1.55">{{bd.d}}</div>
+        <sc-if value="{{bd.hasProg}}" hint-placeholder-val="{{true}}"><div style="display:flex;align-items:center;gap:10px"><div class="bar vi" style="flex:1"><i style="width:{{bd.w}}"></i></div><span style="font-size:12px;font-weight:700">{{bd.p}}</span></div></sc-if>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#9AADC1;margin-top:auto"><span>Raridade {{bd.r}}</span><span class="xp">+{{bd.xp}} XP</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="glass" style="padding:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:18px;font-size:13px;line-height:1.55;color:#C9D5E1">
+    <div><div class="hud" style="color:#5FE0F0;margin-bottom:6px">XP vem de resultado</div>Negócio ganho vale 50 XP + 3 XP por mil reais. Avanço de etapa só conta com atividade registrada.</div>
+    <div><div class="hud" style="color:#5FE0F0;margin-bottom:6px">Sem incentivo a volume vazio</div>Limite diário de XP por atividades repetidas; ticket resolvido fora do SLA não pontua.</div>
+    <div><div class="hud" style="color:#5FE0F0;margin-bottom:6px">Equipe pesa tanto quanto você</div>Desafios de squad dão XP a todos os membros. Ajudar em negócio de colega conta para Mentor.</div>
+    <div><div class="hud" style="color:#5FE0F0;margin-bottom:6px">Privacidade</div>Ranking visível só dentro da organização. Cada pessoa pode ocultar o próprio nível em Perfil.</div>
+  </section>
+</main>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+  <div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { collapsed: false, view: 'i', joined: {}, badge: 'streak', toast: null };
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const IC = {dash:'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',pipe:'M3 4h18l-7 8.5V19l-4 2v-8.5z',cont:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',task:'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',sup:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',goal:'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3',team:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',plan:'M2 5h20v14H2zM2 10h20M6 15h4'};
+    const CUR = 'Metas.dc.html';
+    const NAV = [['Comercial'],['Main.dc.html','Dashboard','dash'],['Pipeline.dc.html','Funis de vendas','pipe','36'],['Contatos.dc.html','Contatos','cont'],['Tarefas.dc.html','Tarefas','task','3'],['Atendimento'],['Suporte.dc.html','Suporte interno','sup','23'],['Performance'],['Metas.dc.html','Metas & conquistas','goal'],['Administração'],['Equipe.dc.html','Equipe & acessos','team'],['Planos.dc.html','Planos & pagamentos','plan']];
+    const nav = NAV.map(a => a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === CUR ? 'nav on' : 'nav' });
+    const ind = s.view === 'i';
+    const hero = ind
+      ? { lvl: 14, name: 'Cauã Augusto', tier: 'Estrategista · Nível 14', color: '#ADA0FF', pct: '78%', dash: Math.round(0.78 * 377) + ' 400', aria: 'Nível 14, 78% para o próximo', sub: '2.340 de 3.000 XP para o Nível 15 · Elite começa no Nível 16', stats: [{ v: '7.960', l: 'XP na temporada', c: '#FF9A62' }, { v: '#3', l: 'no ranking', c: '#F3D06E' }, { v: '6 dias', l: 'sequência', c: '#5FE0F0' }] }
+      : { lvl: 9, name: 'Squad Ômega', tier: 'Especialista · Nível de equipe 9', color: '#5FE0F0', pct: '64%', dash: Math.round(0.64 * 377) + ' 400', aria: 'Nível de equipe 9, 64% para o próximo', sub: 'Cauã, Lívia e Thiago · 20.310 XP na temporada · 2º entre 3 equipes', stats: [{ v: '20.310', l: 'XP na temporada', c: '#FF9A62' }, { v: '#2', l: 'entre equipes', c: '#F3D06E' }, { v: '4.550', l: 'XP para o 1º', c: '#5FE0F0' }] };
+    const TI = [['Operador', '1–5', 'Painel pessoal e missões diárias', '#9AADC1'], ['Especialista', '6–10', 'Desafios semanais e mentoria', '#5ADFA4'], ['Estrategista', '11–15', 'Acesso antecipado a leads inbound', '#ADA0FF'], ['Elite', '16–20', 'Destaque mensal na organização', '#5FE0F0'], ['Vanguarda', '21–25', 'Participa da definição de metas', '#FF9A62'], ['Órbita', '26–30', 'Recompensa definida pela empresa', '#F3D06E']];
+    const curTier = ind ? 2 : 1;
+    const tiers = TI.map((t, i) => ({ n: t[0], r: t[1], perk: t[2], c: t[3], op: i <= curTier ? '1' : '.55', bd: i === curTier ? t[3] : 'rgba(150,200,255,.1)', bg: i === curTier ? 'rgba(173,160,255,.07)' : 'rgba(148,197,255,.03)' }));
+    const G = ind
+      ? [['Receita fechada', 'R$ 118.400', 'R$ 150.000', 79, 'Atlas Engenharia (R$ 62 mil) bate a meta'], ['Negócios criados', '14', '20', 70, '6 restantes · média de 3 por semana'], ['Atividades registradas', '186', '220', 85, 'Ritmo de 8 por dia útil'], ['Conversão pessoal', '26%', '25%', 104, 'Meta batida em 22/10']]
+      : [['Receita do squad', 'R$ 164.300', 'R$ 200.000', 82, 'Faltam R$ 35.700'], ['Negócios ganhos', '6', '8', 75, 'Atlas e Pátio estão em Fechamento'], ['Tempo de 1ª resposta', '9 min', '15 min', 100, 'Melhor da organização'], ['Negócios parados +10d', '2', '0', 60, 'Grupo Lumen e Ferraz Logística']];
+    const goals = G.map(g => ({ t: g[0], v: g[1], goal: g[2], w: Math.min(100, g[3]) + '%', pct: g[3] + '%', note: g[4], pc: g[3] >= 100 ? '#5ADFA4' : '#E7EEF6', barCls: g[3] >= 100 ? 'bar gr' : 'bar' }));
+    const CH = [
+      { id: 'sprint', kind: 'Individual', kCls: 'chip cy', t: 'Sprint de fechamento', d: 'Feche 2 negócios que estão em Fechamento até o fim do mês.', ends: 'termina hoje', p: '0/2', w: '4%', reward: '+300 XP · emblema Sprint', joined: true },
+      { id: 'squad', kind: 'Equipe', kCls: 'chip vi', t: 'Squad Ômega · R$ 120 mil em fechamentos', d: 'Meta semanal do squad. Todos os membros recebem a recompensa.', ends: '1 dia', p: '74%', w: '74%', reward: '+200 XP por membro', joined: true },
+      { id: 'zero', kind: 'Equipe', kCls: 'chip vi', t: 'Zero parados', d: 'Nenhum negócio do squad sem atividade há mais de 10 dias.', ends: '6 dias', p: '2 restantes', w: '60%', reward: '+150 XP por membro', joined: true },
+      { id: 'prosp', kind: 'Aberto', kCls: 'chip or', t: 'Prospector de novembro', d: '30 novos contatos qualificados ao longo de novembro. Opcional.', ends: 'começa amanhã', p: '0/30', w: '0%', reward: '+400 XP · emblema Prospector', joined: false }
+    ];
+    const challenges = CH.map(c => { const j = c.joined || !!s.joined[c.id]; return Object.assign({}, c, { joined: j, canJoin: !j, bd: c.kind === 'Aberto' && !j ? 'rgba(255,154,98,.35)' : 'rgba(150,200,255,.1)', join: () => { this.setState({ joined: Object.assign({}, s.joined, { [c.id]: true }) }); this.flash('Você entrou no desafio ' + c.t); } }); });
+    const B = [
+      ['first', 'Primeiro fechamento', 'M4 13l5 5L22 6', true, '', 'Seu primeiro negócio ganho no Órbita.', '92%', 50, '#5ADFA4'],
+      ['flash', 'Resposta relâmpago', 'M13 2L4 14h7l-1 8 9-12h-7z', true, '', '50 leads respondidos em menos de 15 minutos.', '31%', 150, '#5FE0F0'],
+      ['marathon', 'Maratonista', 'M3 12h4l3-8 4 16 3-8h4', true, '', '100 tarefas concluídas no prazo em um mês.', '24%', 200, '#5FE0F0'],
+      ['streak', 'Sequência de 7 dias', 'M12 22c4 0 7-2.7 7-7 0-4-3-6.5-4-9.5-1.5 2-2.5 3-3.5 3C11 6 10 4 10 2 6.5 4.5 5 9 5 13.5 5 18.8 8 22 12 22z', false, '6/7', 'Bata a meta diária de atividades por 7 dias seguidos. Falta 1 dia: conclua as tarefas de hoje.', '18%', 120, '#FF9A62'],
+      ['mentor', 'Mentor', 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6', false, '2/3', 'Participe de 3 negócios ganhos de colegas como apoio registrado.', '12%', 250, '#ADA0FF'],
+      ['elite', 'Fechador de elite', 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z', false, '4/10', '10 negócios ganhos em um único mês. A Marina desbloqueou hoje.', '6%', 400, '#F3D06E'],
+      ['six', 'Seis dígitos', 'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', false, '0/1', 'Feche um único negócio de R$ 100 mil ou mais.', '4%', 500, '#F3D06E'],
+      ['orbit', 'Top 3 da temporada', 'M12 2l3 7h7l-5.5 4.5 2 7.5-6.5-4.5L5.5 21l2-7.5L2 9h7z', false, 'Q4', 'Termine a temporada entre os 3 primeiros da organização. Você está em 3º.', '3%', 600, '#ADA0FF']
+    ];
+    const badges = B.map(b => ({ n: b[1], icon: b[2], c: b[3] ? b[8] : '#7A8EA3', fill: b[3] ? 'rgba(148,197,255,.08)' : 'rgba(148,197,255,.02)', op: b[3] ? '1' : '.75', cls: s.badge === b[0] ? 'rowb on' : 'rowb', pick: () => this.setState({ badge: b[0] }) }));
+    const sb = B.find(b => b[0] === s.badge) || B[0];
+    const pr = sb[4] && sb[4].includes('/') ? sb[4].split('/').map(Number) : null;
+    const bd = { n: sb[1], d: sb[5], r: sb[6], xp: sb[7], c: sb[3] ? '#5ADFA4' : '#FF9A62', state: sb[3] ? 'Desbloqueada' : 'Em progresso', hasProg: !sb[3] && !!pr, p: sb[4], w: pr ? Math.round(pr[0] / pr[1] * 100) + '%' : '0%' };
+    return {
+      shell: s.collapsed ? 'collapsed' : '', chev: s.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6', toggle: () => this.setState({ collapsed: !s.collapsed }), nav,
+      vI: ind ? 'on' : '', vE: ind ? '' : 'on', setI: () => this.setState({ view: 'i' }), setE: () => this.setState({ view: 'e' }),
+      hero, tiers, goals, goalOwner: ind ? 'você' : 'Squad Ômega', challenges, badges, bd, unlocked: B.filter(b => b[3]).length, badgeN: B.length,
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

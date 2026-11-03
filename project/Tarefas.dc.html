@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CosmoDash · Tarefas</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="./orbita.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Comercial · {{date}}</div><h1 class="h1">Tarefas</h1></div>
+    <div class="seg" role="group" aria-label="Período"><button class="{{vH}}" onClick="{{setH}}">Hoje</button><button class="{{vS}}" onClick="{{setS}}">Próximos dias</button><button class="{{vA}}" onClick="{{setA}}">Atrasadas · {{lateN}}</button></div>
+  </header>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+    <section style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:16px">
+      <form class="glass" onSubmit="{{add}}" style="display:flex;gap:10px;padding:10px;border-radius:16px;align-items:center;flex-wrap:wrap">
+        <label for="nt" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nova tarefa</label>
+        <input id="nt" class="inp" style="flex:1 1 240px;border:0;background:transparent" value="{{draft}}" onChange="{{onDraft}}" placeholder="Adicionar tarefa — ex.: ligar para Sofia Lemos amanhã às 10h">
+        <select class="inp" style="width:auto;flex:0 0 auto" value="{{dType}}" onChange="{{onType}}" aria-label="Tipo"><option value="Ligação">Ligação</option><option value="E-mail">E-mail</option><option value="Reunião">Reunião</option><option value="Follow-up">Follow-up</option></select>
+        <button class="btn pri" type="submit">Adicionar</button>
+      </form>
+
+      <sc-for list="{{groups}}" as="g">
+        <div class="glass" style="padding:16px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 10px"><span class="hud" style="color:{{g.c}}">{{g.name}}</span><span style="font-size:12px;color:#9AADC1">{{g.sum}}</span></div>
+          <sc-for list="{{g.items}}" as="t">
+            <div style="display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:14px;opacity:{{t.op}};flex-wrap:wrap">
+              <button class="{{t.chk}}" onClick="{{t.flip}}" aria-label="{{t.aria}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></button>
+              <span class="disp" style="font-size:13px;color:#5FE0F0;width:44px">{{t.h}}</span>
+              <span style="flex:1 1 160px;min-width:0"><span style="display:block;font-weight:600;font-size:14px;text-decoration:{{t.td}}">{{t.t}}</span><span style="display:block;font-size:12px;color:#9AADC1">{{t.ctx}}</span></span>
+              <span class="{{t.typeCls}}">{{t.type}}</span>
+              <sc-if value="{{t.hi}}"><span class="chip or">Alta</span></sc-if>
+              <span class="xp" style="width:52px;text-align:right">+{{t.xpShow}}</span>
+              <button class="icob" onClick="{{t.del}}" aria-label="Apagar {{t.t}}" style="width:28px;height:28px;flex-basis:28px"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+      <sc-if value="{{noGroups}}"><div class="glass" style="padding:32px;text-align:center;color:#9AADC1">Nenhuma tarefa nesta visão.</div></sc-if>
+    </section>
+
+    <aside style="flex:1 1 300px;display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="glass scan" style="padding:22px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+        <div class="hud">Progresso de hoje</div>
+        <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="{{doneN}} de {{totalN}} tarefas concluídas">
+          <circle cx="75" cy="75" r="62" fill="none" stroke="rgba(150,200,255,.1)" stroke-width="10"></circle>
+          <circle cx="75" cy="75" r="62" fill="none" stroke="#5FE0F0" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{dash}}" transform="rotate(-90 75 75)" style="filter:drop-shadow(0 0 8px rgba(95,224,240,.6));transition:stroke-dasharray .4s"></circle>
+          <circle cx="75" cy="75" r="48" fill="none" stroke="rgba(150,200,255,.08)" stroke-width="1" stroke-dasharray="2 5"></circle>
+          <text x="75" y="80" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="32">{{doneN}}/{{totalN}}</text>
+          <text x="75" y="102" text-anchor="middle" fill="#9AADC1" font-family="Manrope" font-weight="600" font-size="12">concluídas</text>
+        </svg>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%">
+          <div style="padding:12px;border-radius:12px;background:rgba(4,8,14,.45)"><div class="xp" style="font-size:20px">+{{xpToday}}</div><div style="font-size:11.5px;color:#9AADC1">XP hoje</div></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(4,8,14,.45)"><div class="disp" style="font-size:20px;font-weight:700;color:#FF9A62">{{streak}} dias</div><div style="font-size:11.5px;color:#9AADC1">sequência</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#9AADC1;line-height:1.5">{{hint}}</div>
+      </div>
+
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+        <h2 class="h2">Equipe hoje</h2>
+        <sc-for list="{{team}}" as="m">
+          <div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="font-weight:600">{{m.n}}</span><span style="color:#9AADC1">{{m.p}}</span></div><div class="bar"><i style="width:{{m.w}}"></i></div></div></div>
+        </sc-for>
+      </div>
+
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:#C9D5E1;line-height:1.5">
+        <h2 class="h2" style="margin-bottom:4px">Como as tarefas pontuam</h2>
+        <div style="display:flex;justify-content:space-between"><span>Ligação ou e-mail registrado</span><span class="xp">+10</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Reunião realizada</span><span class="xp">+15</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Tarefa de alta prioridade no prazo</span><span class="xp">+20</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Fechar o dia com tudo concluído</span><span class="xp">+30</span></div>
+        <div style="color:#7A8EA3;font-size:11.5px">Tarefas concluídas com atraso valem metade. Tarefas apagadas não somam.</div>
+      </div>
+    </aside>
+  </div>
+</main>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null, view: 'h', draft: Orb.param('new') || '', dType: 'Ligação' };
+  renderVals() {
+    const s = this.state;
+    const O = Orb.data();
+    const todayStr = Orb.today();
+    const period = (t) => { if (t.date < todayStr) return 'Venceu em ' + Orb.dayLabel(t.date); if (t.date > todayStr) return Orb.dayLabel(t.date); return t.h < '12:00' ? 'Manhã' : t.h < '17:00' ? 'Tarde' : 'Fim do dia'; };
+    const today = Orb.tasksToday();
+    const doneN = today.filter((t) => t.done).length, totalN = today.length, pending = totalN - doneN;
+    const TC = { 'Ligação': 'chip cy', 'E-mail': 'chip vi', 'Reunião': 'chip yl', 'Follow-up': 'chip' };
+    const inView = (t) => (s.view === 'h' ? t.date === todayStr : s.view === 's' ? t.date > todayStr : t.date < todayStr && !t.done);
+    const vis = O.tasks.filter(inView).sort((a, b) => (a.date + a.h).localeCompare(b.date + b.h));
+    const order = []; vis.forEach((t) => { const p = period(t); if (!order.includes(p)) order.push(p); });
+    const groups = order.map((p) => {
+      const items = vis.filter((t) => period(t) === p);
+      const d = items.filter((t) => t.done).length;
+      return { name: p, c: s.view === 'a' ? '#FF9A62' : '#7A8EA3', sum: d + ' de ' + items.length + ' concluídas', items: items.map((t) => ({
+        h: t.h, t: t.t, ctx: t.ctx, type: t.type, typeCls: TC[t.type], xpShow: t.date < todayStr ? Math.round(t.xp / 2) : t.xp, hi: !!t.hi && !t.done,
+        chk: t.done ? 'chk on' : 'chk', op: t.done ? '.55' : '1', td: t.done ? 'line-through' : 'none', aria: (t.done ? 'Desmarcar ' : 'Concluir ') + t.t,
+        flip: () => { const r = Orb.toggleTask(t.id); if (r.done) Orb.flash(this, r.dayBonus ? 'Dia completo! +' + r.xp + ' XP e bônus de +30 XP' : r.xp ? 'Tarefa concluída · +' + r.xp + ' XP' + (r.late ? ' (metade, pela demora)' : '') : 'Tarefa concluída'); else this.setState({}); },
+        del: () => { if (!window.confirm('Apagar a tarefa "' + t.t + '"?')) return; Orb.revoke('task-' + t.id); O.tasks = O.tasks.filter((x) => x.id !== t.id); Orb.save(); Orb.flash(this, 'Tarefa apagada'); }
+      })) };
+    });
+    const xpToday = today.filter((t) => t.done).reduce((a, t) => a + t.xp, 0) + (('day-' + todayStr) in O.xpLog ? 30 : 0);
+    const C = 2 * Math.PI * 62;
+    return Object.assign(Orb.shell(this, 'Tarefas.dc.html'), {
+      date: Orb.headerDate(), lateN: Orb.tasksLate().length,
+      vH: s.view === 'h' ? 'on' : '', vS: s.view === 's' ? 'on' : '', vA: s.view === 'a' ? 'on' : '',
+      setH: () => this.setState({ view: 'h' }), setS: () => this.setState({ view: 's' }), setA: () => this.setState({ view: 'a' }),
+      groups, noGroups: groups.length === 0, doneN, totalN, dash: Math.round((totalN ? doneN / totalN : 0) * C) + ' 400', xpToday, streak: O.me.streak,
+      hint: !totalN ? 'Sem tarefas para hoje.' : pending ? 'Conclua ' + Orb.pl(pending, 'tarefa restante', 'tarefas restantes') + ' para fechar o dia e ganhar +30 XP de bônus.' : 'Dia completo. Sua sequência sobe para ' + (O.me.streak + 1) + ' dias à meia-noite.',
+      team: O.teamToday.map((m) => ({ n: Orb.person(m[0]).n, i: m[0], c: Orb.person(m[0]).c, p: m[1] + '/' + m[2], w: Math.round(m[1] / m[2] * 100) + '%' })),
+      draft: s.draft, dType: s.dType, onDraft: (e) => this.setState({ draft: e.target.value }), onType: (e) => this.setState({ dType: e.target.value }),
+      add: (e) => {
+        e.preventDefault();
+        if (!s.draft.trim()) return;
+        const p = Orb.parseTask(s.draft);
+        if (!p.title) return Orb.flash(this, 'Descreva a tarefa');
+        O.tasks.push({ id: Date.now(), date: p.date, h: p.h, t: p.title, ctx: 'Criada agora · sem vínculo', type: s.dType, xp: 10, done: false, seedDone: false, hi: false });
+        Orb.save();
+        this.setState({ draft: '', view: p.date === todayStr ? 'h' : 's' });
+        Orb.flash(this, 'Tarefa adicionada para ' + (p.date === todayStr ? 'hoje' : Orb.dayLabel(p.date)) + ' às ' + p.h);
+      }
+    });
+  }
+}
+</script>
+</body>
+</html>

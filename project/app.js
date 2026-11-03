@@ -3,7 +3,7 @@
 (function () {
   const g = typeof window !== 'undefined' ? window : globalThis;
   const SEED = typeof module !== 'undefined' ? require('./data.js') : g.ORB_SEED;
-  const KEY = 'orbita:v1';
+  const KEY = 'cosmodash:v1';
   const DAY = 86400000;
   const clone = (x) => JSON.parse(JSON.stringify(x));
   const pad = (n) => String(n).padStart(2, '0');
@@ -38,7 +38,7 @@
   }
 
   function load() {
-    try { const raw = g.localStorage && g.localStorage.getItem(KEY); if (raw) return JSON.parse(raw.replace(/Órbita/g, 'CosmoDash')); } catch (e) { /* dado corrompido ou bloqueado: recomeça do seed */ }
+    try { const raw = g.localStorage && g.localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) { /* dado corrompido ou bloqueado: recomeça do seed */ }
     return fresh();
   }
 

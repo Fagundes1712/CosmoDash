@@ -10,7 +10,7 @@ async function checkSite(base) {
   const root = base.endsWith('/') ? base : base + '/';
   const screens = fs.readdirSync(path.resolve(__dirname, '..', 'project')).filter((f) => f.endsWith('.dc.html'));
   const problems = [];
-  for (const file of ['', 'support.js', 'orbita.css', ...screens]) {
+  for (const file of ['', 'support.js', 'CosmoDash.css', ...screens]) {
     const res = await fetch(root + file).catch((e) => ({ ok: false, status: e.message }));
     if (!res.ok) { problems.push((file || 'página inicial') + ': ' + res.status); continue; }
     if (file.endsWith('.dc.html') && !(await res.text()).includes('<x-dc>')) problems.push(file + ': sem o template da tela');

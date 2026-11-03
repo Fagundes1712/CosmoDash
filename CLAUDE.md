@@ -4,7 +4,7 @@ SaaS de CRM com assistente de IA chamado Cosmo. Responda em português. O reposi
 
 Hoje o produto é um protótipo estático de 9 telas, sem backend e sem dependências:
 
-- `project/`: as telas (`*.dc.html`), dados e regras (`data.js`, `app.js`) e estilo (`orbita.css`)
+- `project/`: as telas (`*.dc.html`), dados e regras (`data.js`, `app.js`) e estilo (`CosmoDash.css`)
 - `project-original/`: cópia intacta do protótipo recebido, só para consulta
 - `demo/`: servidor local e runtime das telas
 - `scripts/`: verificação, build e teste do site publicado

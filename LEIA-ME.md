@@ -17,7 +17,7 @@ Testes:
 - `project/*.dc.html`: uma tela por arquivo
 - `project/app.js`: regras, persistência e menu lateral compartilhados
 - `project/data.js`: dados de demonstração das 3 organizações
-- `project/orbita.css`: estilo compartilhado
+- `project/CosmoDash.css`: estilo compartilhado
 - `demo/`: runtime das telas, servidor local e testes
 - `project-original/`: cópia do protótipo como foi recebido
 

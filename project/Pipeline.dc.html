@@ -39,11 +39,27 @@
     <span style="font-size:12px;color:var(--label-2)">Arraste um card para mudar de etapa.</span>
   </div>
 
-  <section class="grid-a" style="grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr))">
-    <div class="glass" style="padding:16px 18px"><div class="hud">Valor aberto</div><div class="disp" style="font-size:24px;font-weight:600;margin-top:6px">{{totOpen}}</div><div style="font-size:12px;color:var(--label-2)">{{totDeals}} negócios</div></div>
-    <div class="glass" style="padding:16px 18px"><div class="hud">Valor ponderado</div><div class="disp" style="font-size:24px;font-weight:600;margin-top:6px">{{weighted}}</div><div style="font-size:12px;color:var(--label-2)">pela probabilidade de cada etapa</div></div>
-    <div class="glass" style="padding:16px 18px"><div class="hud">Ganhos em {{month}}</div><div class="disp" style="font-size:24px;font-weight:600;margin-top:6px;color:var(--accent-text)">{{wonVal}}</div><div style="font-size:12px;color:var(--label-2)">{{wonCount}} negócios · meta {{goal}}</div></div>
-    <div class="glass" style="padding:16px 18px"><div class="hud">Parados +10 dias</div><div class="disp" style="font-size:24px;font-weight:600;margin-top:6px;color:var(--orange)">{{riskCount}}</div><div style="font-size:12px;color:var(--label-2)">sinalizados pelo Cosmo</div></div>
+  <section class="grid-a" style="grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr))" aria-label="Resumo do funil">
+    <div class="glass lift stat">
+      <div class="stat-head"><span>Valor aberto</span><span class="badge">{{totDeals}} negócios</span></div>
+      <div class="kpi">{{totOpen}}</div>
+      <div class="caption t2">soma de todas as etapas</div>
+    </div>
+    <div class="glass lift stat">
+      <div class="stat-head"><span>Valor ponderado</span><span class="badge">{{weightedPct}} do aberto</span></div>
+      <div class="kpi">{{weighted}}</div>
+      <div class="caption t2">pela probabilidade de cada etapa</div>
+    </div>
+    <div class="glass lift stat">
+      <div class="stat-head"><span>Ganhos em {{month}}</span><span class="badge {{goalCls}}">{{goalPct}} da meta</span></div>
+      <div class="kpi {{goalVal}}">{{wonVal}}</div>
+      <div class="caption t2">{{wonCount}} negócios · meta {{goal}}</div>
+    </div>
+    <div class="glass lift stat">
+      <div class="stat-head"><span>Parados +10 dias</span><span class="badge {{riskCls}}">{{riskTag}}</span></div>
+      <div class="kpi {{riskVal}}">{{riskCount}}</div>
+      <div class="caption t2">sinalizados pelo Cosmo</div>
+    </div>
   </section>
 
   <sc-if value="{{isClosed}}">
@@ -268,6 +284,9 @@ class Component extends DCLogic {
       setAll: () => this.setState({ filter: 'all' }), setMine: () => this.setState({ filter: 'mine' }), setRisk: () => this.setState({ filter: 'risk' }), setClosed: () => this.setState({ filter: 'closed' }),
       isClosed: s.filter === 'closed', isBoard: s.filter !== 'closed', closed, noClosed: closed.length === 0, closedCount,
       riskCount: T.risk.length, totOpen: Orb.mil(T.open), totDeals: T.count, weighted: Orb.mil(T.weighted), wonVal: Orb.brl(T.won), wonCount: T.wonCount,
+      weightedPct: T.open ? Math.round(T.weighted / T.open * 100) + '%' : '0%', goalPct: Math.round(T.won / (O.k.goal || 1) * 100) + '%',
+      goalCls: T.won >= O.k.goal * 0.75 ? 'pos' : 'neg', goalVal: T.won >= O.k.goal * 0.75 ? 'val-pos' : 'val-neg',
+      riskTag: T.risk.length ? 'atenção' : 'em dia', riskCls: T.risk.length ? 'neg' : 'pos', riskVal: T.risk.length ? 'val-neg' : '',
       cols, hasSel: !!D, sel, steps, closeSel: () => this.setState({ sel: null }), canDel: Orb.can('del'),
       advance: () => { const r = Orb.moveDeal(D.id, D.st + 1); this.setState({}); Orb.flash(this, r.msg); },
       win: () => { const xp = Orb.closeDeal(D.id, 'won'); this.setState({ sel: null }); Orb.flash(this, 'Ganho! ' + D.co + ' · ' + Orb.brl(D.v) + ' · +' + xp + ' XP'); },

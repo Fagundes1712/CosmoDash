@@ -123,7 +123,7 @@
     counted: (key) => O().counters[key + ':' + Orb.today()] || 0,
     activityXp(xp = 10) { const n = Orb.count('activity'); if (n > ACTIVITY_CAP) return 0; Orb.award('act-' + Orb.today() + '-' + n, xp); return xp; },
 
-    person(i) { if (i === 'CA') return { n: db.profile.name, c: SEED.colors.CA }; const p = O().people.find((x) => x.i === i); return p ? { n: p.n, c: p.c } : { n: i, c: 'var(--label-2)' }; },
+    person(i) { if (i === 'CA') return { n: db.profile.name, c: SEED.colors.CA }; const p = O().people.find((x) => x.i === i); return p ? { n: p.n, c: p.c } : { n: i, c: 'var(--accent)' }; },
     feed(item) { O().feed.unshift(Object.assign({ ts: Date.now(), xp: 0 }, item)); },
     ranking() {
       const list = O().people.map((p) => ({ name: Orb.person(p.i).n, ini: p.i === 'CA' ? Orb.ini(db.profile.name) : p.i, color: p.c, sub: (p.i === 'CA' ? 'Você · ' : p.role + ' · ') + p.sq, season: p.i === 'CA' ? Orb.season() : p.season, me: p.i === 'CA' }));
@@ -349,6 +349,11 @@
       const pending = Orb.tasksPending();
       const NAV = [['Comercial'], ['Main.dc.html', 'Dashboard', 'dash'], ['Pipeline.dc.html', 'Funis de vendas', 'pipe', String(Orb.totals().count)], ['Contatos.dc.html', 'Contatos', 'cont'], ['Tarefas.dc.html', 'Tarefas', 'task', pending ? String(pending) : ''], ['Atendimento'], ['Suporte.dc.html', 'Suporte interno', 'sup', String(Orb.ticketsOpen())], ['Performance'], ['Metas.dc.html', 'Metas & conquistas', 'goal'], ['Administração'], ['Equipe.dc.html', 'Equipe & acessos', 'team'], ['Planos.dc.html', 'Planos & pagamentos', 'plan']];
       const nav = NAV.map((a) => (a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === cur ? 'nav on' : 'nav' }));
+      const links = nav.filter((n) => n.link);
+      const SHORT = { 'Main.dc.html': 'Início', 'Pipeline.dc.html': 'Funis' };
+      // Aparência: o botão do topo alterna automática, clara e escura.
+      const SCH = { auto: ['light', 'Aparência automática', 'M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM12 3v18'], light: ['dark', 'Aparência clara', 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'], dark: ['auto', 'Aparência escura', 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'] };
+      const sch = SCH[db.profile.prefs.scheme] ? db.profile.prefs.scheme : 'auto';
       const o = O();
       const lv = Orb.level();
       const name = db.profile.name;
@@ -359,65 +364,56 @@
         toggle: () => { db.collapsed = !db.collapsed; Orb.save(); c.setState({}); },
         nav, org: orgView, orgOpen: !!s.orgOpen, orgList, toggleOrg: () => c.setState({ orgOpen: !s.orgOpen }),
         userName: name, userIni: Orb.ini(name), userPhoto: db.profile.photo ? "background-image:url('" + db.profile.photo + "');background-size:cover;color:transparent;" : '',
-        profCls: cur === 'Perfil.dc.html' ? 'nav on' : 'nav', xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
+        profCls: cur === 'Perfil.dc.html' ? 'rail-btn on' : 'rail-btn', xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
         xpLabel: Orb.num(lv.xp) + ' / ' + Orb.num(lv.max), xpPct: lv.pct + '%', xpLeft: Orb.num(lv.left),
-        schemes: [['auto', 'Auto'], ['light', 'Claro'], ['dark', 'Escuro']].map(([v, label]) => {
-          const on = (db.profile.prefs.scheme || 'auto') === v;
-          return { label, on: String(on), cls: on ? 'on' : '', pick: () => { db.profile.prefs.scheme = v; Orb.save(); if (Orb.applyPrefs) Orb.applyPrefs(); c.setState({}); } };
-        }),
+        rail: links.map((n) => Object.assign({}, n, { cls: n.href === cur ? 'rail-btn on' : 'rail-btn' })),
+        tabs: links.slice(0, 4).map((n) => Object.assign({}, n, { cls: n.href === cur ? 'tab on' : 'tab glass', short: SHORT[n.href] || n.label })),
+        schemeIcon: SCH[sch][2], schemeLabel: SCH[sch][1] + '. Clique para trocar',
+        cycleScheme: () => { db.profile.prefs.scheme = SCH[sch][0]; Orb.save(); if (Orb.applyPrefs) Orb.applyPrefs(); c.setState({}); },
         hasToast: !!s.toast, toast: s.toast || ''
       };
     },
 
     templates: {
-      sidebar: `<aside class="side">
-  <div class="side-head">
-    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
-    <div class="hide-c" style="flex:1;min-width:0"><div class="brand">CosmoDash</div><div class="brand-sub">CRM · Cosmo IA</div></div>
-    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
-  </div>
-  <div class="orgwrap">
-    <button class="org" onClick="{{toggleOrg}}" aria-label="Trocar organização" aria-expanded="{{orgOpen}}">
-      <span class="orgmark" style="background:{{org.color}}">{{org.mark}}</span>
-      <span class="hide-c org-txt" style="flex:1;min-width:0"><span class="org-name">{{org.name}}</span><span class="org-sub">{{org.role}} · Plano {{org.planName}}</span></span>
-      <svg class="ico s hide-c org-txt" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
-    </button>
-    <sc-if value="{{orgOpen}}">
-      <div class="glass orgmenu">
-        <div class="hud" style="padding:6px 8px">Suas organizações</div>
-        <sc-for list="{{orgList}}" as="o">
-          <button class="{{o.cls}}" onClick="{{o.pick}}" style="padding:8px">
-            <span class="orgmark" style="background:{{o.color}};width:28px;height:28px;flex-basis:28px;font-size:12px">{{o.mark}}</span>
-            <span style="flex:1;min-width:0"><span class="om-name">{{o.name}}</span><span class="om-sub">{{o.role}} · {{o.plan}}</span></span>
-          </button>
-        </sc-for>
-        <a class="btn ghost sm" href="Equipe.dc.html?tab=o&new=1" style="justify-content:flex-start">+ Nova organização</a>
-      </div>
-    </sc-if>
-  </div>
-  <nav class="side-nav" style="display:flex;flex-direction:column;gap:2px">
-    <sc-for list="{{nav}}" as="n">
-      <sc-if value="{{n.head}}"><div class="navh">{{n.label}}</div></sc-if>
-      <sc-if value="{{n.link}}">
-        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="hide-c chip nav-badge">{{n.badge}}</span></sc-if></a>
+      sidebar: `<aside class="rail glass" aria-label="Navegação principal">
+  <sc-for list="{{rail}}" as="n">
+    <a href="{{n.href}}" class="{{n.cls}}" aria-label="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="tip">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="dot">{{n.badge}}</span></sc-if></a>
+  </sc-for>
+  <span class="rail-sep" aria-hidden="true"></span>
+  <a href="Perfil.dc.html" class="{{profCls}}" aria-label="Meu perfil"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path></svg><span class="tip">Meu perfil</span></a>
+</aside>
+<header class="topbar">
+  <div class="tb-side">
+    <a href="Main.dc.html" class="circle brand-mark" aria-label="CosmoDash: início"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></a>
+    <div class="orgwrap">
+      <button class="org glass" onClick="{{toggleOrg}}" aria-label="Trocar organização" aria-expanded="{{orgOpen}}">
+        <span class="orgmark" style="background:{{org.color}}">{{org.mark}}</span>
+        <span class="org-txt" style="min-width:0"><span class="org-name">{{org.name}}</span><span class="org-sub">{{org.role}} · Plano {{org.planName}}</span></span>
+        <svg class="ico s org-txt" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+      </button>
+      <sc-if value="{{orgOpen}}">
+        <div class="orgmenu">
+          <div class="caption t2" style="padding:6px 8px">Suas organizações</div>
+          <sc-for list="{{orgList}}" as="o">
+            <button class="{{o.cls}}" onClick="{{o.pick}}" style="padding:8px">
+              <span class="orgmark" style="background:{{o.color}}">{{o.mark}}</span>
+              <span style="flex:1;min-width:0"><span class="om-name">{{o.name}}</span><span class="om-sub">{{o.role}} · {{o.plan}}</span></span>
+            </button>
+          </sc-for>
+          <a class="btn ghost sm" href="Equipe.dc.html?tab=o&new=1" style="justify-content:flex-start">+ Nova organização</a>
+        </div>
       </sc-if>
-    </sc-for>
-  </nav>
-  <div class="side-foot" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
-    <a href="Metas.dc.html" class="glass hide-c hide-m xpcard">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="hud xp-tier">{{xpTier}}</span><span class="xp" style="white-space:nowrap">{{xpLabel}}</span></div>
-      <div class="bar vi"><i style="width:{{xpPct}}"></i></div>
-      <div class="xp-left">Faltam {{xpLeft}} XP para o Nível {{xpNext}}</div>
-    </a>
-    <div class="scheme hide-c hide-m" role="group" aria-label="Aparência">
-      <sc-for list="{{schemes}}" as="m"><button class="{{m.cls}}" onClick="{{m.pick}}" aria-pressed="{{m.on}}">{{m.label}}</button></sc-for>
     </div>
-    <a href="Perfil.dc.html" class="{{profCls}}" title="Meu perfil" style="min-height:52px">
-      <span class="av me" style="{{userPhoto}}">{{userIni}}</span>
-      <span class="hide-c lbl" style="flex:1;min-width:0"><span class="me-name">{{userName}}</span><span class="me-sub">{{org.role}} · {{org.name}}</span></span>
-    </a>
   </div>
-</aside>`,
+  <nav class="tabs" aria-label="Comercial">
+    <sc-for list="{{tabs}}" as="t"><a href="{{t.href}}" class="{{t.cls}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{t.d}}"></path></svg><span class="lbl">{{t.short}}</span></a></sc-for>
+  </nav>
+  <div class="tb-side end">
+    <a href="Main.dc.html#cosmo-q" class="circle glass" aria-label="Perguntar ao Cosmo"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"></path></svg></a>
+    <button class="circle glass" onClick="{{cycleScheme}}" aria-label="{{schemeLabel}}" title="{{schemeLabel}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{schemeIcon}}"></path></svg></button>
+    <a href="Perfil.dc.html" class="circle" aria-label="Meu perfil: {{userName}}"><span class="av me" style="width:38px;height:38px;flex-basis:38px;{{userPhoto}}">{{userIni}}</span><span class="status-dot"></span></a>
+  </div>
+</header>`,
       toast: `<sc-if value="{{hasToast}}"><div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div></sc-if>`
     }
   };

@@ -7,7 +7,7 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="./apple.css">
+<link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
 <template data-dc><x-dc>
@@ -199,7 +199,7 @@ class Component extends DCLogic {
 
     const stats = Orb.funnelStats(O.funnels[0].id);
     const maxV = Math.max(1, ...stats.map((f) => f.sum));
-    const funnel = stats.map((f) => ({ stage: f.name, n: f.count, val: Orb.mil(f.sum), w: Math.round(f.sum / maxV * 100) + '%', color: 'var(--accent)' }));
+    const funnel = stats.map((f) => ({ stage: f.name, n: f.count, val: Orb.mil(f.sum), w: Math.round(f.sum / maxV * 100) + '%', color:'var(--accent)' }));
 
     const ask = (id) => { this.setState({ askId: id, ans: Orb.cosmo({ id }) }); };
     const ans = s.ans || Orb.cosmo({ id: s.askId, count: false });

@@ -7,7 +7,6 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
@@ -21,27 +20,27 @@
     <div class="seg" role="group" aria-label="Ciclo de cobrança"><button class="{{cM}}" onClick="{{setM}}">Mensal</button><button class="{{cA}}" onClick="{{setA}}">Anual · −20%</button></div>
   </header>
 
-  <sc-if value="{{readOnly}}"><div style="padding:12px 14px;border-radius:12px;background:rgba(243,208,110,.08);border:1px solid rgba(243,208,110,.3);font-size:13px">Seu papel nesta organização é {{org.role}}: você pode consultar a assinatura, mas só quem tem a permissão Plano e cobrança faz alterações.</div></sc-if>
+  <sc-if value="{{readOnly}}"><div style="padding:12px 14px;border-radius:12px;background:var(--fill-q);border:1px solid var(--orange);font-size:13px">Seu papel nesta organização é {{org.role}}: você pode consultar a assinatura, mas só quem tem a permissão Plano e cobrança faz alterações.</div></sc-if>
 
   <section class="grid-a" style="grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))">
-    <div class="glass scan" style="padding:22px;display:flex;flex-direction:column;gap:12px;border-color:rgba(95,224,240,.3)">
+    <div class="glass scan" style="padding:22px;display:flex;flex-direction:column;gap:12px;border-color:var(--accent)">
       <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Plano atual</span><span class="chip gr">Ativo</span></div>
-      <div style="display:flex;align-items:baseline;gap:10px"><span class="disp" style="font-size:34px;font-weight:700">{{curName}}</span><span style="color:#9AADC1">{{curSeats}}</span></div>
-      <div style="font-size:13px;color:#C9D5E1">Próxima cobrança <b>{{nextDate}}</b> · <span class="disp" style="font-weight:700;color:#E7EEF6">{{curTotal}}</span></div>
-      <div style="font-size:12px;color:#9AADC1">{{cycleNote}}</div>
+      <div style="display:flex;align-items:baseline;gap:10px"><span class="disp" style="font-size:34px;font-weight:600">{{curName}}</span><span style="color:var(--label-2)">{{curSeats}}</span></div>
+      <div style="font-size:13px;color:var(--label-2)">Próxima cobrança <b>{{nextDate}}</b> · <span class="disp" style="font-weight:600;color:var(--label)">{{curTotal}}</span></div>
+      <div style="font-size:12px;color:var(--label-2)">{{cycleNote}}</div>
     </div>
     <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Forma de pagamento</span><sc-if value="{{canChangeCard}}"><button class="btn sm" onClick="{{changeCard}}">Alterar</button></sc-if></div>
       <div style="display:flex;align-items:center;gap:14px">
-        <div style="width:64px;height:42px;border-radius:9px;background:linear-gradient(135deg,#1C2C44,#0E1828);border:1px solid rgba(150,200,255,.25);position:relative"><span style="position:absolute;left:8px;top:9px;width:14px;height:10px;border-radius:2px;background:#F3D06E"></span></div>
-        <div><div style="font-weight:700">{{pay.l}}</div><div style="font-size:12px;color:#9AADC1">{{pay.s}}</div></div>
+        <div style="width:64px;height:42px;border-radius:9px;background:var(--fill-q);border:1px solid var(--separator);position:relative"><span style="position:absolute;left:8px;top:9px;width:14px;height:10px;border-radius:2px;background:var(--orange)"></span></div>
+        <div><div style="font-weight:600">{{pay.l}}</div><div style="font-size:12px;color:var(--label-2)">{{pay.s}}</div></div>
       </div>
       <div class="seg" role="group" aria-label="Método" style="align-self:flex-start"><button class="{{pC}}" onClick="{{payC}}">Cartão</button><button class="{{pP}}" onClick="{{payP}}">Pix automático</button><button class="{{pB}}" onClick="{{payB}}">Boleto</button></div>
     </div>
     <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
       <span class="hud">Uso do ciclo</span>
       <sc-for list="{{usage}}" as="u">
-        <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span>{{u.n}}</span><span style="color:#9AADC1">{{u.v}}</span></div><div class="{{u.cls}}"><i style="width:{{u.w}}"></i></div></div>
+        <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span>{{u.n}}</span><span style="color:var(--label-2)">{{u.v}}</span></div><div class="{{u.cls}}"><i style="width:{{u.w}}"></i></div></div>
       </sc-for>
     </div>
   </section>
@@ -50,8 +49,8 @@
     <sc-for list="{{plans}}" as="p">
       <div class="glass lift" style="padding:24px;display:flex;flex-direction:column;gap:16px;border-color:{{p.bd}};position:relative">
         <sc-if value="{{p.rec}}"><span class="chip or" style="align-self:flex-start">Recomendado para 10+ pessoas</span></sc-if>
-        <div><div class="disp" style="font-size:22px;font-weight:700;color:{{p.c}}">{{p.n}}</div><div style="font-size:13px;color:#9AADC1;margin-top:4px">{{p.d}}</div></div>
-        <div style="display:flex;align-items:baseline;gap:6px"><span class="disp" style="font-size:36px;font-weight:700">{{p.price}}</span><span style="color:#9AADC1;font-size:13px">por usuário/mês · {{p.seats}}</span></div>
+        <div><div class="disp" style="font-size:22px;font-weight:600;color:{{p.c}}">{{p.n}}</div><div style="font-size:13px;color:var(--label-2);margin-top:4px">{{p.d}}</div></div>
+        <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px"><span class="disp" style="font-size:36px;font-weight:600;white-space:nowrap">{{p.price}}</span><span style="color:var(--label-2);font-size:13px">por usuário/mês · {{p.seats}}</span></div>
         <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;font-size:13.5px">
           <sc-for list="{{p.f}}" as="x"><li style="display:flex;gap:10px;align-items:flex-start"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{p.c}}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;margin-top:2px" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg><span>{{x}}</span></li></sc-for>
         </ul>
@@ -64,32 +63,32 @@
   </section>
 
   <section class="glass" style="padding:8px 6px">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px 4px;gap:8px;flex-wrap:wrap"><h2 class="h2">Faturas</h2><span style="font-size:12px;color:#9AADC1">NFS-e emitida para o CNPJ cadastrado quando a cobrança real for integrada</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px 4px;gap:8px;flex-wrap:wrap"><h2 class="h2">Faturas</h2><span style="font-size:12px;color:var(--label-2)">NFS-e emitida para o CNPJ cadastrado quando a cobrança real for integrada</span></div>
     <div class="tblw"><table class="tbl">
       <thead><tr><th>Competência</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Pago em</th><th></th></tr></thead>
       <tbody>
         <sc-for list="{{invoices}}" as="i">
-          <tr><td style="font-weight:700">{{i.m}}</td><td style="color:#C9D5E1">{{i.d}}</td><td class="disp" style="font-weight:700">{{i.v}}</td><td><span class="chip gr">Paga</span></td><td style="color:#9AADC1">{{i.p}}</td><td style="text-align:right"><button class="btn sm ghost" onClick="{{i.dl}}">Baixar</button></td></tr>
+          <tr><td style="font-weight:600">{{i.m}}</td><td style="color:var(--label-2)">{{i.d}}</td><td class="disp" style="font-weight:600">{{i.v}}</td><td><span class="chip gr">Paga</span></td><td style="color:var(--label-2)">{{i.p}}</td><td style="text-align:right"><button class="btn sm ghost" onClick="{{i.dl}}">Baixar</button></td></tr>
         </sc-for>
       </tbody>
     </table></div>
-    <sc-if value="{{noInv}}"><div style="padding:32px;text-align:center;color:#9AADC1">Nenhuma fatura ainda.</div></sc-if>
+    <sc-if value="{{noInv}}"><div style="padding:32px;text-align:center;color:var(--label-2)">Nenhuma fatura ainda.</div></sc-if>
   </section>
 </main>
 
 <sc-if value="{{hasModal}}">
   <div class="ov">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="up-t">
-      <div class="hud" style="color:#5FE0F0">Confirmar mudança</div>
+      <div class="hud" style="color:var(--accent-text)">Confirmar mudança</div>
       <h2 id="up-t" class="disp" style="margin:6px 0 16px;font-size:24px">{{m.from}} → {{m.to}}</h2>
-      <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;padding:16px;border-radius:14px;background:rgba(4,8,14,.5);border:1px solid rgba(150,200,255,.1)">
-        <div style="display:flex;justify-content:space-between;gap:10px"><span style="color:#9AADC1">{{m.totalLabel}}</span><b class="disp">{{m.total}}</b></div>
-        <sc-if value="{{m.hasPro}}"><div style="display:flex;justify-content:space-between;gap:10px"><span style="color:#9AADC1">{{m.proLabel}}</span><b class="disp">{{m.pro}}</b></div></sc-if>
-        <div style="display:flex;justify-content:space-between;gap:10px"><span style="color:#9AADC1">Cobrado em</span><b>{{pay.l}}</b></div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;padding:16px;border-radius:14px;background:var(--page);border:1px solid var(--separator)">
+        <div style="display:flex;justify-content:space-between;gap:10px"><span style="color:var(--label-2)">{{m.totalLabel}}</span><b class="disp">{{m.total}}</b></div>
+        <sc-if value="{{m.hasPro}}"><div style="display:flex;justify-content:space-between;gap:10px"><span style="color:var(--label-2)">{{m.proLabel}}</span><b class="disp">{{m.pro}}</b></div></sc-if>
+        <div style="display:flex;justify-content:space-between;gap:10px"><span style="color:var(--label-2)">Cobrado em</span><b>{{pay.l}}</b></div>
       </div>
-      <p style="font-size:12.5px;color:#9AADC1;line-height:1.5;margin:14px 0 14px">{{m.note}}</p>
+      <p style="font-size:12.5px;color:var(--label-2);line-height:1.5;margin:14px 0 14px">{{m.note}}</p>
       <sc-if value="{{m.blocked}}">
-        <div class="err" role="alert" style="margin-bottom:14px"><b>Antes de mudar:</b><sc-for list="{{m.blockers}}" as="b"><div>{{b}}</div></sc-for><a href="Equipe.dc.html" style="font-weight:700">Abrir equipe →</a></div>
+        <div class="err" role="alert" style="margin-bottom:14px"><b>Antes de mudar:</b><sc-for list="{{m.blockers}}" as="b"><div>{{b}}</div></sc-for><a href="Equipe.dc.html" style="font-weight:600">Abrir equipe →</a></div>
       </sc-if>
       <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-close onClick="{{closeModal}}">Cancelar</button><button class="btn pri" onClick="{{confirm}}" disabled="{{m.blocked}}">Confirmar {{m.to}}</button></div>
     </div>
@@ -109,7 +108,7 @@ class Component extends DCLogic {
     const k = O.cycle === 'a' ? 0.8 : 1;
     const total = Orb.monthly();
     const guard = (fn) => () => { if (!can) return Orb.flash(this, 'Seu papel não permite alterar a assinatura'); fn(); };
-    const plans = Object.keys(SP).map((id) => { const p = SP[id]; const up = p.rank > cur.rank; return { n: p.n, d: p.d, c: p.c, f: p.f, seats: p.seats, price: 'R$ ' + Math.round(p.p * k), isCur: id === O.plan, canPick: id !== O.plan && can, rec: id === 'business' && O.plan !== 'business', bd: id === O.plan ? 'rgba(95,224,240,.4)' : 'rgba(150,200,255,.12)', btnCls: up ? 'btn pri' : 'btn', cta: up ? 'Mudar para ' + p.n : 'Reduzir para ' + p.n, pick: () => this.setState({ pending: id }) }; });
+    const plans = Object.keys(SP).map((id) => { const p = SP[id]; const up = p.rank > cur.rank; return { n: p.n, d: p.d, c: p.c, f: p.f, seats: p.seats, price: 'R$ ' + Math.round(p.p * k), isCur: id === O.plan, canPick: id !== O.plan && can, rec: id === 'business' && O.plan !== 'business', bd: id === O.plan ? 'var(--accent)' : 'var(--fill-q)', btnCls: up ? 'btn pri' : 'btn', cta: up ? 'Mudar para ' + p.n : 'Reduzir para ' + p.n, pick: () => this.setState({ pending: id }) }; });
     let m = {};
     if (s.pending) {
       const np = SP[s.pending]; const nt = Orb.monthly(s.pending); const diff = nt - total; const up = np.rank > cur.rank;

@@ -7,7 +7,6 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
@@ -20,14 +19,14 @@
     <div><div class="hud">Administração · {{org.name}}</div><h1 class="h1">Equipe &amp; acessos</h1></div>
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
       <div class="glass" style="padding:8px 14px;border-radius:12px;display:flex;align-items:center;gap:12px;min-width:220px">
-        <div style="flex:1"><div style="font-size:12px;color:#9AADC1;margin-bottom:6px">Assentos · Plano {{org.planName}}</div><div class="{{seatBar}}"><i style="width:{{seatW}}"></i></div></div>
-        <span class="disp" style="font-weight:700">{{seatsLabel}}</span>
+        <div style="flex:1"><div style="font-size:12px;color:var(--label-2);margin-bottom:6px">Assentos · Plano {{org.planName}}</div><div class="{{seatBar}}"><i style="width:{{seatW}}"></i></div></div>
+        <span class="disp" style="font-weight:600">{{seatsLabel}}</span>
       </div>
       <sc-if value="{{canUsers}}"><button class="btn pri" onClick="{{openInv}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6"></path></svg>Convidar pessoas</button></sc-if>
     </div>
   </header>
 
-  <sc-if value="{{readOnly}}"><div style="padding:12px 14px;border-radius:12px;background:rgba(243,208,110,.08);border:1px solid rgba(243,208,110,.3);font-size:13px">Seu papel nesta organização é {{org.role}}: você pode consultar a equipe, mas só quem tem a permissão Gerenciar usuários altera acessos.</div></sc-if>
+  <sc-if value="{{readOnly}}"><div style="padding:12px 14px;border-radius:12px;background:var(--fill-q);border:1px solid var(--orange);font-size:13px">Seu papel nesta organização é {{org.role}}: você pode consultar a equipe, mas só quem tem a permissão Gerenciar usuários altera acessos.</div></sc-if>
 
   <div class="seg" role="group" aria-label="Seções" style="align-self:flex-start;flex-wrap:wrap">
     <button class="{{tM}}" onClick="{{setM}}">Membros · {{memberN}}</button>
@@ -44,59 +43,59 @@
         <tbody>
           <sc-for list="{{members}}" as="m">
             <tr>
-              <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div><div style="font-weight:700">{{m.n}}</div><div style="font-size:12px;color:#9AADC1">{{m.e}}</div></div></div></td>
+              <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div><div style="font-weight:600">{{m.n}}</div><div style="font-size:12px;color:var(--label-2)">{{m.e}}</div></div></div></td>
               <td><sc-if value="{{m.locked}}"><span class="chip cy">{{m.roleLabel}}</span></sc-if><sc-if value="{{m.editable}}"><select class="inp" style="height:36px;width:140px;font-size:13px" value="{{m.role}}" onChange="{{m.setRole}}" aria-label="Papel de {{m.n}}"><option value="Admin">Admin</option><option value="Gestor">Gestor</option><option value="Vendedor">Vendedor</option><option value="Suporte">Suporte</option><option value="Leitor">Leitor</option></select></sc-if></td>
-              <td style="color:#C9D5E1">{{m.sq}}</td>
-              <td><span class="disp" style="font-weight:700;color:#ADA0FF">Nv {{m.lv}}</span></td>
-              <td style="color:#9AADC1">{{m.last}}</td>
+              <td style="color:var(--label-2)">{{m.sq}}</td>
+              <td><span class="disp" style="font-weight:600;color:var(--pink)">Nv {{m.lv}}</span></td>
+              <td style="color:var(--label-2)">{{m.last}}</td>
               <td><span class="{{m.tfaCls}}">{{m.tfa}}</span></td>
               <td style="text-align:right"><sc-if value="{{m.editable}}"><button class="btn sm ghost" onClick="{{m.remove}}">Remover</button></sc-if></td>
             </tr>
           </sc-for>
         </tbody>
       </table></div>
-      <sc-if value="{{hidMembers}}"><div style="padding:12px 14px;font-size:12px;color:#7A8EA3">Mais {{hidMembers}} pessoas na base simulada desta demonstração.</div></sc-if>
+      <sc-if value="{{hidMembers}}"><div style="padding:12px 14px;font-size:12px;color:var(--label-2)">Mais {{hidMembers}} pessoas na base simulada desta demonstração.</div></sc-if>
     </section>
   </sc-if>
 
   <sc-if value="{{isC}}">
     <section class="glass" style="padding:18px;display:flex;flex-direction:column;gap:10px">
       <sc-for list="{{invites}}" as="v">
-        <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);flex-wrap:wrap">
-          <span class="av sm" style="background:rgba(150,200,255,.2);color:#E7EEF6">@</span>
-          <div style="flex:1 1 220px;min-width:0"><div style="font-weight:700">{{v.e}}</div><div style="font-size:12px;color:#9AADC1">{{v.role}} · {{v.sq}} · enviado {{v.sent}}</div></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:var(--page);border:1px solid var(--separator);flex-wrap:wrap">
+          <span class="av sm" style="background:var(--fill-q);color:var(--label)">@</span>
+          <div style="flex:1 1 220px;min-width:0"><div style="font-weight:600">{{v.e}}</div><div style="font-size:12px;color:var(--label-2)">{{v.role}} · {{v.sq}} · enviado {{v.sent}}</div></div>
           <span class="chip yl">Expira em {{v.exp}}</span>
           <sc-if value="{{canUsers}}"><button class="btn sm" onClick="{{v.resend}}">Reenviar</button><button class="btn sm ghost" onClick="{{v.cancel}}">Cancelar</button></sc-if>
         </div>
       </sc-for>
-      <sc-if value="{{noInv}}"><div style="padding:30px;text-align:center;color:#9AADC1">Nenhum convite pendente.</div></sc-if>
-      <div style="font-size:12.5px;color:#9AADC1;padding:4px">Convites pendentes ocupam um assento até expirarem (7 dias). Demonstração: nenhum e-mail é enviado de verdade.</div>
+      <sc-if value="{{noInv}}"><div style="padding:30px;text-align:center;color:var(--label-2)">Nenhum convite pendente.</div></sc-if>
+      <div style="font-size:12.5px;color:var(--label-2);padding:4px">Convites pendentes ocupam um assento até expirarem (7 dias). Demonstração: nenhum e-mail é enviado de verdade.</div>
     </section>
   </sc-if>
 
   <sc-if value="{{isP}}">
     <section class="glass" style="padding:8px 6px">
-      <sc-if value="{{permLocked}}"><div style="margin:8px;padding:12px 14px;border-radius:12px;background:rgba(255,154,98,.08);border:1px solid rgba(255,154,98,.3);font-size:13px">{{permMsg}} <sc-if value="{{showUpsell}}"><a href="Planos.dc.html" style="font-weight:700">Ver planos →</a></sc-if></div></sc-if>
+      <sc-if value="{{permLocked}}"><div style="margin:8px;padding:12px 14px;border-radius:12px;background:var(--fill-q);border:1px solid var(--orange);font-size:13px">{{permMsg}} <sc-if value="{{showUpsell}}"><a href="Planos.dc.html" style="font-weight:600">Ver planos →</a></sc-if></div></sc-if>
       <div class="tblw"><table class="tbl">
         <thead><tr><th>Permissão</th><sc-for list="{{roles}}" as="r"><th style="text-align:center">{{r}}</th></sc-for></tr></thead>
         <tbody>
           <sc-for list="{{matrix}}" as="p">
-            <tr><td><div style="font-weight:600">{{p.n}}</div><div style="font-size:12px;color:#9AADC1">{{p.d}}</div></td>
+            <tr><td><div style="font-weight:600">{{p.n}}</div><div style="font-size:12px;color:var(--label-2)">{{p.d}}</div></td>
               <sc-for list="{{p.cells}}" as="c"><td style="text-align:center"><button class="{{c.cls}}" onClick="{{c.flip}}" aria-label="{{c.aria}}" aria-pressed="{{c.on}}" disabled="{{c.dis}}" style="margin:0 auto;opacity:{{c.op}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></button></td></sc-for>
             </tr>
           </sc-for>
         </tbody>
       </table></div>
-      <div style="font-size:12.5px;color:#9AADC1;padding:12px 14px">Admin tem acesso total e não pode ser editado.</div>
+      <div style="font-size:12.5px;color:var(--label-2);padding:12px 14px">Admin tem acesso total e não pode ser editado.</div>
     </section>
   </sc-if>
 
   <sc-if value="{{isA}}">
     <section class="glass" style="padding:8px 6px">
-      <sc-if value="{{auditLocked}}"><div style="margin:8px;padding:12px 14px;border-radius:12px;background:rgba(255,154,98,.08);border:1px solid rgba(255,154,98,.3);font-size:13px">O log de auditoria faz parte do plano Business. <a href="Planos.dc.html" style="font-weight:700">Ver planos →</a></div></sc-if>
+      <sc-if value="{{auditLocked}}"><div style="margin:8px;padding:12px 14px;border-radius:12px;background:var(--fill-q);border:1px solid var(--orange);font-size:13px">O log de auditoria faz parte do plano Business. <a href="Planos.dc.html" style="font-weight:600">Ver planos →</a></div></sc-if>
       <sc-if value="{{auditOpen}}">
-        <div class="tblw"><table class="tbl"><thead><tr><th>Quando</th><th>Quem</th><th>Ação</th></tr></thead><tbody><sc-for list="{{audit}}" as="a"><tr><td style="color:#9AADC1;white-space:nowrap">{{a.when}}</td><td>{{a.who}}</td><td>{{a.text}}</td></tr></sc-for></tbody></table></div>
-        <sc-if value="{{noAudit}}"><div style="padding:30px;text-align:center;color:#9AADC1">Nenhuma ação registrada ainda.</div></sc-if>
+        <div class="tblw"><table class="tbl"><thead><tr><th>Quando</th><th>Quem</th><th>Ação</th></tr></thead><tbody><sc-for list="{{audit}}" as="a"><tr><td style="color:var(--label-2);white-space:nowrap">{{a.when}}</td><td>{{a.who}}</td><td>{{a.text}}</td></tr></sc-for></tbody></table></div>
+        <sc-if value="{{noAudit}}"><div style="padding:30px;text-align:center;color:var(--label-2)">Nenhuma ação registrada ainda.</div></sc-if>
       </sc-if>
     </section>
   </sc-if>
@@ -105,15 +104,15 @@
     <section class="grid-a">
       <sc-for list="{{orgs}}" as="o">
         <div class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:14px;border-color:{{o.bd}}">
-          <div style="display:flex;gap:12px;align-items:center"><span class="orgmark" style="background:{{o.color}};width:44px;height:44px;flex-basis:44px;font-size:16px">{{o.mark}}</span><div><div style="font-weight:700;font-size:15px">{{o.name}}</div><div style="font-size:12px;color:#9AADC1">{{o.role}} · Plano {{o.plan}}</div></div></div>
-          <div style="display:flex;gap:16px;font-size:12.5px;color:#9AADC1"><span><b style="color:#E7EEF6">{{o.members}}</b> membros</span><span><b style="color:#E7EEF6">{{o.deals}}</b> negócios abertos</span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span class="orgmark" style="background:{{o.color}};width:44px;height:44px;flex-basis:44px;font-size:16px">{{o.mark}}</span><div><div style="font-weight:600;font-size:15px">{{o.name}}</div><div style="font-size:12px;color:var(--label-2)">{{o.role}} · Plano {{o.plan}}</div></div></div>
+          <div style="display:flex;gap:16px;font-size:12.5px;color:var(--label-2)"><span><b style="color:var(--label)">{{o.members}}</b> membros</span><span><b style="color:var(--label)">{{o.deals}}</b> negócios abertos</span></div>
           <sc-if value="{{o.isCur}}"><span class="chip gr" style="align-self:flex-start">Organização atual</span></sc-if>
           <sc-if value="{{o.canEnter}}"><button class="btn sm" onClick="{{o.enter}}" style="align-self:flex-start">Entrar nesta organização</button></sc-if>
         </div>
       </sc-for>
-      <button class="glass" onClick="{{openOrg}}" style="padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;border-style:dashed;color:#9AADC1;cursor:pointer;min-height:170px;font:inherit">
+      <button class="glass" onClick="{{openOrg}}" style="padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;border-style:dashed;color:var(--label-2);cursor:pointer;min-height:170px;font:inherit">
         <span class="icob" style="border-radius:50%"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span>
-        <span style="font-weight:700;color:#E7EEF6">Criar organização</span><span style="font-size:12px">Dados, equipe e cobrança separados</span>
+        <span style="font-weight:600;color:var(--label)">Criar organização</span><span style="font-size:12px">Dados, equipe e cobrança separados</span>
       </button>
     </section>
   </sc-if>
@@ -129,9 +128,9 @@
           <div><label class="lb" for="iv-r">Papel</label><select id="iv-r" class="inp" value="{{ivR}}" onChange="{{onIvR}}"><option value="Vendedor">Vendedor</option><option value="Gestor">Gestor</option><option value="Suporte">Suporte</option><option value="Leitor">Leitor</option></select></div>
           <div><label class="lb" for="iv-s">Squad</label><select id="iv-s" class="inp" value="{{ivS}}" onChange="{{onIvS}}"><sc-for list="{{squadList}}" as="q"><option value="{{q}}">{{q}}</option></sc-for></select></div>
         </div>
-        <div style="padding:12px;border-radius:12px;background:rgba(95,224,240,.06);border:1px solid rgba(95,224,240,.2);font-size:12.5px;line-height:1.5;color:#C9D5E1">{{ivHint}}</div>
+        <div style="padding:12px;border-radius:12px;background:var(--fill-q);border:1px solid var(--accent);font-size:12.5px;line-height:1.5;color:var(--label-2)">{{ivHint}}</div>
         <sc-if value="{{hasInvErr}}"><div class="err" role="alert">{{invErr}}</div></sc-if>
-        <sc-if value="{{full}}"><a href="Planos.dc.html" style="font-size:13px;font-weight:700">Assentos esgotados: ver planos com mais assentos →</a></sc-if>
+        <sc-if value="{{full}}"><a href="Planos.dc.html" style="font-size:13px;font-weight:600">Assentos esgotados: ver planos com mais assentos →</a></sc-if>
         <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeInv}}">Cancelar</button><button class="btn pri" onClick="{{sendInv}}">Enviar convite</button></div>
       </div>
     </div>
@@ -144,7 +143,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="no-t" class="disp" style="margin:0;font-size:22px">Nova organização</h2><button class="icob" data-close onClick="{{closeOrg}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <div><label class="lb" for="no-n">Nome</label><input id="no-n" class="inp" value="{{orgName}}" onChange="{{onOrgName}}" placeholder="Ex.: Mar Azul Turismo"></div>
-        <div style="font-size:12.5px;color:#9AADC1">Começa vazia, no plano Starter, com você como Admin.</div>
+        <div style="font-size:12.5px;color:var(--label-2)">Começa vazia, no plano Starter, com você como Admin.</div>
         <sc-if value="{{hasOrgErr}}"><div class="err" role="alert">Informe o nome da organização.</div></sc-if>
         <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeOrg}}">Cancelar</button><button class="btn pri" onClick="{{createOrg}}">Criar</button></div>
       </div>
@@ -182,7 +181,7 @@ class Component extends DCLogic {
     const matrix = S.permissions.map((p) => ({ n: p[1], d: p[2], cells: O.perms[p[0]].map((v, i) => ({ cls: v ? 'chk on' : 'chk', on: v ? 'true' : 'false', dis: i === 0 || !permEditable, op: i === 0 ? '.6' : permEditable ? '1' : '.75', aria: (v ? 'Remover ' : 'Conceder ') + p[1] + ' para ' + S.roles[i],
       flip: () => { const row = O.perms[p[0]]; row[i] = row[i] ? 0 : 1; Orb.audit(S.roles[i] + ': ' + p[1] + (row[i] ? ' concedido' : ' removido')); Orb.save(); Orb.flash(this, S.roles[i] + ': ' + p[1] + (row[i] ? ' concedido' : ' removido')); } })) }));
     const invites = O.invites.map((v) => Object.assign({}, v, { resend: () => { v.exp = '7 dias'; v.sent = 'hoje'; Orb.save(); Orb.flash(this, 'Convite reenviado para ' + v.e); }, cancel: () => { O.invites = O.invites.filter((x) => x.id !== v.id); Orb.audit('Convite cancelado: ' + v.e); Orb.save(); Orb.flash(this, 'Convite cancelado · assento liberado'); } }));
-    const orgs = Object.keys(db.orgs).map((id) => { const o = db.orgs[id]; return { name: o.name, mark: o.mark, color: o.color, role: o.role, plan: S.plans[o.plan].n, members: Orb.orgMembers(o), deals: o.deals.filter((d) => d.status === 'open').length + Object.values(o.hid).flat().reduce((a, h) => a + h[0], 0), isCur: id === db.org, canEnter: id !== db.org, bd: id === db.org ? 'rgba(95,224,240,.35)' : 'rgba(150,200,255,.12)', enter: () => { Orb.setOrg(id); location.href = 'Equipe.dc.html?tab=o'; } }; });
+    const orgs = Object.keys(db.orgs).map((id) => { const o = db.orgs[id]; return { name: o.name, mark: o.mark, color:o.color, role: o.role, plan: S.plans[o.plan].n, members: Orb.orgMembers(o), deals: o.deals.filter((d) => d.status === 'open').length + Object.values(o.hid).flat().reduce((a, h) => a + h[0], 0), isCur: id === db.org, canEnter: id !== db.org, bd: id === db.org ? 'var(--accent)' : 'var(--fill-q)', enter: () => { Orb.setOrg(id); location.href = 'Equipe.dc.html?tab=o'; } }; });
     const tab = (t) => () => this.setState({ tab: t });
     return Object.assign(Orb.shell(this, 'Equipe.dc.html'), {
       canUsers, readOnly: !canUsers, seatsLabel: lim === null ? seats + ' · ilimitado' : seats + '/' + lim, seatW: lim === null ? '100%' : Math.min(100, seats / lim * 100) + '%', seatBar: full ? 'bar or' : 'bar',

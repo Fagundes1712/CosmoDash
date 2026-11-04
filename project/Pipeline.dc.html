@@ -7,7 +7,6 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
@@ -37,23 +36,23 @@
       <sc-for list="{{funnels}}" as="f"><button class="{{f.cls}}" onClick="{{f.pick}}">{{f.name}}</button></sc-for>
     </div>
     <sc-if value="{{canPipe}}"><button class="btn sm ghost" onClick="{{openFunnel}}">+ Novo funil</button></sc-if>
-    <span style="font-size:12px;color:#7A8EA3">Arraste um card para mudar de etapa.</span>
+    <span style="font-size:12px;color:var(--label-2)">Arraste um card para mudar de etapa.</span>
   </div>
 
   <section class="grid-a" style="grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr))">
-    <div class="glass" style="padding:16px 18px"><div class="hud">Valor aberto</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px">{{totOpen}}</div><div style="font-size:12px;color:#9AADC1">{{totDeals}} negócios</div></div>
-    <div class="glass" style="padding:16px 18px"><div class="hud">Valor ponderado</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px">{{weighted}}</div><div style="font-size:12px;color:#9AADC1">pela probabilidade de cada etapa</div></div>
-    <div class="glass" style="padding:16px 18px"><div class="hud">Ganhos em {{month}}</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px;color:#5ADFA4">{{wonVal}}</div><div style="font-size:12px;color:#9AADC1">{{wonCount}} negócios · meta {{goal}}</div></div>
-    <div class="glass" style="padding:16px 18px"><div class="hud">Parados +10 dias</div><div class="disp" style="font-size:24px;font-weight:700;margin-top:6px;color:#FF9A62">{{riskCount}}</div><div style="font-size:12px;color:#9AADC1">sinalizados pelo Cosmo</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Valor aberto</div><div class="disp" style="font-size:24px;font-weight:600;margin-top:6px">{{totOpen}}</div><div style="font-size:12px;color:var(--label-2)">{{totDeals}} negócios</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Valor ponderado</div><div class="disp" style="font-size:24px;font-weight:600;margin-top:6px">{{weighted}}</div><div style="font-size:12px;color:var(--label-2)">pela probabilidade de cada etapa</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Ganhos em {{month}}</div><div class="disp" style="font-size:24px;font-weight:600;margin-top:6px;color:var(--accent-text)">{{wonVal}}</div><div style="font-size:12px;color:var(--label-2)">{{wonCount}} negócios · meta {{goal}}</div></div>
+    <div class="glass" style="padding:16px 18px"><div class="hud">Parados +10 dias</div><div class="disp" style="font-size:24px;font-weight:600;margin-top:6px;color:var(--orange)">{{riskCount}}</div><div style="font-size:12px;color:var(--label-2)">sinalizados pelo Cosmo</div></div>
   </section>
 
   <sc-if value="{{isClosed}}">
     <section class="glass" style="padding:8px 6px">
       <div class="tblw"><table class="tbl">
         <thead><tr><th>Empresa</th><th>Valor</th><th>Resultado</th><th>Motivo</th><th>Responsável</th><th></th></tr></thead>
-        <tbody><sc-for list="{{closed}}" as="c"><tr><td style="font-weight:700">{{c.co}}</td><td class="disp" style="font-weight:600">{{c.val}}</td><td><span class="{{c.cls}}">{{c.res}}</span></td><td style="color:#9AADC1">{{c.reason}}</td><td>{{c.owner}}</td><td style="text-align:right"><button class="btn sm" onClick="{{c.reopen}}">Reabrir</button></td></tr></sc-for></tbody>
+        <tbody><sc-for list="{{closed}}" as="c"><tr><td style="font-weight:600">{{c.co}}</td><td class="disp" style="font-weight:600">{{c.val}}</td><td><span class="{{c.cls}}">{{c.res}}</span></td><td style="color:var(--label-2)">{{c.reason}}</td><td>{{c.owner}}</td><td style="text-align:right"><button class="btn sm" onClick="{{c.reopen}}">Reabrir</button></td></tr></sc-for></tbody>
       </table></div>
-      <sc-if value="{{noClosed}}"><div style="padding:32px;text-align:center;color:#9AADC1">Nenhum negócio encerrado por aqui.</div></sc-if>
+      <sc-if value="{{noClosed}}"><div style="padding:32px;text-align:center;color:var(--label-2)">Nenhum negócio encerrado por aqui.</div></sc-if>
     </section>
   </sc-if>
 
@@ -62,57 +61,57 @@
     <section style="flex:999 1 640px;min-width:0;overflow-x:auto;padding-bottom:8px" aria-label="Quadro do funil">
       <div style="display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;min-width:1090px">
         <sc-for list="{{cols}}" as="c">
-          <div class="{{c.zone}}" onDragOver="{{c.over}}" onDragLeave="{{c.leave}}" onDrop="{{c.drop}}" style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:18px;background:rgba(148,197,255,.03);border:1px solid rgba(150,200,255,.08);min-height:560px">
+          <div class="{{c.zone}}" onDragOver="{{c.over}}" onDragLeave="{{c.leave}}" onDrop="{{c.drop}}" style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:18px;background:var(--fill-q);border:1px solid var(--separator);min-height:560px">
             <div style="display:flex;flex-direction:column;gap:8px;padding:2px 4px 6px">
-              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:13.5px">{{c.name}}</span><span class="chip">{{c.count}}</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;color:#9AADC1"><span class="disp" style="color:#E7EEF6;font-size:14px;font-weight:600">{{c.val}}</span><span>{{c.prob}}</span></div>
-              <div style="height:3px;border-radius:3px;background:{{c.color}};box-shadow:0 0 10px {{c.color}}"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;font-size:13.5px">{{c.name}}</span><span class="chip">{{c.count}}</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--label-2)"><span class="disp" style="color:var(--label);font-size:14px;font-weight:600">{{c.val}}</span><span>{{c.prob}}</span></div>
+              <div style="height:3px;border-radius:3px;background:{{c.color}};"></div>
             </div>
             <sc-for list="{{c.cards}}" as="d">
-              <div role="button" tabindex="0" draggable="{{d.drag}}" class="{{d.cls}} dealcard" onClick="{{d.open}}" onDragStart="{{d.start}}" aria-label="{{d.co}}, {{d.valF}}" style="flex-direction:column;align-items:stretch;gap:10px;padding:14px;background:rgba(11,20,34,.85);border-color:{{d.border}}">
-                <span style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-weight:700;font-size:13.5px;line-height:1.3">{{d.co}}</span><span class="av sm" style="background:{{d.oc}}" title="{{d.owner}}">{{d.oi}}</span></span>
-                <span class="disp" style="font-size:17px;font-weight:700">{{d.valF}}</span>
-                <span style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;color:#9AADC1"><span>{{d.contact}}</span><span class="{{d.ageCls}}">{{d.days}}d na etapa</span></span>
+              <div role="button" tabindex="0" draggable="{{d.drag}}" class="{{d.cls}} dealcard" onClick="{{d.open}}" onDragStart="{{d.start}}" aria-label="{{d.co}}, {{d.valF}}" style="flex-direction:column;align-items:stretch;gap:10px;padding:14px;background:var(--page);border-color:{{d.border}}">
+                <span style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-weight:600;font-size:13.5px;line-height:1.3">{{d.co}}</span><span class="av sm" style="background:{{d.oc}}" title="{{d.owner}}">{{d.oi}}</span></span>
+                <span class="disp" style="font-size:17px;font-weight:600">{{d.valF}}</span>
+                <span style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;color:var(--label-2)"><span>{{d.contact}}</span><span class="{{d.ageCls}}">{{d.days}}d na etapa</span></span>
               </div>
             </sc-for>
-            <sc-if value="{{c.hasMore}}"><div style="font-size:12px;color:#7A8EA3;text-align:center;padding:8px">+ {{c.more}} negócios da base de demonstração</div></sc-if>
-            <sc-if value="{{c.empty}}"><div style="font-size:12px;color:#7A8EA3;text-align:center;padding:16px 8px">Sem negócios nesta etapa.</div></sc-if>
+            <sc-if value="{{c.hasMore}}"><div style="font-size:12px;color:var(--label-2);text-align:center;padding:8px">+ {{c.more}} negócios da base de demonstração</div></sc-if>
+            <sc-if value="{{c.empty}}"><div style="font-size:12px;color:var(--label-2);text-align:center;padding:16px 8px">Sem negócios nesta etapa.</div></sc-if>
           </div>
         </sc-for>
       </div>
     </section>
 
     <sc-if value="{{hasSel}}">
-      <aside class="glass" style="flex:1 1 340px;max-width:100%;padding:22px;display:flex;flex-direction:column;gap:16px;border-color:rgba(95,224,240,.3)" aria-label="Detalhes do negócio">
+      <aside class="glass" style="flex:1 1 340px;max-width:100%;padding:22px;display:flex;flex-direction:column;gap:16px;border-color:var(--accent)" aria-label="Detalhes do negócio">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
           <div><div class="hud">Negócio · {{sel.stageName}}</div><h2 class="disp" style="margin:4px 0 0;font-size:22px">{{sel.co}}</h2></div>
           <button class="icob" onClick="{{closeSel}}" aria-label="Fechar detalhes"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
         </div>
-        <div style="display:flex;align-items:baseline;gap:10px"><span class="disp" style="font-size:30px;font-weight:700">{{sel.valF}}</span><span class="chip cy">{{sel.prob}} de chance</span></div>
+        <div style="display:flex;align-items:baseline;gap:10px"><span class="disp" style="font-size:30px;font-weight:600">{{sel.valF}}</span><span class="chip cy">{{sel.prob}} de chance</span></div>
         <div style="display:flex;gap:4px" aria-label="Etapa atual">
-          <sc-for list="{{steps}}" as="s"><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="height:4px;border-radius:3px;background:{{s.bg}}"></div><span style="font-size:10.5px;color:{{s.tc}};font-weight:700">{{s.n}}</span></div></sc-for>
+          <sc-for list="{{steps}}" as="s"><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="height:4px;border-radius:3px;background:{{s.bg}}"></div><span style="font-size:10.5px;color:{{s.tc}};font-weight:600">{{s.n}}</span></div></sc-for>
         </div>
         <sc-if value="{{sel.risk}}">
-          <div style="display:flex;gap:10px;padding:12px;border-radius:12px;background:rgba(255,154,98,.08);border:1px solid rgba(255,154,98,.3);font-size:13px;line-height:1.5"><span class="orb" style="width:18px;height:18px;flex-basis:18px;background:radial-gradient(circle,#FFD2B8,#FF9A62 60%)" aria-hidden="true"></span><span><b>Cosmo:</b> {{sel.days}} dias sem avanço. Sugestão: ligar para {{sel.contact}} hoje.</span></div>
+          <div style="display:flex;gap:10px;padding:12px;border-radius:12px;background:var(--fill-q);border:1px solid var(--orange);font-size:13px;line-height:1.5"><span class="orb" style="width:18px;height:18px;flex-basis:18px;background:var(--fill-q)" aria-hidden="true"></span><span><b>Cosmo:</b> {{sel.days}} dias sem avanço. Sugestão: ligar para {{sel.contact}} hoje.</span></div>
         </sc-if>
         <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
-          <dt style="color:#9AADC1">Contato</dt><dd style="margin:0;font-weight:600"><a href="{{sel.contactHref}}" style="text-decoration:none">{{sel.contact}}</a> · {{sel.role}}</dd>
-          <dt style="color:#9AADC1">Responsável</dt><dd style="margin:0;font-weight:600">{{sel.owner}}</dd>
-          <dt style="color:#9AADC1">Próximo passo</dt><dd style="margin:0;font-weight:600">{{sel.next}}</dd>
-          <dt style="color:#9AADC1">Origem</dt><dd style="margin:0;font-weight:600">{{sel.src}}</dd>
+          <dt style="color:var(--label-2)">Contato</dt><dd style="margin:0;font-weight:600"><a href="{{sel.contactHref}}" style="text-decoration:none">{{sel.contact}}</a> · {{sel.role}}</dd>
+          <dt style="color:var(--label-2)">Responsável</dt><dd style="margin:0;font-weight:600">{{sel.owner}}</dd>
+          <dt style="color:var(--label-2)">Próximo passo</dt><dd style="margin:0;font-weight:600">{{sel.next}}</dd>
+          <dt style="color:var(--label-2)">Origem</dt><dd style="margin:0;font-weight:600">{{sel.src}}</dd>
         </dl>
         <div style="display:flex;flex-direction:column;gap:10px">
           <div class="hud">Linha do tempo</div>
           <sc-for list="{{sel.tl}}" as="t">
-            <div style="display:flex;gap:10px;font-size:12.5px;line-height:1.45"><span style="width:7px;height:7px;margin-top:6px;border-radius:50%;background:#5FE0F0;flex:0 0 7px"></span><span style="flex:1;color:#C9D5E1">{{t.t}}</span><span style="color:#7A8EA3;white-space:nowrap">{{t.w}}</span></div>
+            <div style="display:flex;gap:10px;font-size:12.5px;line-height:1.45"><span style="width:7px;height:7px;margin-top:6px;border-radius:50%;background:var(--accent);flex:0 0 7px"></span><span style="flex:1;color:var(--label-2)">{{t.t}}</span><span style="color:var(--label-2);white-space:nowrap">{{t.w}}</span></div>
           </sc-for>
-          <sc-if value="{{sel.noTl}}"><div style="font-size:12.5px;color:#7A8EA3">Nenhuma atividade registrada neste negócio.</div></sc-if>
+          <sc-if value="{{sel.noTl}}"><div style="font-size:12.5px;color:var(--label-2)">Nenhuma atividade registrada neste negócio.</div></sc-if>
         </div>
-        <sc-if value="{{sel.locked}}"><div style="font-size:12.5px;color:#9AADC1">Seu papel só permite consultar este negócio.</div></sc-if>
+        <sc-if value="{{sel.locked}}"><div style="font-size:12.5px;color:var(--label-2)">Seu papel só permite consultar este negócio.</div></sc-if>
         <sc-if value="{{sel.canEdit}}">
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto">
           <sc-if value="{{sel.canAdv}}"><button class="btn pri" onClick="{{advance}}" style="flex:1 1 100%">Avançar para {{sel.nextStage}}{{sel.advXp}}</button></sc-if>
-          <sc-if value="{{sel.isLast}}"><button class="btn pri" onClick="{{win}}" style="flex:1 1 100%;background:#5ADFA4">Marcar como ganho · +{{sel.winXp}} XP</button></sc-if>
+          <sc-if value="{{sel.isLast}}"><button class="btn pri" onClick="{{win}}" style="flex:1 1 100%;background:var(--teal)">Marcar como ganho · +{{sel.winXp}} XP</button></sc-if>
           <button class="btn" onClick="{{openAct}}" style="flex:1">Registrar atividade</button>
           <button class="btn" onClick="{{openEdit}}">Editar</button>
           <button class="btn" onClick="{{openLost}}">Perdido</button>
@@ -136,7 +135,7 @@
           <div><label class="lb" for="nd-o">Responsável</label><select id="nd-o" class="inp" value="{{nOwner}}" onChange="{{onOwner}}"><sc-for list="{{owners}}" as="p"><option value="{{p.i}}">{{p.n}}</option></sc-for></select></div>
         </div>
         <div><label class="lb" for="nd-c">Contato principal</label><input id="nd-c" class="inp" value="{{nContact}}" onChange="{{onContact}}" placeholder="Nome do decisor"></div>
-        <sc-if value="{{isNew}}"><div style="font-size:12.5px;color:#9AADC1">Entra em <b style="color:#E7EEF6">Prospecção</b> com 10% de probabilidade. O Cosmo cria a primeira tarefa de contato para amanhã.</div></sc-if>
+        <sc-if value="{{isNew}}"><div style="font-size:12.5px;color:var(--label-2)">Entra em <b style="color:var(--label)">Prospecção</b> com 10% de probabilidade. O Cosmo cria a primeira tarefa de contato para amanhã.</div></sc-if>
         <sc-if value="{{hasFormErr}}"><div class="err" role="alert">{{formErr}}</div></sc-if>
         <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeForm}}">Cancelar</button><button class="btn pri" onClick="{{saveDeal}}">{{formCta}}</button></div>
       </div>
@@ -151,7 +150,7 @@
       <div style="display:flex;flex-direction:column;gap:14px">
         <div><label class="lb" for="ac-ty">Tipo</label><select id="ac-ty" class="inp" value="{{aType}}" onChange="{{onAType}}"><option value="Ligação">Ligação</option><option value="E-mail">E-mail</option><option value="Reunião">Reunião</option><option value="WhatsApp">WhatsApp</option></select></div>
         <div><label class="lb" for="ac-n">O que aconteceu?</label><textarea id="ac-n" class="inp" rows="3" value="{{aNote}}" onChange="{{onANote}}" placeholder="Ex.: confirmou reunião para quinta"></textarea></div>
-        <div style="font-size:12.5px;color:#9AADC1">Vale +10 XP nas {{actCap}} primeiras atividades do dia.</div>
+        <div style="font-size:12.5px;color:var(--label-2)">Vale +10 XP nas {{actCap}} primeiras atividades do dia.</div>
         <sc-if value="{{hasActErr}}"><div class="err" role="alert">Descreva o que aconteceu.</div></sc-if>
         <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeAct}}">Cancelar</button><button class="btn pri" onClick="{{saveAct}}">Registrar</button></div>
       </div>
@@ -177,7 +176,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="fu-t" class="disp" style="margin:0;font-size:22px">Novo funil</h2><button class="icob" data-close onClick="{{closeFunnel}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <div><label class="lb" for="fu-n">Nome do funil</label><input id="fu-n" class="inp" value="{{fName}}" onChange="{{onFName}}" placeholder="Ex.: Parcerias"></div>
-        <div style="font-size:12.5px;color:#9AADC1">Usa as 5 etapas padrão.</div>
+        <div style="font-size:12.5px;color:var(--label-2)">Usa as 5 etapas padrão.</div>
         <sc-if value="{{hasFunnelErr}}"><div class="err" role="alert">{{funnelErr}}</div></sc-if>
         <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeFunnel}}">Cancelar</button><button class="btn pri" onClick="{{saveFunnel}}">Criar funil</button></div>
       </div>
@@ -197,7 +196,7 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
     const O = Orb.data(), S = Orb.SEED;
-    const CC = ['#2BB8CC', '#45CDE0', '#5FE0F0', '#ADA0FF', '#FF9A62'];
+    const CC = ['var(--accent)', 'var(--accent)', 'var(--accent)', 'var(--accent)', 'var(--accent)'];
     const NEXT = ['Agendar diagnóstico inicial', 'Reunião de descoberta com decisor', 'Revisar proposta com financeiro', 'Ajustar condições de pagamento', 'Assinatura do contrato'];
     const T = Orb.totals();
     const stats = Orb.funnelStats(s.fid);
@@ -206,13 +205,13 @@ class Component extends DCLogic {
     const cols = stats.map((c, i) => {
       const cards = c.deals.filter(visible).map((d) => ({
         co: d.co, valF: Orb.brl(d.v), contact: d.c, days: d.d, owner: person(d.o).n, oi: d.o === 'CA' ? Orb.ini(Orb.profile().name) : d.o, oc: person(d.o).c,
-        ageCls: d.d >= 10 ? 'chip or' : '', cls: s.sel === d.id ? 'rowb on' : 'rowb', border: s.sel === d.id ? 'rgba(95,224,240,.45)' : (d.d >= 10 ? 'rgba(255,154,98,.35)' : 'rgba(150,200,255,.1)'),
+        ageCls: d.d >= 10 ? 'chip or' : '', cls: s.sel === d.id ? 'rowb on' : 'rowb', border:s.sel === d.id ? 'var(--accent)' : (d.d >= 10 ? 'var(--orange)' : 'var(--fill-q)'),
         drag: Orb.dealEditable(d) ? 'true' : 'false',
         open: () => this.setState({ sel: d.id }),
         start: (e) => { e.dataTransfer.setData('text/plain', d.id); e.dataTransfer.effectAllowed = 'move'; }
       }));
       const more = s.filter === 'all' ? c.more : 0;
-      return { name: c.name, count: c.count, val: Orb.mil(c.sum), prob: Math.round(c.prob * 100) + '% prob.', color: CC[i], cards, more, hasMore: more > 0, empty: cards.length === 0 && more === 0,
+      return { name: c.name, count: c.count, val: Orb.mil(c.sum), prob: Math.round(c.prob * 100) + '% prob.', color:CC[i], cards, more, hasMore: more > 0, empty: cards.length === 0 && more === 0,
         zone: s.over === i ? 'dropzone' : '',
         over: (e) => { e.preventDefault(); if (s.over !== i) this.setState({ over: i }); },
         leave: (e) => { if (!e.currentTarget.contains(e.relatedTarget)) this.setState({ over: null }); },
@@ -230,7 +229,7 @@ class Component extends DCLogic {
         canAdv: !isLast, isLast, nextStage: S.stages[D.st + 1] || '', winXp: Orb.winXp(D.v), advXp: D.act ? ' · +25 XP' : ' · sem XP',
         tl: D.log.map((l) => ({ t: l.t, w: Orb.ago(l.ts) })) };
       sel.noTl = sel.tl.length === 0;
-      steps = S.stages.map((n, i) => ({ n: n.slice(0, 4) + '.', bg: i <= D.st ? CC[i] : 'rgba(150,200,255,.12)', tc: i === D.st ? '#E7EEF6' : '#7A8EA3' }));
+      steps = S.stages.map((n, i) => ({ n: n.slice(0, 4) + '.', bg: i <= D.st ? CC[i] : 'var(--fill-q)', tc: i === D.st ? 'var(--label)' : 'var(--label-2)' }));
     }
     const closed = O.deals.filter((d) => d.status !== 'open' && (d.f || 'b2b') === s.fid && Orb.dealVisible(d)).map((d) => ({ co: d.co, val: Orb.brl(d.v), res: d.status === 'won' ? 'Ganho' : 'Perdido', cls: d.status === 'won' ? 'chip gr' : 'chip rd', reason: d.reason || '—', owner: person(d.o).n, reopen: () => { Orb.reopenDeal(d.id); Orb.flash(this, d.co + ' reaberto'); } }));
     const closedCount = O.deals.filter((d) => d.status !== 'open' && Orb.dealVisible(d)).length;

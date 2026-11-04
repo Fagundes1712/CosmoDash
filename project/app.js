@@ -11,7 +11,7 @@
   const MONTHS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
   const WEEK = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   const unaccent = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const TIERS = [['Operador', 1, 5, 'Painel pessoal e missões diárias', '#9AADC1'], ['Especialista', 6, 10, 'Desafios semanais e mentoria', '#5ADFA4'], ['Estrategista', 11, 15, 'Acesso antecipado a leads inbound', '#ADA0FF'], ['Elite', 16, 20, 'Destaque mensal na organização', '#5FE0F0'], ['Vanguarda', 21, 25, 'Participa da definição de metas', '#FF9A62'], ['Cosmos', 26, 30, 'Recompensa definida pela empresa', '#F3D06E']];
+  const TIERS = [['Operador', 1, 5, 'Painel pessoal e missões diárias', 'var(--label-2)'], ['Especialista', 6, 10, 'Desafios semanais e mentoria', 'var(--accent-text)'], ['Estrategista', 11, 15, 'Acesso antecipado a leads inbound', 'var(--pink)'], ['Elite', 16, 20, 'Destaque mensal na organização', 'var(--accent)'], ['Vanguarda', 21, 25, 'Participa da definição de metas', 'var(--orange)'], ['Cosmos', 26, 30, 'Recompensa definida pela empresa', 'var(--label-2)']];
   const XP_PER_LEVEL = 3000;
   const ACTIVITY_CAP = 5;
 
@@ -123,7 +123,7 @@
     counted: (key) => O().counters[key + ':' + Orb.today()] || 0,
     activityXp(xp = 10) { const n = Orb.count('activity'); if (n > ACTIVITY_CAP) return 0; Orb.award('act-' + Orb.today() + '-' + n, xp); return xp; },
 
-    person(i) { if (i === 'CA') return { n: db.profile.name, c: SEED.colors.CA }; const p = O().people.find((x) => x.i === i); return p ? { n: p.n, c: p.c } : { n: i, c: '#9AADC1' }; },
+    person(i) { if (i === 'CA') return { n: db.profile.name, c: SEED.colors.CA }; const p = O().people.find((x) => x.i === i); return p ? { n: p.n, c: p.c } : { n: i, c: 'var(--label-2)' }; },
     feed(item) { O().feed.unshift(Object.assign({ ts: Date.now(), xp: 0 }, item)); },
     ranking() {
       const list = O().people.map((p) => ({ name: Orb.person(p.i).n, ini: p.i === 'CA' ? Orb.ini(db.profile.name) : p.i, color: p.c, sub: (p.i === 'CA' ? 'Você · ' : p.role + ' · ') + p.sq, season: p.i === 'CA' ? Orb.season() : p.season, me: p.i === 'CA' }));
@@ -236,11 +236,11 @@
 
     // Suporte
     slaInfo(t) {
-      if (t.status === 'resolved') return { txt: t.inSla ? 'Cumprido' : 'Fora do SLA', c: t.inSla ? '#5ADFA4' : '#FF7A8A', w: '100%', min: 0 };
+      if (t.status === 'resolved') return { txt: t.inSla ? 'Cumprido' : 'Fora do SLA', c: t.inSla ? 'var(--accent-text)' : 'var(--orange)', w: '100%', min: 0 };
       const min = Math.round((t.due - Date.now()) / 60000);
-      if (min <= 0) return { txt: 'Vencido', c: '#FF7A8A', w: '100%', min };
+      if (min <= 0) return { txt: 'Vencido', c: 'var(--orange)', w: '100%', min };
       const txt = min < 60 ? min + ' min' : Math.floor(min / 60) + 'h' + (min % 60 ? ' ' + pad(min % 60) + 'min' : '');
-      return { txt, c: min < 60 ? '#FF9A62' : min < 240 ? '#F3D06E' : '#5ADFA4', w: Math.max(4, Math.min(100, Math.round((1 - min / t.tot) * 100))) + '%', min };
+      return { txt, c: min < 60 ? 'var(--orange)' : min < 240 ? 'var(--label-2)' : 'var(--accent-text)', w: Math.max(4, Math.min(100, Math.round((1 - min / t.tot) * 100))) + '%', min };
     },
     ticketsOpen: () => O().tickets.filter((t) => t.status === 'open').length + Object.values(O().hidTickets).reduce((a, b) => a + b, 0),
     resolveTicket(id) {
@@ -329,7 +329,7 @@
     createOrg(name) {
       const id = 'o' + Date.now();
       const clean = name.trim();
-      db.orgs[id] = { name: clean, mark: Orb.ini(clean) || 'NO', color: '#5ADFA4', role: 'Admin', plan: 'starter', cycle: 'm', pay: 'c', cardLabel: 'Sem cartão cadastrado',
+      db.orgs[id] = { name: clean, mark: Orb.ini(clean) || 'NO', color: 'var(--accent-text)', role: 'Admin', plan: 'starter', cycle: 'm', pay: 'c', cardLabel: 'Sem cartão cadastrado',
         me: { lvl: 1, xp: 0, season: 0, streak: 0, squad: 'Geral', won: 0, goalWon: 10000, created: 0, createdGoal: 5, acts: 0, actsGoal: 20 },
         k: { wonBase: 0, wonCount: 0, goal: 10000, delta: '', conv: '—', convDelta: '', up: true, sla: '—', first: '—', csat: '—', spark: '0,36 200,36', cycleDays: 0, weekWon: 0, weekVal: 0, weekActs: 0, leadReply: '—' },
         bars: [0, 0, 0, 0, 0], funnels: [{ id: 'b2b', name: 'Vendas' }], hid: {}, deals: [], people: [{ i: 'CA', n: db.profile.name, e: db.profile.email, sq: 'Geral', lv: 1, last: 'agora', tfa: true, c: SEED.colors.CA, role: 'Admin', season: 0 }], hidMembers: 0, invites: [], squads: ['Geral'], squad: { lvl: 1, pct: 0, won: 0, goalWon: 10000, wins: 0, winsGoal: 3, resp: '—', respGoal: '—' }, contactsBase: 0, companies: [], contacts: [], tasks: [], teamToday: [], hidTickets: {}, tickets: [], feed: [], notifications: [], usage: { cosmo: 0, storage: 0 }, invoices: [], perms: clone(SEED.perms), xpLog: {}, audit: [], counters: {}, joined: {}, claimed: {} };

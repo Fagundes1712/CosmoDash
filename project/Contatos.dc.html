@@ -7,7 +7,6 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
@@ -29,7 +28,7 @@
   <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
     <div class="seg" role="group" aria-label="Tipo de registro"><button class="{{tP}}" onClick="{{showP}}">Pessoas · {{nP}}</button><button class="{{tE}}" onClick="{{showE}}">Empresas · {{nE}}</button></div>
     <label class="cmd" style="flex:1 1 280px;min-height:44px;border-radius:12px;padding:0 12px">
-      <svg class="ico s" viewBox="0 0 24 24" style="color:#7A8EA3" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"></path></svg>
+      <svg class="ico s" viewBox="0 0 24 24" style="color:var(--label-2)" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"></path></svg>
       <input type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Buscar por nome, empresa ou tag" aria-label="Buscar contatos">
     </label>
     <div class="seg" role="group" aria-label="Filtro de saúde"><button class="{{hA}}" onClick="{{hAll}}">Todos</button><button class="{{hL}}" onClick="{{hLow}}">Pulso baixo</button></div>
@@ -48,19 +47,19 @@
             <tbody>
               <sc-for list="{{rows}}" as="r">
                 <tr class="{{r.cls}}" tabindex="0" onClick="{{r.pick}}">
-                  <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{r.color}}">{{r.ini}}</span><div><div style="font-weight:700">{{r.name}}</div><div style="font-size:12px;color:#9AADC1">{{r.role}}</div></div></div></td>
+                  <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{r.color}}">{{r.ini}}</span><div><div style="font-weight:600">{{r.name}}</div><div style="font-size:12px;color:var(--label-2)">{{r.role}}</div></div></div></td>
                   <td>{{r.co}}</td>
                   <td><span class="{{r.stCls}}">{{r.stage}}</span></td>
                   <td style="color:{{r.ageC}}">{{r.last}}</td>
-                  <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:56px"><i style="width:{{r.pw}};background:{{r.pc}};box-shadow:none"></i></div><span class="disp" style="font-weight:700;color:{{r.pc}}">{{r.p}}</span></div></td>
+                  <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:56px"><i style="width:{{r.pw}};background:{{r.pc}};box-shadow:none"></i></div><span class="disp" style="font-weight:600;color:{{r.pc}}">{{r.p}}</span></div></td>
                   <td><span class="av sm" style="background:{{r.oc}}" title="{{r.owner}}">{{r.oi}}</span></td>
                 </tr>
               </sc-for>
             </tbody>
           </table>
         </div>
-        <sc-if value="{{empty}}"><div style="padding:40px;text-align:center;color:#9AADC1">Nenhum contato encontrado.</div></sc-if>
-        <sc-if value="{{hasBase}}"><div style="padding:12px 14px;font-size:12px;color:#7A8EA3">Mostrando {{shown}} de {{nP}}. Os outros {{base}} contatos são a base simulada desta demonstração.</div></sc-if>
+        <sc-if value="{{empty}}"><div style="padding:40px;text-align:center;color:var(--label-2)">Nenhum contato encontrado.</div></sc-if>
+        <sc-if value="{{hasBase}}"><div style="padding:12px 14px;font-size:12px;color:var(--label-2)">Mostrando {{shown}} de {{nP}}. Os outros {{base}} contatos são a base simulada desta demonstração.</div></sc-if>
       </sc-if>
       <sc-if value="{{isE}}">
         <div class="tblw">
@@ -68,12 +67,12 @@
             <thead><tr><th>Empresa</th><th>Setor</th><th>Status</th><th>Contatos</th><th>Em aberto</th><th>Receita 12m</th></tr></thead>
             <tbody>
               <sc-for list="{{cos}}" as="c">
-                <tr class="{{c.cls}}" tabindex="0" onClick="{{c.pick}}"><td><div style="display:flex;align-items:center;gap:10px"><span class="orgmark" style="width:28px;height:28px;flex-basis:28px;font-size:11px;background:{{c.color}}">{{c.mk}}</span><b>{{c.name}}</b></div></td><td style="color:#9AADC1">{{c.sector}}</td><td><span class="{{c.stCls}}">{{c.status}}</span></td><td>{{c.n}}</td><td class="disp" style="font-weight:600">{{c.open}}</td><td class="disp" style="font-weight:600">{{c.rev}}</td></tr>
+                <tr class="{{c.cls}}" tabindex="0" onClick="{{c.pick}}"><td><div style="display:flex;align-items:center;gap:10px"><span class="orgmark" style="width:28px;height:28px;flex-basis:28px;font-size:11px;background:{{c.color}}">{{c.mk}}</span><b>{{c.name}}</b></div></td><td style="color:var(--label-2)">{{c.sector}}</td><td><span class="{{c.stCls}}">{{c.status}}</span></td><td>{{c.n}}</td><td class="disp" style="font-weight:600">{{c.open}}</td><td class="disp" style="font-weight:600">{{c.rev}}</td></tr>
               </sc-for>
             </tbody>
           </table>
         </div>
-        <sc-if value="{{noCos}}"><div style="padding:40px;text-align:center;color:#9AADC1">Nenhuma empresa encontrada.</div></sc-if>
+        <sc-if value="{{noCos}}"><div style="padding:40px;text-align:center;color:var(--label-2)">Nenhuma empresa encontrada.</div></sc-if>
       </sc-if>
     </section>
 
@@ -81,28 +80,28 @@
       <aside class="glass" style="flex:1 1 340px;max-width:100%;padding:22px;display:flex;flex-direction:column;gap:16px" aria-label="Ficha do contato">
         <div style="display:flex;gap:14px;align-items:center">
           <span class="av lg" style="background:{{s.color}}">{{s.ini}}</span>
-          <div style="flex:1;min-width:0"><h2 class="disp" style="margin:0;font-size:21px">{{s.name}}</h2><div style="font-size:13px;color:#9AADC1">{{s.role}} · {{s.co}}</div></div>
-          <svg width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Pulso do relacionamento {{s.p}} de 100"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(150,200,255,.12)" stroke-width="5"></circle><circle cx="32" cy="32" r="26" fill="none" stroke="{{s.pc}}" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{s.dash}}" transform="rotate(-90 32 32)"></circle><text x="32" y="37" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="16">{{s.p}}</text></svg>
+          <div style="flex:1;min-width:0"><h2 class="disp" style="margin:0;font-size:21px">{{s.name}}</h2><div style="font-size:13px;color:var(--label-2)">{{s.role}} · {{s.co}}</div></div>
+          <svg width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Pulso do relacionamento {{s.p}} de 100"><circle cx="32" cy="32" r="26" fill="none" stroke-width="5" style="stroke:var(--separator)"></circle><circle cx="32" cy="32" r="26" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{s.dash}}" transform="rotate(-90 32 32)" style="stroke:{{s.pc}}"></circle><text x="32" y="37" text-anchor="middle" font-family="SF Pro Display, system-ui, -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="600" font-size="16" style="fill:var(--label)">{{s.p}}</text></svg>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{s.tags}}" as="t"><span class="chip cy">{{t}}</span></sc-for></div>
         <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
           <button class="btn sm" onClick="{{callIt}}">Ligar</button><button class="btn sm" onClick="{{mailIt}}">E-mail</button><button class="btn sm" onClick="{{zapIt}}">WhatsApp</button><a class="btn sm" href="{{s.taskHref}}">Tarefa</a>
         </div>
         <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
-          <dt style="color:#9AADC1">E-mail</dt><dd style="margin:0;font-weight:600;word-break:break-all">{{s.email}}</dd>
-          <dt style="color:#9AADC1">Telefone</dt><dd style="margin:0;font-weight:600">{{s.phone}}</dd>
-          <dt style="color:#9AADC1">Responsável</dt><dd style="margin:0;font-weight:600">{{s.owner}}</dd>
+          <dt style="color:var(--label-2)">E-mail</dt><dd style="margin:0;font-weight:600;word-break:break-all">{{s.email}}</dd>
+          <dt style="color:var(--label-2)">Telefone</dt><dd style="margin:0;font-weight:600">{{s.phone}}</dd>
+          <dt style="color:var(--label-2)">Responsável</dt><dd style="margin:0;font-weight:600">{{s.owner}}</dd>
         </dl>
         <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
-          <a href="{{s.dealHref}}" style="padding:12px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);text-decoration:none;color:#E7EEF6"><div class="hud">Negócio</div><div style="font-weight:700;margin-top:4px">{{s.stage}}</div><div class="disp" style="color:#5FE0F0">{{s.val}}</div></a>
-          <a href="Suporte.dc.html" style="padding:12px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.1);text-decoration:none;color:#E7EEF6"><div class="hud">Suporte</div><div style="font-weight:700;margin-top:4px">{{s.tk}}</div><div style="font-size:12px;color:#9AADC1">{{s.tkSub}}</div></a>
+          <a href="{{s.dealHref}}" style="padding:12px;border-radius:14px;background:var(--page);border:1px solid var(--separator);text-decoration:none;color:var(--label)"><div class="hud">Negócio</div><div style="font-weight:600;margin-top:4px">{{s.stage}}</div><div class="disp" style="color:var(--accent-text)">{{s.val}}</div></a>
+          <a href="Suporte.dc.html" style="padding:12px;border-radius:14px;background:var(--page);border:1px solid var(--separator);text-decoration:none;color:var(--label)"><div class="hud">Suporte</div><div style="font-weight:600;margin-top:4px">{{s.tk}}</div><div style="font-size:12px;color:var(--label-2)">{{s.tkSub}}</div></a>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <div class="hud">Interações recentes</div>
-          <sc-for list="{{s.tl}}" as="t"><div style="display:flex;gap:10px;font-size:12.5px;line-height:1.45"><span style="width:7px;height:7px;margin-top:6px;border-radius:50%;background:#5FE0F0;flex:0 0 7px"></span><span style="flex:1;color:#C9D5E1">{{t.t}}</span><span style="color:#7A8EA3;white-space:nowrap">{{t.w}}</span></div></sc-for>
-          <sc-if value="{{s.noTl}}"><div style="font-size:12.5px;color:#7A8EA3">Nenhuma interação registrada.</div></sc-if>
+          <sc-for list="{{s.tl}}" as="t"><div style="display:flex;gap:10px;font-size:12.5px;line-height:1.45"><span style="width:7px;height:7px;margin-top:6px;border-radius:50%;background:var(--accent);flex:0 0 7px"></span><span style="flex:1;color:var(--label-2)">{{t.t}}</span><span style="color:var(--label-2);white-space:nowrap">{{t.w}}</span></div></sc-for>
+          <sc-if value="{{s.noTl}}"><div style="font-size:12.5px;color:var(--label-2)">Nenhuma interação registrada.</div></sc-if>
         </div>
-        <sc-if value="{{s.showTip}}"><div style="padding:12px;border-radius:12px;background:rgba(95,224,240,.06);border:1px solid rgba(95,224,240,.2);font-size:12.5px;line-height:1.5;color:#C9D5E1"><b style="color:#5FE0F0">Cosmo:</b> {{s.tip}}</div></sc-if>
+        <sc-if value="{{s.showTip}}"><div style="padding:12px;border-radius:12px;background:var(--fill-q);border:1px solid var(--accent);font-size:12.5px;line-height:1.5;color:var(--label-2)"><b style="color:var(--accent-text)">Cosmo:</b> {{s.tip}}</div></sc-if>
         <div style="display:flex;gap:8px"><button class="btn sm" onClick="{{openEdit}}">Editar</button><sc-if value="{{canDel}}"><button class="btn sm ghost" onClick="{{delIt}}">Excluir</button></sc-if></div>
       </aside>
     </sc-if>
@@ -136,25 +135,25 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
     const O = Orb.data();
-    const PAL = ['#5FE0F0', '#FF9A62', '#ADA0FF', '#5ADFA4', '#F3D06E', '#FF7A8A'];
+    const PAL = ['var(--accent)', 'var(--orange)', 'var(--pink)', 'var(--accent-text)', 'var(--label-2)', 'var(--orange)'];
     const deals = O.deals;
     const dealOf = (c) => deals.find((d) => d.status === 'open' && (d.c === c.name || d.co === c.co));
     const view = (c, i) => {
       const d = dealOf(c);
-      return Object.assign({}, c, { color: PAL[i % 6], stage: d ? Orb.SEED.stages[d.st] : c.stage || 'Sem negócio', val: d ? Orb.brl(d.v) : '—', deal: d });
+      return Object.assign({}, c, { color:PAL[i % 6], stage: d ? Orb.SEED.stages[d.st] : c.stage || 'Sem negócio', val: d ? Orb.brl(d.v) : '—', deal: d });
     };
-    const pcol = (p) => (p >= 75 ? '#5ADFA4' : p >= 55 ? '#F3D06E' : '#FF9A62');
+    const pcol = (p) => (p >= 75 ? 'var(--accent-text)' : p >= 55 ? 'var(--label-2)' : 'var(--orange)');
     const C = O.contacts.map(view);
     const q = s.q.trim().toLowerCase();
     const matchQ = (c) => !q || (c.name + ' ' + c.co + ' ' + c.tags.join(' ')).toLowerCase().includes(q);
     const list = C.filter((c) => matchQ(c) && (!s.low || c.p < 55) && (!s.co || c.co === s.co));
-    const rows = list.map((c) => ({ name: c.name, role: c.role, co: c.co, ini: Orb.ini(c.name), color: c.color, stage: c.stage, stCls: c.stage === 'Cliente' ? 'chip gr' : c.stage === 'Sem negócio' ? 'chip' : 'chip cy', last: c.days === 0 ? 'hoje' : 'há ' + c.days + ' dias', ageC: c.days >= 10 ? '#FF9A62' : '#C9D5E1', p: c.p, pw: c.p + '%', pc: pcol(c.p), oi: c.o === 'CA' ? Orb.ini(Orb.profile().name) : c.o, oc: Orb.person(c.o).c, owner: Orb.person(c.o).n, cls: s.sel === c.id ? 'rw sel' : 'rw', pick: () => this.setState({ sel: c.id }) }));
+    const rows = list.map((c) => ({ name: c.name, role: c.role, co: c.co, ini: Orb.ini(c.name), color:c.color, stage: c.stage, stCls: c.stage === 'Cliente' ? 'chip gr' : c.stage === 'Sem negócio' ? 'chip' : 'chip cy', last: c.days === 0 ? 'hoje' : 'há ' + c.days + ' dias', ageC: c.days >= 10 ? 'var(--orange)' : 'var(--label-2)', p: c.p, pw: c.p + '%', pc: pcol(c.p), oi: c.o === 'CA' ? Orb.ini(Orb.profile().name) : c.o, oc: Orb.person(c.o).c, owner: Orb.person(c.o).n, cls: s.sel === c.id ? 'rw sel' : 'rw', pick: () => this.setState({ sel: c.id }) }));
     const S = list.find((c) => c.id === s.sel);
     let sel = {};
     if (S) {
       const tickets = O.tickets.filter((t) => t.status === 'open' && t.org.split(' · ')[0] === S.co);
       const next = tickets.map((t) => Orb.slaInfo(t)).sort((a, b) => a.min - b.min)[0];
-      sel = { name: S.name, role: S.role, co: S.co, ini: Orb.ini(S.name), color: S.color, p: S.p, pc: pcol(S.p), dash: Math.round(S.p / 100 * 163.4) + ' 200', tags: S.tags, email: S.email, phone: S.phone || '—', owner: Orb.person(S.o).n, stage: S.stage, val: S.val,
+      sel = { name: S.name, role: S.role, co: S.co, ini: Orb.ini(S.name), color:S.color, p: S.p, pc: pcol(S.p), dash: Math.round(S.p / 100 * 163.4) + ' 200', tags: S.tags, email: S.email, phone: S.phone || '—', owner: Orb.person(S.o).n, stage: S.stage, val: S.val,
         dealHref: 'Pipeline.dc.html' + (S.deal ? '?deal=' + S.deal.id : ''), taskHref: 'Tarefas.dc.html?new=' + encodeURIComponent('Falar com ' + S.name),
         tk: tickets.length ? tickets.length + (tickets.length > 1 ? ' tickets abertos' : ' ticket aberto') : 'Sem tickets', tkSub: next ? 'SLA: ' + next.txt : 'Nada pendente',
         tip: S.tip, showTip: Orb.profile().prefs.cosmo, tl: S.tl.map((t) => ({ t: t.t, w: Orb.ago(t.ts) })) };
@@ -177,7 +176,7 @@ class Component extends DCLogic {
     const COS = names.filter((n) => !q || n.toLowerCase().includes(q)).map((n, i) => {
       const seed = O.companies.find((c) => c[0] === n) || [n, '—', 'Oportunidade', '—'];
       const open = deals.filter((d) => d.status === 'open' && d.co === n).reduce((a, d) => a + d.v, 0);
-      return { name: n, mk: Orb.ini(n), sector: seed[1], status: seed[2], stCls: seed[2] === 'Cliente' ? 'chip gr' : 'chip', n: C.filter((c) => c.co === n).length, open: open ? Orb.mil(open) : '—', rev: seed[3], color: PAL[i % 6], cls: 'rw', pick: () => this.setState({ tab: 'p', co: n, q: '', low: false, sel: (C.find((c) => c.co === n) || {}).id || null }) };
+      return { name: n, mk: Orb.ini(n), sector: seed[1], status: seed[2], stCls: seed[2] === 'Cliente' ? 'chip gr' : 'chip', n: C.filter((c) => c.co === n).length, open: open ? Orb.mil(open) : '—', rev: seed[3], color:PAL[i % 6], cls: 'rw', pick: () => this.setState({ tab: 'p', co: n, q: '', low: false, sel: (C.find((c) => c.co === n) || {}).id || null }) };
     });
     const openForm = (mode) => this.setState({ form: mode, formErr: '', f: mode === 'edit' ? { name: S.name, email: S.email, phone: S.phone, co: S.co, role: S.role } : {} });
     const onF = {};

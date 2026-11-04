@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CosmoDash · Conversas</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="./CosmoDash.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Atendimento · Caixa de entrada</div><h1 class="h1">Conversas</h1></div>
+  </header>
+
+  <div style="padding:12px 14px;border-radius:12px;background:rgba(95,224,240,.06);border:1px solid rgba(95,224,240,.2);font-size:13px;line-height:1.5;color:#C9D5E1">Prévia: esta seção ainda não recebe nem envia mensagens. Os exemplos usam os contatos de {{org.name}}.</div>
+
+  <div class="split">
+    <section class="glass" style="padding:16px;display:flex;flex-direction:column;gap:4px">
+      <h2 class="h2" style="padding:4px 8px 10px">Conversas recentes</h2>
+      <sc-for list="{{threads}}" as="t">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 10px;border-radius:14px;flex-wrap:wrap">
+          <span class="av" style="background:{{t.c}}">{{t.i}}</span>
+          <span style="flex:1 1 200px;min-width:0"><span style="display:block;font-weight:700">{{t.n}}</span><span style="display:block;font-size:12.5px;color:#9AADC1">{{t.text}}</span></span>
+          <span class="chip">Exemplo</span>
+        </div>
+      </sc-for>
+      <sc-if value="{{noThreads}}"><div style="padding:32px;text-align:center;color:#9AADC1">Nenhuma conversa ainda. Cadastre contatos para começar.</div></sc-if>
+    </section>
+
+    <aside class="glass" style="padding:20px;display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.5;color:#C9D5E1">
+      <h2 class="h2" style="color:#E7EEF6">O que esta seção vai fazer</h2>
+      <div>Reunir em uma só caixa as mensagens de cada contato.</div>
+      <div>Mostrar o histórico junto da ficha e do negócio do contato.</div>
+      <div>Permitir que o Cosmo sugira respostas e próximos passos.</div>
+      <a class="btn sm" href="Instancias.dc.html" style="align-self:flex-start">Ver instâncias WhatsApp</a>
+    </aside>
+  </div>
+</main>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null };
+  renderVals() {
+    const threads = Orb.data().contacts.slice(0, 4).map((k) => ({ n: k.name, i: Orb.ini(k.name), c: Orb.person(k.o).c, text: k.role + ' em ' + k.co + ' · último contato há ' + k.days + ' dias' }));
+    return Object.assign(Orb.shell(this, 'Conversas.dc.html'), { threads, noThreads: threads.length === 0 });
+  }
+}
+</script>
+</body>
+</html>

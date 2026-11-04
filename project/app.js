@@ -1,4 +1,4 @@
-// Regras, persistência e menu lateral compartilhados pelas 9 telas.
+// Regras, persistência e menu lateral compartilhados por todas as telas.
 // shortcut: localStorage guarda tudo neste navegador; trocar por API e banco ao virar SaaS.
 (function () {
   const g = typeof window !== 'undefined' ? window : globalThis;
@@ -345,10 +345,15 @@
     shell(c, cur) {
       if (db.toast) { const t = db.toast; db.toast = null; Orb.save(); setTimeout(() => Orb.flash(c, t)); }
       const s = c.state;
-      const IC = { dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', pipe: 'M3 4h18l-7 8.5V19l-4 2v-8.5z', cont: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', task: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11', sup: 'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z', goal: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3', team: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4', plan: 'M2 5h20v14H2zM2 10h20M6 15h4' };
+      const IC = { dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', pipe: 'M3 4h18l-7 8.5V19l-4 2v-8.5z', cont: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', task: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11', sup: 'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z', goal: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3', team: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4', plan: 'M2 5h20v14H2zM2 10h20M6 15h4', chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', wpp: 'M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM11 18h2', org: 'M3 21h18M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17M15 9h3a1 1 0 0 1 1 1v11M9 7h2M9 11h2M9 15h2', user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' };
       const pending = Orb.tasksPending();
-      const NAV = [['Comercial'], ['Main.dc.html', 'Dashboard', 'dash'], ['Pipeline.dc.html', 'Funis de vendas', 'pipe', String(Orb.totals().count)], ['Contatos.dc.html', 'Contatos', 'cont'], ['Tarefas.dc.html', 'Tarefas', 'task', pending ? String(pending) : ''], ['Atendimento'], ['Suporte.dc.html', 'Suporte interno', 'sup', String(Orb.ticketsOpen())], ['Performance'], ['Metas.dc.html', 'Metas & conquistas', 'goal'], ['Administração'], ['Equipe.dc.html', 'Equipe & acessos', 'team'], ['Planos.dc.html', 'Planos & pagamentos', 'plan']];
-      const nav = NAV.map((a) => (a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === cur ? 'nav on' : 'nav' }));
+      const NAV = [['Main.dc.html', 'Painel', 'dash'], ['Conversas.dc.html', 'Conversas', 'chat'], ['Contatos.dc.html', 'Contatos', 'cont'], ['Pipeline.dc.html', 'Funil de vendas', 'pipe', String(Orb.totals().count)], ['Tarefas.dc.html', 'Tarefas', 'task', pending ? String(pending) : ''], ['Instancias.dc.html', 'Instâncias WhatsApp', 'wpp'], ['Metas.dc.html', 'Metas e conquistas', 'goal'], ['Organizacoes.dc.html', 'Organizações', 'org'], ['Equipe.dc.html', 'Equipe e permissões', 'team'], ['Planos.dc.html', 'Planos e pagamentos', 'plan'], ['Perfil.dc.html', 'Meu perfil', 'user'], ['Suporte.dc.html', 'Suporte interno', 'sup', String(Orb.ticketsOpen())]];
+      const nav = NAV.map((a) => ({ href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === cur ? 'nav on' : 'nav', current: a[0] === cur ? 'page' : false }));
+      // Em telas estreitas as abas rolam na horizontal; deixa a ativa à vista depois do desenho e das fontes, que mudam as larguras.
+      if (typeof document !== 'undefined' && !c._navShown) {
+        c._navShown = true;
+        setTimeout(() => document.fonts.ready.then(() => { const n = document.querySelector('.side-nav'), a = n && n.querySelector('.nav.on'); if (a) n.scrollLeft += a.getBoundingClientRect().left - n.getBoundingClientRect().left - 16; }));
+      }
       const o = O();
       const lv = Orb.level();
       const name = db.profile.name;
@@ -358,8 +363,8 @@
         shell: db.collapsed ? 'collapsed' : '', chev: db.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6',
         toggle: () => { db.collapsed = !db.collapsed; Orb.save(); c.setState({}); },
         nav, org: orgView, orgOpen: !!s.orgOpen, orgList, toggleOrg: () => c.setState({ orgOpen: !s.orgOpen }),
-        userName: name, userIni: Orb.ini(name), userPhoto: db.profile.photo ? "background-image:url('" + db.profile.photo + "');background-size:cover;color:transparent;" : '',
-        profCls: cur === 'Perfil.dc.html' ? 'nav on' : 'nav', xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
+        userIni: Orb.ini(name), userPhoto: db.profile.photo ? "background-image:url('" + db.profile.photo + "');background-size:cover;color:transparent;" : '',
+        xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
         xpLabel: Orb.num(lv.xp) + ' / ' + Orb.num(lv.max), xpPct: lv.pct + '%', xpLeft: Orb.num(lv.left),
         hasToast: !!s.toast, toast: s.toast || ''
       };
@@ -387,16 +392,13 @@
             <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13px">{{o.name}}</span><span style="display:block;font-size:11px;color:#9AADC1">{{o.role}} · {{o.plan}}</span></span>
           </button>
         </sc-for>
-        <a class="btn ghost sm" href="Equipe.dc.html?tab=o&new=1" style="justify-content:flex-start">+ Nova organização</a>
+        <a class="btn ghost sm" href="Organizacoes.dc.html?new=1" style="justify-content:flex-start">+ Nova organização</a>
       </div>
     </sc-if>
   </div>
   <nav class="side-nav" style="display:flex;flex-direction:column;gap:2px">
     <sc-for list="{{nav}}" as="n">
-      <sc-if value="{{n.head}}"><div class="navh">{{n.label}}</div></sc-if>
-      <sc-if value="{{n.link}}">
-        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
-      </sc-if>
+      <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}" aria-current="{{n.current}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
     </sc-for>
   </nav>
   <div class="side-foot" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
@@ -404,10 +406,6 @@
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="hud" style="color:#ADA0FF">{{xpTier}}</span><span class="xp" style="white-space:nowrap">{{xpLabel}}</span></div>
       <div class="bar vi"><i style="width:{{xpPct}}"></i></div>
       <div style="font-size:11.5px;color:#9AADC1">Faltam {{xpLeft}} XP para o Nível {{xpNext}}</div>
-    </a>
-    <a href="Perfil.dc.html" class="{{profCls}}" title="Meu perfil" style="min-height:52px">
-      <span class="av" style="background:#5FE0F0;{{userPhoto}}">{{userIni}}</span>
-      <span class="hide-c lbl" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">{{userName}}</span><span style="display:block;font-size:11.5px;font-weight:500">{{org.role}} · {{org.name}}</span></span>
     </a>
   </div>
 </aside>`,

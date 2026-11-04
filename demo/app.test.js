@@ -5,6 +5,17 @@ const Orb = require('../project/app.js');
 
 const fresh = (org = 'v') => { Orb.reset(); Orb.db().org = org; return Orb.data(); };
 
+test('menu tem as 12 abas na ordem, cada uma com tela, e marca só a ativa', () => {
+  fresh();
+  const { nav } = Orb.shell({ state: {} }, 'Tarefas.dc.html');
+  assert.deepStrictEqual(nav.map((n) => n.label), ['Painel', 'Conversas', 'Contatos', 'Funil de vendas', 'Tarefas', 'Instâncias WhatsApp', 'Metas e conquistas', 'Organizações', 'Equipe e permissões', 'Planos e pagamentos', 'Meu perfil', 'Suporte interno']);
+  for (const n of nav) {
+    assert.ok(require('fs').existsSync(require('path').join(__dirname, '..', 'project', n.href)), n.href);
+    assert.ok(n.d, n.label);
+  }
+  assert.deepStrictEqual(nav.filter((n) => n.cls === 'nav on').map((n) => n.label), ['Tarefas']);
+});
+
 test('desmarcar e marcar a última tarefa não gera XP infinito', () => {
   const O = fresh();
   Orb.toggleTask(6); Orb.toggleTask(7); Orb.toggleTask(8);

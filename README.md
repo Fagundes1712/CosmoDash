@@ -1,6 +1,6 @@
 # CosmoDash
 
-SaaS de CRM com assistente de IA Cosmo. Hoje é um protótipo navegável de 9 telas, sem backend.
+SaaS de CRM com assistente de IA Cosmo. Hoje é um protótipo navegável de 12 telas, sem backend.
 
 ```bash
 npm run dev

@@ -1,5 +1,5 @@
 // Runtime local das telas .dc.html. O support.js original não veio no pacote;
-// este arquivo reimplementa só o que as 9 telas usam ({{}}, sc-for, sc-if, DCLogic).
+// este arquivo reimplementa só o que as telas usam ({{}}, sc-for, sc-if, DCLogic).
 (function () {
   const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
   const SVG_NS = 'http://www.w3.org/2000/svg';

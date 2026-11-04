@@ -124,3 +124,19 @@ select.inp{appearance:none;cursor:pointer}
 ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:rgba(150,200,255,.16);border-radius:9px;border:3px solid transparent;background-clip:padding-box}
 @media (max-width:1100px){.split,.tri{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:760px){.side,.collapsed .side{flex-basis:100%;width:100%;flex-direction:row;align-items:center;overflow-x:auto;backdrop-filter:none;border-right:0;border-bottom:1px solid var(--line);padding:10px 12px}.side .hide-m,.navh,.side-head .hide-c,.org-txt{display:none!important}.side-head{padding:0}.side nav{flex-direction:row!important}.nav .lbl{display:none}.org{min-height:44px;width:auto;padding:4px 6px}.orgmenu{position:fixed;left:12px;right:12px;top:72px}.side-foot{margin:0 0 0 auto!important;flex-direction:row!important}.side-foot .nav{min-height:44px!important;padding:0 4px}.main{padding:16px 16px 40px}.h1{font-size:22px}}
+/* classes do menu lateral compartilhado; mantêm o visual das telas que ainda não foram migradas para apple.css */
+.logo{color:#04141A}
+.brand{font-family:'Chakra Petch','Manrope',sans-serif;font-size:15px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.brand-sub{font:600 9.5px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.org-name{display:block;font-weight:700;font-size:13.5px}
+.org-sub{display:block;font-size:11.5px;color:#9AADC1}
+.om-name{display:block;font-weight:700;font-size:13px}
+.om-sub{display:block;font-size:11px;color:#9AADC1}
+.chip.nav-badge{height:20px;padding:0 8px;font-size:11px}
+.xpcard{padding:14px;border-radius:16px;text-decoration:none;color:#E7EEF6;display:flex;flex-direction:column;gap:8px}
+.xp-tier{color:#ADA0FF}
+.xp-left{font-size:11.5px;color:#9AADC1}
+.av.me{background:#5FE0F0}
+.me-name{display:block;color:#E7EEF6;font-size:13.5px}
+.me-sub{display:block;font-size:11.5px;font-weight:500}
+.scheme{display:none}

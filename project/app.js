@@ -361,6 +361,10 @@
         userName: name, userIni: Orb.ini(name), userPhoto: db.profile.photo ? "background-image:url('" + db.profile.photo + "');background-size:cover;color:transparent;" : '',
         profCls: cur === 'Perfil.dc.html' ? 'nav on' : 'nav', xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
         xpLabel: Orb.num(lv.xp) + ' / ' + Orb.num(lv.max), xpPct: lv.pct + '%', xpLeft: Orb.num(lv.left),
+        schemes: [['auto', 'Auto'], ['light', 'Claro'], ['dark', 'Escuro']].map(([v, label]) => {
+          const on = (db.profile.prefs.scheme || 'auto') === v;
+          return { label, on: String(on), cls: on ? 'on' : '', pick: () => { db.profile.prefs.scheme = v; Orb.save(); if (Orb.applyPrefs) Orb.applyPrefs(); c.setState({}); } };
+        }),
         hasToast: !!s.toast, toast: s.toast || ''
       };
     },
@@ -368,14 +372,14 @@
     templates: {
       sidebar: `<aside class="side">
   <div class="side-head">
-    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
-    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:15px;font-weight:700;letter-spacing:.1em">COSMODASH</div><div class="hud" style="font-size:9.5px">CRM · Cosmo IA</div></div>
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
+    <div class="hide-c" style="flex:1;min-width:0"><div class="brand">CosmoDash</div><div class="brand-sub">CRM · Cosmo IA</div></div>
     <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
   </div>
   <div class="orgwrap">
     <button class="org" onClick="{{toggleOrg}}" aria-label="Trocar organização" aria-expanded="{{orgOpen}}">
       <span class="orgmark" style="background:{{org.color}}">{{org.mark}}</span>
-      <span class="hide-c org-txt" style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">{{org.name}}</span><span style="display:block;font-size:11.5px;color:#9AADC1">{{org.role}} · Plano {{org.planName}}</span></span>
+      <span class="hide-c org-txt" style="flex:1;min-width:0"><span class="org-name">{{org.name}}</span><span class="org-sub">{{org.role}} · Plano {{org.planName}}</span></span>
       <svg class="ico s hide-c org-txt" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
     </button>
     <sc-if value="{{orgOpen}}">
@@ -384,7 +388,7 @@
         <sc-for list="{{orgList}}" as="o">
           <button class="{{o.cls}}" onClick="{{o.pick}}" style="padding:8px">
             <span class="orgmark" style="background:{{o.color}};width:28px;height:28px;flex-basis:28px;font-size:12px">{{o.mark}}</span>
-            <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13px">{{o.name}}</span><span style="display:block;font-size:11px;color:#9AADC1">{{o.role}} · {{o.plan}}</span></span>
+            <span style="flex:1;min-width:0"><span class="om-name">{{o.name}}</span><span class="om-sub">{{o.role}} · {{o.plan}}</span></span>
           </button>
         </sc-for>
         <a class="btn ghost sm" href="Equipe.dc.html?tab=o&new=1" style="justify-content:flex-start">+ Nova organização</a>
@@ -395,19 +399,22 @@
     <sc-for list="{{nav}}" as="n">
       <sc-if value="{{n.head}}"><div class="navh">{{n.label}}</div></sc-if>
       <sc-if value="{{n.link}}">
-        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
+        <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="hide-c chip nav-badge">{{n.badge}}</span></sc-if></a>
       </sc-if>
     </sc-for>
   </nav>
   <div class="side-foot" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
-    <a href="Metas.dc.html" class="glass hide-c hide-m" style="padding:14px;border-radius:16px;text-decoration:none;color:#E7EEF6;display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="hud" style="color:#ADA0FF">{{xpTier}}</span><span class="xp" style="white-space:nowrap">{{xpLabel}}</span></div>
+    <a href="Metas.dc.html" class="glass hide-c hide-m xpcard">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="hud xp-tier">{{xpTier}}</span><span class="xp" style="white-space:nowrap">{{xpLabel}}</span></div>
       <div class="bar vi"><i style="width:{{xpPct}}"></i></div>
-      <div style="font-size:11.5px;color:#9AADC1">Faltam {{xpLeft}} XP para o Nível {{xpNext}}</div>
+      <div class="xp-left">Faltam {{xpLeft}} XP para o Nível {{xpNext}}</div>
     </a>
+    <div class="scheme hide-c hide-m" role="group" aria-label="Aparência">
+      <sc-for list="{{schemes}}" as="m"><button class="{{m.cls}}" onClick="{{m.pick}}" aria-pressed="{{m.on}}">{{m.label}}</button></sc-for>
+    </div>
     <a href="Perfil.dc.html" class="{{profCls}}" title="Meu perfil" style="min-height:52px">
-      <span class="av" style="background:#5FE0F0;{{userPhoto}}">{{userIni}}</span>
-      <span class="hide-c lbl" style="flex:1;min-width:0"><span style="display:block;color:#E7EEF6;font-size:13.5px">{{userName}}</span><span style="display:block;font-size:11.5px;font-weight:500">{{org.role}} · {{org.name}}</span></span>
+      <span class="av me" style="{{userPhoto}}">{{userIni}}</span>
+      <span class="hide-c lbl" style="flex:1;min-width:0"><span class="me-name">{{userName}}</span><span class="me-sub">{{org.role}} · {{org.name}}</span></span>
     </a>
   </div>
 </aside>`,
@@ -424,6 +431,8 @@
     const p = db.profile.prefs;
     document.documentElement.classList.toggle('no-motion', !p.motion);
     document.documentElement.classList.toggle('compact', !!p.compact);
+    // Aparência das telas no padrão Apple: auto segue o sistema; light e dark fixam.
+    document.documentElement.setAttribute('data-color-scheme', p.scheme || 'auto');
   };
   Orb.applyPrefs = applyPrefs;
   applyPrefs();

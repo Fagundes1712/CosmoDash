@@ -2,7 +2,7 @@
 
 SaaS de CRM com assistente de IA chamado Cosmo. Responda em português. O repositório é `Fagundes1712/CosmoDash`, e a branch principal é `main`.
 
-Hoje o produto é um protótipo estático de 12 telas, sem backend e sem dependências:
+Hoje o produto é um protótipo estático de 13 telas, sem backend e sem dependências:
 
 - `project/`: as telas (`*.dc.html`), dados e regras (`data.js`, `app.js`) e estilo (`CosmoDash.css`)
 - `project-original/`: cópia intacta do protótipo recebido, só para consulta

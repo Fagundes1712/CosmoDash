@@ -8,8 +8,8 @@ const { parse, build } = require('./support.js');
 const PROJECT = path.resolve(__dirname, '..', 'project');
 const screens = fs.readdirSync(PROJECT).filter((f) => f.endsWith('.dc.html'));
 
-test('as 12 telas têm template bem formado', () => {
-  assert.strictEqual(screens.length, 12);
+test('as 13 telas têm template bem formado', () => {
+  assert.strictEqual(screens.length, 13);
   for (const f of screens) {
     const src = fs.readFileSync(path.join(PROJECT, f), 'utf8');
     assert.doesNotThrow(() => parse(src.match(/<x-dc>([\s\S]*)<\/x-dc>/)[1]), f);

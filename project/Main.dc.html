@@ -87,7 +87,7 @@
 
     <div class="glass card-pad" style="display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;align-items:center;gap:12px"><span class="orb" aria-hidden="true"></span><div><h2 class="h2">Cosmo</h2><div class="caption t2">Assistente de vendas · {{org.name}}</div></div></div>
-      <div class="well" style="flex:1;min-height:150px;padding:16px;display:flex;flex-direction:column;gap:10px">
+      <div class="well" style="flex:1;min-height:150px;padding:16px;display:flex;flex-direction:column;gap:10px" aria-live="polite">
         <div class="small ac" style="font-weight:600">{{ans.title}}</div>
         <p class="small" style="margin:0;line-height:1.4705882353;text-wrap:pretty">{{ans.text}}</p>
         <sc-if value="{{ans.hasLink}}"><a class="btn sm" href="{{ans.href}}" style="align-self:flex-start">{{ans.cta}} ›</a></sc-if>
@@ -95,7 +95,7 @@
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         <sc-for list="{{asks}}" as="a"><button class="{{a.cls}}" onClick="{{a.go}}">{{a.label}}</button></sc-for>
       </div>
-      <div class="caption t2">Demonstração: respostas por regras sobre os dados da organização, ainda sem modelo de IA.</div>
+      <div class="caption t2">{{aiLabel}} · <a href="Cosmo.dc.html">{{aiLink}}</a></div>
     </div>
   </section>
 
@@ -173,15 +173,41 @@
     </div>
   </section>
 </main>
+<sc-if value="{{chatOpen}}">
+  <section class="chat" role="dialog" aria-label="Conversa com o Cosmo">
+    <div class="chat-head"><span class="orb" aria-hidden="true"></span><div style="flex:1;min-width:0"><div class="h2">Cosmo</div><div class="caption t2">{{aiLabel}} · <a href="Cosmo.dc.html">{{aiLink}}</a></div></div><button class="icob" onClick="{{closeChat}}" aria-label="Fechar conversa"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>
+    <div id="cosmo-log" class="chat-log" aria-live="polite">
+      <sc-for list="{{chat}}" as="m">
+        <sc-if value="{{m.me}}"><div class="chat-me">{{m.text}}</div></sc-if>
+        <sc-if value="{{m.ai}}"><div class="well chat-ai"><div class="small ac" style="font-weight:600">{{m.title}}</div><p class="small" style="margin:0;line-height:1.4705882353;text-wrap:pretty">{{m.text}}</p><sc-if value="{{m.hasLink}}"><a class="btn sm" href="{{m.href}}" style="align-self:flex-start">{{m.cta}} ›</a></sc-if></div></sc-if>
+      </sc-for>
+    </div>
+    <div class="chat-form"><input id="cosmo-chat-q" class="inp" type="text" value="{{cq}}" onChange="{{onCq}}" onKeyDown="{{onChatKey}}" placeholder="Pergunte mais alguma coisa" aria-label="Nova pergunta ao Cosmo"></div>
+  </section>
+</sc-if>
 <sc-include name="toast"></sc-include>
 </div>
 </x-dc></template>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
 class Component extends DCLogic {
-  state = { orgOpen: false, ans: null, askId: 'risco', q: '', rank: 'ind', toast: null, bellOpen: false };
+  state = { orgOpen: false, ans: null, askId: 'risco', q: '', rank: 'ind', toast: null, bellOpen: false, chat: [], chatOpen: false, cq: '' };
+  // Pergunta digitada abre a conversa flutuante; a resposta entra no fim e o campo dela recebe o foco.
+  async askChat(text) {
+    if (this._busy) return;
+    this._busy = true;
+    const history = this.state.chat.map((m) => ({ role: m.me ? 'user' : 'assistant', text: m.text }));
+    this.setState({ chat: this.state.chat.concat([{ me: true, text }, { ai: true, title: 'Cosmo', text: 'Pensando…' }]), chatOpen: true, askId: '', q: '', cq: '' });
+    this.scrollChat();
+    const ans = await Orb.askCosmo(text, history);
+    this._busy = false;
+    this.setState({ chat: this.state.chat.slice(0, -1).concat([Object.assign({ ai: true }, ans)]), ans });
+    this.scrollChat();
+  }
+  scrollChat() { setTimeout(() => { const log = document.getElementById('cosmo-log'); if (log) log.scrollTop = log.scrollHeight; const f = document.getElementById('cosmo-chat-q'); if (f) f.focus(); }); }
   componentDidMount() {
-    this._key = (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('cosmo-q').focus(); } };
+    this._key = (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('cosmo-q').focus(); } else if (e.key === 'Escape' && this.state.chatOpen) this.setState({ chatOpen: false }); };
     document.addEventListener('keydown', this._key);
+    if (location.hash === '#cosmo-q') setTimeout(() => document.getElementById('cosmo-q').focus());
   }
   componentWillUnmount() { document.removeEventListener('keydown', this._key); }
   renderVals() {
@@ -245,7 +271,11 @@ class Component extends DCLogic {
       toggleBell: () => this.setState({ bellOpen: !s.bellOpen }),
       readAll: () => { O.notifications.forEach((n) => { n.unread = false; }); Orb.save(); this.setState({}); },
       q: s.q, onQ: (e) => this.setState({ q: e.target.value }),
-      onKey: (e) => { if (e.key === 'Enter' && s.q.trim()) this.setState({ ans: Orb.cosmo({ text: s.q }), askId: '', q: '' }); }
+      onKey: (e) => { if (e.key === 'Enter' && s.q.trim()) this.askChat(s.q.trim()); },
+      aiLabel: Orb.ai() ? 'Respondendo com ' + Orb.AI[Orb.ai().provider].n : 'Respostas por regras, sem IA conectada', aiLink: Orb.ai() ? 'Histórico e conexão' : 'Conectar sua IA',
+      chat: s.chat, chatOpen: s.chatOpen, cq: s.cq, closeChat: () => this.setState({ chatOpen: false }),
+      onCq: (e) => this.setState({ cq: e.target.value }),
+      onChatKey: (e) => { if (e.key === 'Enter' && s.cq.trim()) this.askChat(s.cq.trim()); }
     });
   }
 }

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CosmoDash · Instâncias WhatsApp</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="./CosmoDash.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Atendimento · Números conectados</div><h1 class="h1">Instâncias WhatsApp</h1></div>
+    <button class="btn pri" disabled="{{true}}">Conectar número</button>
+  </header>
+
+  <div style="padding:12px 14px;border-radius:12px;background:rgba(95,224,240,.06);border:1px solid rgba(95,224,240,.2);font-size:13px;line-height:1.5;color:#C9D5E1">Prévia: a conexão com o WhatsApp ainda não existe. Os cartões abaixo são exemplos, e nenhum número está conectado.</div>
+
+  <section class="grid-a">
+    <sc-for list="{{instances}}" as="n">
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="h2">{{n.name}}</span><span class="{{n.cls}}">{{n.status}}</span></div>
+        <div class="disp" style="font-size:15px;color:#C9D5E1">{{n.phone}}</div>
+        <div style="font-size:12.5px;color:#9AADC1;line-height:1.5">{{n.note}}</div>
+      </div>
+    </sc-for>
+  </section>
+
+  <section class="glass" style="padding:20px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.5;color:#C9D5E1">
+    <h2 class="h2" style="color:#E7EEF6">O que esta seção vai fazer</h2>
+    <div>Conectar os números da organização e mostrar o estado de cada um.</div>
+    <div>Definir qual equipe atende cada número.</div>
+    <div>Entregar as mensagens recebidas na aba <a href="Conversas.dc.html">Conversas</a>.</div>
+  </section>
+</main>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null };
+  renderVals() {
+    return Object.assign(Orb.shell(this, 'Instancias.dc.html'), { instances: [
+      { name: 'Comercial', phone: '+55 11 90000-0001', status: 'Exemplo · conectada', cls: 'chip gr', note: 'Recebe os novos contatos e distribui para a equipe de vendas.' },
+      { name: 'Pós-venda', phone: '+55 11 90000-0002', status: 'Exemplo · aguardando', cls: 'chip yl', note: 'Falta ler o QR Code no aparelho para concluir a conexão.' },
+      { name: 'Suporte', phone: '+55 11 90000-0003', status: 'Exemplo · desconectada', cls: 'chip rd', note: 'Sem sinal do aparelho. As mensagens ficam na fila até reconectar.' }
+    ] });
+  }
+}
+</script>
+</body>
+</html>

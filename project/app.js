@@ -1,4 +1,4 @@
-// Regras, persistência e menu lateral compartilhados pelas 9 telas.
+// Regras, persistência e menu lateral compartilhados por todas as telas.
 // shortcut: localStorage guarda tudo neste navegador; trocar por API e banco ao virar SaaS.
 (function () {
   const g = typeof window !== 'undefined' ? window : globalThis;
@@ -345,12 +345,17 @@
     shell(c, cur) {
       if (db.toast) { const t = db.toast; db.toast = null; Orb.save(); setTimeout(() => Orb.flash(c, t)); }
       const s = c.state;
-      const IC = { dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', pipe: 'M3 4h18l-7 8.5V19l-4 2v-8.5z', cont: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', task: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11', sup: 'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z', goal: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3', team: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4', plan: 'M2 5h20v14H2zM2 10h20M6 15h4' };
+      const IC = { dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', pipe: 'M3 4h18l-7 8.5V19l-4 2v-8.5z', cont: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', task: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11', sup: 'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z', goal: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3', team: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4', plan: 'M2 5h20v14H2zM2 10h20M6 15h4', chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', wpp: 'M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM11 18h2', org: 'M3 21h18M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17M15 9h3a1 1 0 0 1 1 1v11M9 7h2M9 11h2M9 15h2', user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' };
       const pending = Orb.tasksPending();
-      const NAV = [['Comercial'], ['Main.dc.html', 'Dashboard', 'dash'], ['Pipeline.dc.html', 'Funis de vendas', 'pipe', String(Orb.totals().count)], ['Contatos.dc.html', 'Contatos', 'cont'], ['Tarefas.dc.html', 'Tarefas', 'task', pending ? String(pending) : ''], ['Atendimento'], ['Suporte.dc.html', 'Suporte interno', 'sup', String(Orb.ticketsOpen())], ['Performance'], ['Metas.dc.html', 'Metas & conquistas', 'goal'], ['Administração'], ['Equipe.dc.html', 'Equipe & acessos', 'team'], ['Planos.dc.html', 'Planos & pagamentos', 'plan']];
-      const nav = NAV.map((a) => (a.length === 1 ? { head: true, link: false, label: a[0] } : { head: false, link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === cur ? 'nav on' : 'nav' }));
+      const NAV = [['Main.dc.html', 'Painel', 'dash'], ['Conversas.dc.html', 'Conversas', 'chat'], ['Contatos.dc.html', 'Contatos', 'cont'], ['Pipeline.dc.html', 'Funil de vendas', 'pipe', String(Orb.totals().count)], ['Tarefas.dc.html', 'Tarefas', 'task', pending ? String(pending) : ''], ['Instancias.dc.html', 'Instâncias WhatsApp', 'wpp'], ['Metas.dc.html', 'Metas e conquistas', 'goal'], ['Organizacoes.dc.html', 'Organizações', 'org'], ['Equipe.dc.html', 'Equipe e permissões', 'team'], ['Planos.dc.html', 'Planos e pagamentos', 'plan'], ['Perfil.dc.html', 'Meu perfil', 'user'], ['Suporte.dc.html', 'Suporte interno', 'sup', String(Orb.ticketsOpen())]];
+      const nav = NAV.map((a) => ({ link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === cur ? 'nav on' : 'nav', current: a[0] === cur ? 'page' : false }));
       const links = nav.filter((n) => n.link);
-      const SHORT = { 'Main.dc.html': 'Início', 'Pipeline.dc.html': 'Funis' };
+      // No celular a barra .rail rola na horizontal; deixa a tela ativa à vista depois do desenho e das fontes, que mudam as larguras.
+      if (typeof document !== 'undefined' && !c._navShown) {
+        c._navShown = true;
+        setTimeout(() => document.fonts.ready.then(() => { const r = document.querySelector('.rail'), a = r && r.querySelector('.rail-btn.on'); if (a && r.scrollWidth > r.clientWidth) r.scrollLeft += a.getBoundingClientRect().left - r.getBoundingClientRect().left - 16; }));
+      }
+      const SHORT = { 'Pipeline.dc.html': 'Funil' };
       // Aparência: o botão do topo alterna automática, clara e escura.
       const SCH = { auto: ['light', 'Aparência automática', 'M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM12 3v18'], light: ['dark', 'Aparência clara', 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'], dark: ['auto', 'Aparência escura', 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'] };
       const sch = SCH[db.profile.prefs.scheme] ? db.profile.prefs.scheme : 'auto';
@@ -364,7 +369,7 @@
         toggle: () => { db.collapsed = !db.collapsed; Orb.save(); c.setState({}); },
         nav, org: orgView, orgOpen: !!s.orgOpen, orgList, toggleOrg: () => c.setState({ orgOpen: !s.orgOpen }),
         userName: name, userIni: Orb.ini(name), userPhoto: db.profile.photo ? "background-image:url('" + db.profile.photo + "');background-size:cover;color:transparent;" : '',
-        profCls: cur === 'Perfil.dc.html' ? 'rail-btn on' : 'rail-btn', xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
+        xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
         xpLabel: Orb.num(lv.xp) + ' / ' + Orb.num(lv.max), xpPct: lv.pct + '%', xpLeft: Orb.num(lv.left),
         rail: links.map((n) => Object.assign({}, n, { cls: n.href === cur ? 'rail-btn on' : 'rail-btn' })),
         tabs: links.slice(0, 4).map((n) => Object.assign({}, n, { cls: n.href === cur ? 'tab on' : 'tab glass', short: SHORT[n.href] || n.label })),
@@ -377,10 +382,8 @@
     templates: {
       sidebar: `<aside class="rail glass" aria-label="Navegação principal">
   <sc-for list="{{rail}}" as="n">
-    <a href="{{n.href}}" class="{{n.cls}}" aria-label="{{n.label}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="tip">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="dot">{{n.badge}}</span></sc-if></a>
+    <a href="{{n.href}}" class="{{n.cls}}" aria-label="{{n.label}}" aria-current="{{n.current}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="tip">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="dot">{{n.badge}}</span></sc-if></a>
   </sc-for>
-  <span class="rail-sep" aria-hidden="true"></span>
-  <a href="Perfil.dc.html" class="{{profCls}}" aria-label="Meu perfil"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path></svg><span class="tip">Meu perfil</span></a>
 </aside>
 <header class="topbar">
   <div class="tb-side">
@@ -400,13 +403,13 @@
               <span style="flex:1;min-width:0"><span class="om-name">{{o.name}}</span><span class="om-sub">{{o.role}} · {{o.plan}}</span></span>
             </button>
           </sc-for>
-          <a class="btn ghost sm" href="Equipe.dc.html?tab=o&new=1" style="justify-content:flex-start">+ Nova organização</a>
+          <a class="btn ghost sm" href="Organizacoes.dc.html?new=1" style="justify-content:flex-start">+ Nova organização</a>
         </div>
       </sc-if>
     </div>
   </div>
   <nav class="tabs" aria-label="Comercial">
-    <sc-for list="{{tabs}}" as="t"><a href="{{t.href}}" class="{{t.cls}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{t.d}}"></path></svg><span class="lbl">{{t.short}}</span></a></sc-for>
+    <sc-for list="{{tabs}}" as="t"><a href="{{t.href}}" class="{{t.cls}}" aria-current="{{t.current}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{t.d}}"></path></svg><span class="lbl">{{t.short}}</span></a></sc-for>
   </nav>
   <div class="tb-side end">
     <a href="Main.dc.html#cosmo-q" class="circle glass" aria-label="Perguntar ao Cosmo"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"></path></svg></a>

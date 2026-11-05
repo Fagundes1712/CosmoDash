@@ -1,6 +1,6 @@
 # CosmoDash
 
-Protótipo navegável de CRM com 12 abas: Painel, Conversas, Contatos, Funil de vendas, Tarefas, Instâncias WhatsApp, Metas e conquistas, Organizações, Equipe e permissões, Planos e pagamentos, Meu perfil e Suporte interno. Conversas e Instâncias WhatsApp são páginas iniciais, sem envio real de mensagens. O assistente se chama Cosmo.
+Protótipo navegável de CRM com 13 abas: Painel, Conversas, Contatos, Funil de vendas, Tarefas, Respostas do Cosmo, Instâncias WhatsApp, Metas e conquistas, Organizações, Equipe e permissões, Planos e pagamentos, Meu perfil e Suporte interno. Conversas e Instâncias WhatsApp são páginas iniciais, sem envio real de mensagens. O assistente se chama Cosmo: responde por regras ou pela IA que o cliente conectar com a própria chave de API (Claude, ChatGPT, Gemini ou Grok).
 
 ## Como abrir
 

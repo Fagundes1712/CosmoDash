@@ -5,10 +5,10 @@ const Orb = require('../project/app.js');
 
 const fresh = (org = 'v') => { Orb.reset(); Orb.db().org = org; return Orb.data(); };
 
-test('menu tem as 12 abas na ordem, cada uma com tela, e marca só a ativa', () => {
+test('menu tem as 13 abas na ordem, cada uma com tela, e marca só a ativa', () => {
   fresh();
   const { nav } = Orb.shell({ state: {} }, 'Tarefas.dc.html');
-  assert.deepStrictEqual(nav.map((n) => n.label), ['Painel', 'Conversas', 'Contatos', 'Funil de vendas', 'Tarefas', 'Instâncias WhatsApp', 'Metas e conquistas', 'Organizações', 'Equipe e permissões', 'Planos e pagamentos', 'Meu perfil', 'Suporte interno']);
+  assert.deepStrictEqual(nav.map((n) => n.label), ['Painel', 'Conversas', 'Contatos', 'Funil de vendas', 'Tarefas', 'Respostas do Cosmo', 'Instâncias WhatsApp', 'Metas e conquistas', 'Organizações', 'Equipe e permissões', 'Planos e pagamentos', 'Meu perfil', 'Suporte interno']);
   for (const n of nav) {
     assert.ok(require('fs').existsSync(require('path').join(__dirname, '..', 'project', n.href)), n.href);
     assert.ok(n.d, n.label);
@@ -165,4 +165,25 @@ test('negócio ganho soma na receita e reabrir desfaz', () => {
   Orb.reopenDeal('atlas');
   assert.strictEqual(Orb.totals().won, base);
   assert.strictEqual(Orb.bonus(), 0);
+});
+
+test('Cosmo guarda a pergunta por assunto e responde pela IA conectada', async () => {
+  fresh();
+  let ans = await Orb.askCosmo('quais negócios estão em risco?');
+  assert.strictEqual(ans.topic, 'risco');
+  assert.strictEqual(Orb.cosmoLog()[0].q, 'quais negócios estão em risco?');
+  assert.strictEqual(Orb.setAI('anthropic', ''), 'Cole a chave de API.');
+  assert.strictEqual(Orb.setAI('anthropic', 'chave-de-teste'), '');
+  const sent = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, opt) => { sent.push({ url, body: JSON.parse(opt.body), headers: opt.headers }); return { ok: true, json: async () => ({ content: [{ type: 'text', text: 'Previsão boa.' }] }) }; };
+  try {
+    ans = await Orb.askCosmo('e a previsão do mês?', [{ role: 'user', text: 'oi' }, { role: 'assistant', text: 'olá' }]);
+  } finally { globalThis.fetch = realFetch; Orb.clearAI(); }
+  assert.strictEqual(ans.text, 'Previsão boa.');
+  assert.strictEqual(ans.topic, 'prev');
+  assert.strictEqual(sent[0].headers['x-api-key'], 'chave-de-teste');
+  assert.deepStrictEqual(sent[0].body.messages.map((m) => m.role), ['user', 'assistant', 'user']);
+  assert.match(sent[0].body.system, /Cosmo/);
+  assert.strictEqual(Orb.cosmoLog().length, 2);
 });

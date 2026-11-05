@@ -179,7 +179,7 @@
     <div id="cosmo-log" class="chat-log" aria-live="polite">
       <sc-for list="{{chat}}" as="m">
         <sc-if value="{{m.me}}"><div class="chat-me">{{m.text}}</div></sc-if>
-        <sc-if value="{{m.ai}}"><div class="well chat-ai"><div class="small ac" style="font-weight:600">{{m.title}}</div><p class="small" style="margin:0;line-height:1.4705882353;text-wrap:pretty">{{m.text}}</p><sc-if value="{{m.hasLink}}"><a class="btn sm" href="{{m.href}}" style="align-self:flex-start">{{m.cta}} ›</a></sc-if></div></sc-if>
+        <sc-if value="{{m.ai}}"><div class="well chat-ai"><div class="small ac" style="font-weight:600">{{m.title}}</div><p class="small" style="margin:0;line-height:1.4705882353;text-wrap:pretty">{{m.text}}</p><sc-if value="{{m.hasLink}}"><a class="btn sm" href="{{m.href}}" style="align-self:flex-start">{{m.cta}} ›</a></sc-if></div><sc-if value="{{m.hasSugg}}"><div class="caption t2">Você também pode perguntar:</div><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{m.sugg}}" as="g"><button class="btn sm" onClick="{{g.go}}">{{g.label}}</button></sc-for></div></sc-if></sc-if>
       </sc-for>
     </div>
     <div class="chat-form"><input id="cosmo-chat-q" class="inp" type="text" value="{{cq}}" onChange="{{onCq}}" onKeyDown="{{onChatKey}}" placeholder="Pergunte mais alguma coisa" aria-label="Nova pergunta ao Cosmo"></div>
@@ -192,13 +192,13 @@
 class Component extends DCLogic {
   state = { orgOpen: false, ans: null, askId: 'risco', q: '', rank: 'ind', toast: null, bellOpen: false, chat: [], chatOpen: false, cq: '' };
   // Pergunta digitada abre a conversa flutuante; a resposta entra no fim e o campo dela recebe o foco.
-  async askChat(text) {
+  async askChat(text, id) {
     if (this._busy) return;
     this._busy = true;
     const history = this.state.chat.map((m) => ({ role: m.me ? 'user' : 'assistant', text: m.text }));
     this.setState({ chat: this.state.chat.concat([{ me: true, text }, { ai: true, title: 'Cosmo', text: 'Pensando…' }]), chatOpen: true, askId: '', q: '', cq: '' });
     this.scrollChat();
-    const ans = await Orb.askCosmo(text, history);
+    const ans = await Orb.askCosmo(text, history, id);
     this._busy = false;
     this.setState({ chat: this.state.chat.slice(0, -1).concat([Object.assign({ ai: true }, ans)]), ans });
     this.scrollChat();
@@ -273,7 +273,7 @@ class Component extends DCLogic {
       q: s.q, onQ: (e) => this.setState({ q: e.target.value }),
       onKey: (e) => { if (e.key === 'Enter' && s.q.trim()) this.askChat(s.q.trim()); },
       aiLabel: Orb.ai() ? 'Respondendo com ' + Orb.AI[Orb.ai().provider].n : 'Respostas por regras, sem IA conectada', aiLink: Orb.ai() ? 'Histórico e conexão' : 'Conectar sua IA',
-      chat: s.chat, chatOpen: s.chatOpen, cq: s.cq, closeChat: () => this.setState({ chatOpen: false }),
+      chat: s.chat.map((m, i) => { const sugg = i === s.chat.length - 1 && m.suggestions ? m.suggestions.map((g) => ({ label: g.label, go: () => this.askChat(g.label, g.id) })) : []; return Object.assign({}, m, { sugg, hasSugg: sugg.length > 0 }); }), chatOpen: s.chatOpen, cq: s.cq, closeChat: () => this.setState({ chatOpen: false }),
       onCq: (e) => this.setState({ cq: e.target.value }),
       onChatKey: (e) => { if (e.key === 'Enter' && s.cq.trim()) this.askChat(s.cq.trim()); }
     });

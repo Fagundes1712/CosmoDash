@@ -95,7 +95,9 @@ test('vendedor sem permissão só vê os próprios negócios', () => {
 
 test('Cosmo não inventa resposta e encontra contato pelo nome', () => {
   fresh();
-  assert.strictEqual(Orb.cosmo({ text: 'qual a capital da França?', count: false }).title, 'Não entendi');
+  const none = Orb.cosmo({ text: 'qual a capital da França?', count: false });
+  assert.strictEqual(none.title, 'Não achei uma resposta exata');
+  assert.strictEqual(none.suggestions.length, 3);
   assert.strictEqual(Orb.cosmo({ text: 'qual o telefone da Helena?', count: false }).title, 'Helena Duarte');
 });
 
@@ -186,4 +188,19 @@ test('Cosmo guarda a pergunta por assunto e responde pela IA conectada', async (
   assert.deepStrictEqual(sent[0].body.messages.map((m) => m.role), ['user', 'assistant', 'user']);
   assert.match(sent[0].body.system, /Cosmo/);
   assert.strictEqual(Orb.cosmoLog().length, 2);
+});
+
+test('Cosmo entende erros de digitação e outras formas de perguntar, e sugere perguntas do assunto', () => {
+  fresh();
+  const ask = (text) => Orb.cosmo({ text, count: false });
+  const cases = { 'quais negocios tao em riso?': 'Negócios em risco', 'tem tarefa atrazada?': 'Tarefas atrasadas', 'qual chamado mais urgente': 'Ticket mais urgente', 'quantos vendedores tem': 'Equipe', 'quanto custa meu plano': 'Plano Pro', 'taxa de converssao': 'Conversão', 'como mudo a etapa do negocio': 'Avançar etapa', 'grupo lumen': 'Grupo Lumen' };
+  for (const q in cases) assert.strictEqual(ask(q).title, cases[q], q);
+  const r = ask('minhas tarefas');
+  assert.ok(r.suggestions.some((x) => x.id === 'atrasadas'));
+  assert.ok(!r.suggestions.some((x) => x.id === 'tarefas'));
+  for (const it of Orb.cosmoIntents()) {
+    const a = Orb.cosmo({ id: it[0], count: false });
+    assert.ok(a.title && a.text && Orb.TOPICS[a.topic], it[0]);
+    assert.strictEqual(Orb.cosmo({ text: it[2], count: false }).title, a.title, it[2]);
+  }
 });

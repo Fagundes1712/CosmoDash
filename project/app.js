@@ -285,43 +285,163 @@
       return { ok, fail };
     },
 
-    // Cosmo: respostas por regras sobre os dados da organização; o modelo de IA entra com o backend.
-    cosmo(q) {
-      const lim = Orb.plan().limits.cosmo;
-      if (q.count !== false && lim !== null && O().usage.cosmo >= lim) return { topic: 'outros', title: 'Limite do plano', text: 'As ' + Orb.num(lim) + ' consultas do Cosmo deste mês acabaram.', href: 'Planos.dc.html', cta: 'Ver planos', hasLink: true };
-      if (q.count !== false) { O().usage.cosmo++; Orb.save(); }
-      const t = unaccent((q.text || '').toLowerCase());
-      const s = Orb.totals();
+    // Cosmo: respostas por regras sobre os dados da organização. Cada intenção tem palavras-chave (radicais);
+    // a busca tolera acentos, plurais e erros de digitação e sempre devolve sugestões de perguntas parecidas.
+    cosmoIntents() {
+      const s = Orb.totals(), o = O(), k = o.k;
       const list = (ds) => ds.map((d) => d.co + ' (' + Orb.mil(d.v) + ', ' + SEED.stages[d.st] + ', ' + d.d + ' dias)').join(', ');
-      const has = (...w) => w.some((x) => t.includes(x));
-      const person = O().contacts.find((c) => t.split(/[^a-z]+/).some((w) => w.length > 2 && unaccent(c.name.toLowerCase()).split(' ').includes(w)));
-      if (q.id === 'risco' || (!q.id && has('risco', 'parad'))) {
-        const sum = s.risk.reduce((a, d) => a + d.v, 0);
-        return s.risk.length ? { topic: 'risco', title: 'Negócios em risco', text: (s.risk.length === 1 ? '1 negócio está' : s.risk.length + ' negócios estão') + ' sem interação há 10 dias ou mais e ' + (s.risk.length === 1 ? 'soma ' : 'somam ') + Orb.mil(sum) + ': ' + list(s.risk) + '. Sugiro um follow-up hoje.', href: 'Pipeline.dc.html?filter=risk', cta: 'Abrir funil', hasLink: true } : { topic: 'risco', title: 'Negócios em risco', text: 'Nenhum negócio parado há 10 dias ou mais.', href: 'Pipeline.dc.html', cta: 'Abrir funil', hasLink: true };
-      }
-      if (q.id === 'semana' || (!q.id && has('seman', 'resumo'))) {
-        const k = O().k;
-        const wins = O().deals.filter((d) => d.status === 'won' && Date.now() - d.closedAt < 7 * DAY);
-        return { topic: 'semana', title: 'Resumo da semana', text: Orb.pl(k.weekWon + wins.length, 'negócio ganho', 'negócios ganhos') + ' (' + Orb.mil(k.weekVal + wins.reduce((a, d) => a + d.v, 0)) + '), ' + (k.weekActs + Orb.counted('activity')) + ' atividades registradas e 1ª resposta média a leads de ' + k.leadReply + '. Você está em ' + Orb.myRank() + 'º no ranking.', href: 'Metas.dc.html', cta: 'Ver metas', hasLink: true };
-      }
-      if (q.id === 'sup' || (!q.id && has('suporte', 'ticket'))) {
-        const urgent = O().tickets.filter((x) => x.status === 'open' && Orb.slaInfo(x).min < 60);
-        return { topic: 'sup', title: 'Suporte', text: Orb.pl(Orb.ticketsOpen(), 'ticket aberto', 'tickets abertos') + (urgent.length ? ', ' + urgent.length + ' com SLA vencendo em menos de 1 hora (' + urgent.map((x) => x.id + ' de ' + x.org.split(' · ')[0]).join(', ') + ').' : ', nenhum com SLA vencendo em menos de 1 hora.'), href: 'Suporte.dc.html', cta: 'Abrir fila', hasLink: true };
-      }
-      if (q.id === 'prev' || (!q.id && has('previs', 'meta', 'fechamento', 'mes'))) {
-        const missing = O().k.goal - s.won;
-        const closing = Orb.openDeals().filter((d) => d.st === 4).sort((a, b) => b.v - a.v);
+      const open = Orb.openDeals();
+      const byValue = open.slice().sort((a, b) => b.v - a.v);
+      const tasksToday = Orb.tasksToday();
+      const pendingToday = tasksToday.filter((t) => !t.done).sort((a, b) => a.h.localeCompare(b.h));
+      const late = Orb.tasksLate();
+      const openTickets = o.tickets.filter((x) => x.status === 'open').sort((a, b) => Orb.slaInfo(a).min - Orb.slaInfo(b).min);
+      const lv = Orb.level();
+      const plan = Orb.plan();
+      const lim = plan.limits;
+      const lim$ = (v, unit) => (v === null ? 'ilimitado' : Orb.num(v) + (unit || ''));
+      const unread = o.notifications.filter((n) => n.unread);
+      const won = o.deals.filter((d) => d.status === 'won'), lost = o.deals.filter((d) => d.status === 'lost');
+      const nextTask = pendingToday.find((t) => t.h >= Orb.clock()) || pendingToday[0];
+      const role = o.role, myPerms = SEED.permissions.filter((p) => Orb.can(p[0])).map((p) => p[1].toLowerCase());
+      const prevAns = () => {
+        const missing = k.goal - s.won;
+        const closing = open.filter((d) => d.st === 4).sort((a, b) => b.v - a.v);
         const left = Orb.daysLeftInMonth();
         const when = left === 0 ? 'O mês fecha hoje' : 'Faltam ' + left + ' dias para fechar o mês';
-        const res = { topic: 'prev', title: 'Fechamento de ' + Orb.monthName(), href: 'Pipeline.dc.html', cta: 'Priorizar no funil', hasLink: true };
-        if (missing <= 0) return Object.assign(res, { text: 'Meta batida: ' + Orb.brl(s.won) + ' de ' + Orb.brl(O().k.goal) + '.' });
+        const res = { title: 'Fechamento de ' + Orb.monthName(), href: 'Pipeline.dc.html', cta: 'Priorizar no funil' };
+        if (missing <= 0) return Object.assign(res, { text: 'Meta batida: ' + Orb.brl(s.won) + ' de ' + Orb.brl(k.goal) + '.' });
         let acc = 0; const need = [];
         for (const d of closing) { if (acc >= missing) break; acc += d.v; need.push(d.co); }
         const tail = acc >= missing ? ' Fechar ' + need.join(' e ') + ' já bate a meta.' : ' Mesmo fechando todos, a meta não é atingida.';
-        return Object.assign(res, { text: when + ' e faltam ' + Orb.brl(missing) + ' para a meta. Em Fechamento há ' + Orb.pl(closing.length, 'negócio', 'negócios') + ' somando ' + Orb.mil(closing.reduce((a, d) => a + d.v, 0)) + '.' + tail });
+        return Object.assign(res, { text: when + ' e faltam ' + Orb.brl(missing) + ' para a meta. Em Fechamento há ' + Orb.pl(closing.length, 'negócio', 'negócios') + ' somando ' + Orb.mil(closing.reduce((a, d) => a + d.v, 0)) + '.' + tail + ' Receita ponderada do funil: ' + Orb.mil(s.weighted) + '.' });
+      };
+      // [id, assunto, pergunta sugerida, palavras-chave, resposta]
+      return [
+        ['risco', 'risco', 'Quais negócios estão em risco?', 'risco perigo parad esfri estagn esquec interac follow negocio', () => {
+          const sum = s.risk.reduce((a, d) => a + d.v, 0);
+          return s.risk.length ? { title: 'Negócios em risco', text: (s.risk.length === 1 ? '1 negócio está' : s.risk.length + ' negócios estão') + ' sem interação há 10 dias ou mais e ' + (s.risk.length === 1 ? 'soma ' : 'somam ') + Orb.mil(sum) + ': ' + list(s.risk) + '. Sugiro um follow-up hoje.', href: 'Pipeline.dc.html?filter=risk', cta: 'Abrir funil' } : { title: 'Negócios em risco', text: 'Nenhum negócio parado há 10 dias ou mais.', href: 'Pipeline.dc.html', cta: 'Abrir funil' };
+        }],
+        ['prev', 'prev', 'Qual a previsão do mês?', 'previs meta fechament mes falta bater projec forecast estimat', prevAns],
+        ['semana', 'semana', 'Como foi minha semana?', 'seman resumo balanc retrospect', () => {
+          const wins = won.filter((d) => Date.now() - d.closedAt < 7 * DAY);
+          return { title: 'Resumo da semana', text: Orb.pl(k.weekWon + wins.length, 'negócio ganho', 'negócios ganhos') + ' (' + Orb.mil(k.weekVal + wins.reduce((a, d) => a + d.v, 0)) + '), ' + (k.weekActs + Orb.counted('activity')) + ' atividades registradas e 1ª resposta média a leads de ' + k.leadReply + '. Você está em ' + Orb.myRank() + 'º no ranking.', href: 'Metas.dc.html', cta: 'Ver metas' };
+        }],
+        ['receita', 'vendas', 'Quanto vendemos este mês?', 'receit fatur vendi vendemos vendas ganh dinheiro entrou resultado', () => ({ title: 'Receita de ' + Orb.monthName(), text: Orb.brl(s.won) + ' em ' + Orb.pl(s.wonCount, 'negócio ganho', 'negócios ganhos') + ', ' + Math.round(s.won / k.goal * 100) + '% da meta de ' + Orb.brl(k.goal) + (k.delta ? '. Variação contra o mês anterior: ' + k.delta : '') + '. Ticket médio: ' + (s.wonCount ? Orb.brl(s.won / s.wonCount) : '—') + '.', href: 'Main.dc.html', cta: 'Ver painel' })],
+        ['maior', 'vendas', 'Quais são os maiores negócios?', 'maior maiores top grande principa valios priorid negocio', () => ({ title: 'Maiores negócios abertos', text: byValue.length ? list(byValue.slice(0, 5)) + '.' : 'Nenhum negócio aberto.', href: 'Pipeline.dc.html', cta: 'Abrir funil' })],
+        ['pipeline', 'vendas', 'Quanto tenho no pipeline?', 'pipeline funil abert aberto carteira oportunidad ponderad', () => {
+          const st = SEED.stages.map((n, i) => n + ' ' + open.filter((d) => d.st === i).length).join(', ');
+          return { title: 'Pipeline aberto', text: Orb.mil(s.open) + ' em ' + Orb.pl(s.count, 'negócio aberto', 'negócios abertos') + ' (ponderado pela probabilidade: ' + Orb.mil(s.weighted) + '). Por etapa: ' + st + '.', href: 'Pipeline.dc.html', cta: 'Abrir funil' };
+        }],
+        ['closing', 'vendas', 'Quais negócios estão para fechar?', 'quase prest perto fechar negociac proposta assinar negocio', () => {
+          const near = open.filter((d) => d.st >= 3).sort((a, b) => b.st - a.st || b.v - a.v);
+          return { title: 'Perto de fechar', text: near.length ? Orb.pl(near.length, 'negócio', 'negócios') + ' em Negociação ou Fechamento: ' + list(near) + '.' : 'Nenhum negócio em Negociação ou Fechamento.', href: 'Pipeline.dc.html', cta: 'Abrir funil' };
+        }],
+        ['conv', 'vendas', 'Qual a taxa de conversão?', 'convers taxa ciclo ticket medio desempenh performanc eficien', () => ({ title: 'Conversão', text: 'Taxa de conversão de ' + k.conv + ' (' + k.convDelta + '), ciclo médio de ' + k.cycleDays + ' dias e ticket médio de ' + (s.wonCount ? Orb.brl(s.won / s.wonCount) : '—') + '. 1ª resposta média a leads: ' + k.leadReply + '.', href: 'Main.dc.html', cta: 'Ver painel' })],
+        ['ganhos', 'vendas', 'Quais negócios ganhei ou perdi?', 'ganhei perdi perdid ganhos fechei vitori derrot motivo perda negocio', () => ({ title: 'Ganhos e perdas', text: (won.length ? 'Ganhos recentes: ' + won.map((d) => d.co + ' (' + Orb.mil(d.v) + ')').join(', ') + '. ' : 'Nenhum negócio marcado como ganho no CosmoDash ainda. ') + (lost.length ? 'Perdidos: ' + lost.map((d) => d.co + (d.reason ? ' (' + d.reason + ')' : '')).join(', ') + '.' : 'Nenhum perdido.') + ' No mês, ' + Orb.pl(s.wonCount, 'negócio ganho', 'negócios ganhos') + ' no total.', href: 'Pipeline.dc.html', cta: 'Abrir funil' })],
+        ['novoNeg', 'ajuda', 'Como crio um negócio?', 'criar cri novo nova cadastr adicion negocio oportunidad deal', () => ({ title: 'Criar negócio', text: 'No Funil de vendas, clique em "Novo negócio", informe empresa, valor, etapa e contato. Criar um negócio vale 10 XP.', href: 'Pipeline.dc.html', cta: 'Abrir funil' })],
+        ['mover', 'ajuda', 'Como avanço um negócio de etapa?', 'avanc mover mov muda etapa estagio arrast pular negocio', () => ({ title: 'Avançar etapa', text: 'Abra o negócio no Funil, registre uma atividade e use "Avançar para". O avanço só vale XP com uma atividade registrada antes, e cada etapa pontua uma vez.', href: 'Pipeline.dc.html', cta: 'Abrir funil' })],
+        ['tarefas', 'tarefas', 'Quais são minhas tarefas de hoje?', 'tarefa agenda hoje compromiss afazer pendent lista', () => ({ title: 'Tarefas de hoje', text: tasksToday.length ? Orb.pl(tasksToday.filter((t) => t.done).length, 'concluída', 'concluídas') + ' de ' + tasksToday.length + '. ' + (pendingToday.length ? 'Pendentes: ' + pendingToday.map((t) => t.h + ' ' + t.t).join('; ') + '.' : 'Tudo feito hoje.') : 'Nenhuma tarefa para hoje.', href: 'Tarefas.dc.html', cta: 'Abrir tarefas' })],
+        ['atrasadas', 'tarefas', 'Tenho tarefas atrasadas?', 'atrasad vencid esqueci ontem passad acumulad tarefa', () => ({ title: 'Tarefas atrasadas', text: late.length ? Orb.pl(late.length, 'tarefa atrasada', 'tarefas atrasadas') + ': ' + late.map((t) => t.t + ' (' + Orb.dayLabel(t.date) + ')').join('; ') + '. Concluída com atraso, vale metade do XP.' : 'Nenhuma tarefa atrasada.', href: 'Tarefas.dc.html', cta: 'Abrir tarefas' })],
+        ['proxima', 'tarefas', 'Qual meu próximo compromisso?', 'proxim reuniao ligac depois seguinte agora horario', () => ({ title: 'Próximo compromisso', text: nextTask ? nextTask.h + ' · ' + nextTask.t + (nextTask.ctx ? ' (' + nextTask.ctx + ')' : '') + '.' : 'Nada pendente para hoje.', href: 'Tarefas.dc.html', cta: 'Abrir tarefas' })],
+        ['novaTarefa', 'ajuda', 'Como crio uma tarefa?', 'criar cri nova novo adicion marcar agendar lembrete tarefa', () => ({ title: 'Criar tarefa', text: 'Em Tarefas, escreva em linguagem natural, como "ligar para Sofia amanhã às 10h". O CosmoDash entende o dia e o horário.', href: 'Tarefas.dc.html', cta: 'Abrir tarefas' })],
+        ['urgente', 'sup', 'Qual ticket é mais urgente?', 'urgent priorid primeiro critic grave vencend', () => {
+          const t = openTickets[0];
+          return { title: 'Ticket mais urgente', text: t ? t.id + ' · ' + t.title + ', de ' + t.from + ' (' + t.org.split(' · ')[0] + '). Prioridade ' + t.prio + ', SLA: ' + Orb.slaInfo(t).txt + '.' : 'Nenhum ticket aberto.', href: 'Suporte.dc.html', cta: 'Abrir fila' };
+        }],
+        ['sup', 'sup', 'Como está o suporte?', 'suporte ticket chamado atendiment fila reclama problema cliente', () => {
+          const urgent = openTickets.filter((x) => Orb.slaInfo(x).min < 60);
+          return { title: 'Suporte', text: Orb.pl(Orb.ticketsOpen(), 'ticket aberto', 'tickets abertos') + (urgent.length ? ', ' + urgent.length + ' com SLA vencendo em menos de 1 hora (' + urgent.map((x) => x.id + ' de ' + x.org.split(' · ')[0]).join(', ') + ').' : ', nenhum com SLA vencendo em menos de 1 hora.'), href: 'Suporte.dc.html', cta: 'Abrir fila' };
+        }],
+        ['sla', 'sup', 'Como está o SLA e a satisfação?', 'sla csat satisfac nps nota qualidade tempo resposta', () => ({ title: 'SLA e satisfação', text: 'SLA cumprido em ' + k.sla + ', CSAT ' + k.csat + ' e 1ª resposta média de ' + k.first + '.', href: 'Suporte.dc.html', cta: 'Abrir fila' })],
+        ['nivel', 'metas', 'Qual é o meu nível?', 'nivel xp ponto experienc tier categori subir evolu', () => ({ title: 'Seu nível', text: 'Nível ' + lv.lvl + ' (' + lv.tier + '), com ' + Orb.num(lv.xp) + ' de ' + Orb.num(lv.max) + ' XP. Faltam ' + Orb.num(lv.left) + ' XP para o nível ' + (lv.lvl + 1) + (lv.nextTier ? '; ' + lv.nextTier + ' começa no nível ' + lv.nextTierLvl : '') + '.', href: 'Metas.dc.html', cta: 'Ver metas' })],
+        ['ranking', 'metas', 'Qual minha posição no ranking?', 'ranking posic coloca lider primeiro competic disput temporad classific', () => {
+          const r = Orb.ranking();
+          return { title: 'Ranking · ' + Orb.seasonName(), text: 'Você está em ' + Orb.myRank() + 'º de ' + r.length + ' com ' + Orb.num(Orb.season()) + ' XP na temporada. Lidera ' + r[0].name + ' (' + Orb.num(r[0].season) + ' XP). A temporada acaba em ' + Orb.daysLeftInSeason() + ' dias.', href: 'Metas.dc.html', cta: 'Ver ranking' };
+        }],
+        ['missoes', 'metas', 'Quais são as missões de hoje?', 'missao missoe desafio diari objetivo', () => {
+          const m = [['Avançar 2 negócios de etapa', Orb.counted('advance'), 2], ['Registrar 5 atividades', Orb.counted('activity'), 5], ['Concluir 3 tarefas de hoje', tasksToday.filter((t) => t.done).length, 3]];
+          return { title: 'Missões de hoje', text: m.map((x) => x[0] + ': ' + Math.min(x[1], x[2]) + '/' + x[2]).join('; ') + '. Renovam à meia-noite.', href: 'Main.dc.html', cta: 'Ver painel' };
+        }],
+        ['squad', 'metas', 'Como está meu squad?', 'squad time coletiv grupo', () => ({ title: o.me.squad, text: 'Nível ' + o.squad.lvl + ', ' + o.squad.wins + ' de ' + o.squad.winsGoal + ' vitórias e ' + Orb.mil(o.squad.won) + ' de ' + Orb.mil(o.squad.goalWon) + ' na meta do squad. Resposta média ' + o.squad.resp + ' (meta ' + o.squad.respGoal + ').', href: 'Metas.dc.html', cta: 'Ver metas' })],
+        ['streak', 'metas', 'Quantos dias seguidos eu tenho?', 'sequenc seguid streak ofensiv fogo dias', () => ({ title: 'Sequência', text: o.me.streak + ' dias seguidos batendo as missões. Não deixe zerar hoje.', href: 'Metas.dc.html', cta: 'Ver metas' })],
+        ['xpRegras', 'ajuda', 'Como ganho XP?', 'ganhar ganho pontu regra xp vale', () => ({ title: 'Como ganhar XP', text: 'Criar negócio vale 10 XP; avançar etapa com atividade, 25; ganhar, 50 mais 3 por mil reais; resolver ticket no SLA, 20; tarefas valem o indicado e, atrasadas, metade. Atividades pontuam até 5 por dia.', href: 'Metas.dc.html', cta: 'Ver metas' })],
+        ['contatos', 'contato', 'Quais contatos estão sem retorno?', 'contato client lead pessoa esquecid sumid retorn ligar relacion', () => {
+          const cold = o.contacts.slice().sort((a, b) => b.days - a.days).slice(0, 5);
+          return { title: 'Contatos sem retorno', text: Orb.pl(Orb.contactsCount(), 'contato', 'contatos') + ' na base. Há mais tempo sem contato: ' + cold.map((c) => c.name + ' (' + c.co + ', ' + c.days + ' dias)').join(', ') + '.', href: 'Contatos.dc.html', cta: 'Abrir contatos' };
+        }],
+        ['novoContato', 'ajuda', 'Como cadastro ou importo contatos?', 'cadastr import csv planilh excel novo adicion contato export', () => ({ title: 'Cadastrar contatos', text: 'Em Contatos, use "Novo contato" para um por vez ou "Importar CSV" para uma planilha com nome, e-mail, telefone, empresa e cargo. "Exportar CSV" baixa a base.', href: 'Contatos.dc.html', cta: 'Abrir contatos' })],
+        ['convidar', 'ajuda', 'Como convido alguém?', 'convid chamar adicion incluir novo usuario acesso', () => ({ title: 'Convidar pessoa', text: Orb.can('users') ? 'Em Equipe e permissões, clique em "Convidar", informe os e-mails, o papel e o squad.' : 'Seu papel (' + role + ') não pode convidar. Peça a um Admin.', href: 'Equipe.dc.html', cta: 'Abrir equipe' })],
+        ['equipe', 'equipe', 'Quem está na equipe?', 'equipe membro usuari pessoa vendedor vendedores colabor convit assento', () => ({ title: 'Equipe', text: Orb.pl(Orb.orgMembers(o), 'pessoa', 'pessoas') + ' em ' + o.squads.length + ' squads (' + o.squads.join(', ') + ')' + (o.invites.length ? ' e ' + Orb.pl(o.invites.length, 'convite pendente', 'convites pendentes') : '') + '. Assentos usados: ' + Orb.seatsUsed() + ' de ' + lim$(lim.seats) + '.', href: 'Equipe.dc.html', cta: 'Abrir equipe' })],
+        ['perm', 'equipe', 'O que meu papel pode fazer?', 'permiss papel acesso pode posso admin gestor bloque', () => ({ title: 'Seu papel: ' + role, text: myPerms.length ? 'Você pode: ' + myPerms.join(', ') + '.' : 'Seu papel não tem permissões extras.', href: 'Equipe.dc.html?tab=p', cta: 'Ver permissões' })],
+        ['org', 'equipe', 'Quais são minhas organizações?', 'organiz empresa conta workspac trocar mudar', () => ({ title: 'Organizações', text: 'Você está em ' + o.name + '. Suas organizações: ' + Object.values(db.orgs).map((x) => x.name + ' (' + x.role + ')').join(', ') + '. Troque pelo menu no topo.', href: 'Organizacoes.dc.html', cta: 'Ver organizações' })],
+        ['plano', 'plano', 'Qual é o meu plano?', 'plano assinatur pago pagar preco custa valor mensalid cobranc cartao', () => ({ title: 'Plano ' + plan.n, text: 'Plano ' + plan.n + ', cobrança ' + (o.cycle === 'a' ? 'anual' : 'mensal') + ' de ' + Orb.brl2(Orb.monthly()) + ' por mês no ' + o.cardLabel + '. Próxima cobrança em ' + Orb.daysToCharge() + ' dias.', href: 'Planos.dc.html', cta: 'Ver plano' })],
+        ['limites', 'plano', 'Quanto já usei do plano?', 'limit uso usei usad consult armazen espaco cota sobra resta', () => ({ title: 'Uso do plano', text: 'Cosmo: ' + Orb.num(o.usage.cosmo) + ' de ' + lim$(lim.cosmo) + ' consultas. Armazenamento: ' + String(o.usage.storage).replace('.', ',') + ' de ' + lim.storage + ' GB. Contatos: ' + Orb.num(Orb.contactsCount()) + ' de ' + lim$(lim.contacts) + '. Usuários: ' + Orb.seatsUsed() + ' de ' + lim$(lim.seats) + '.', href: 'Planos.dc.html', cta: 'Ver plano' })],
+        ['faturas', 'plano', 'Onde vejo minhas faturas?', 'fatura faturas nota boleto recibo pagament historico', () => ({ title: 'Faturas', text: o.invoices.length ? 'Última: ' + o.invoices[0][0] + ', ' + o.invoices[0][1] + ', ' + Orb.brl2(o.invoices[0][2]) + ' em ' + o.invoices[0][3] + '. Em Planos e pagamentos você baixa todas.' : 'Nenhuma fatura ainda.', href: 'Planos.dc.html', cta: 'Ver faturas' })],
+        ['mudarPlano', 'ajuda', 'Como mudo de plano?', 'mudar trocar upgrade downgrade cancelar plano melhorar', () => ({ title: 'Mudar de plano', text: 'Em Planos e pagamentos, use "Mudar de plano". No upgrade, a diferença é cobrada proporcional aos dias que faltam.', href: 'Planos.dc.html', cta: 'Ver planos' })],
+        ['notif', 'outros', 'Tenho notificações?', 'notifica aviso alerta novidad sino', () => ({ title: 'Notificações', text: unread.length ? Orb.pl(unread.length, 'não lida', 'não lidas') + ': ' + unread.map((n) => n.text).join('; ') + '.' : 'Nenhuma notificação nova.', href: 'Main.dc.html', cta: 'Ver painel' })],
+        ['whats', 'ajuda', 'Como conecto o WhatsApp?', 'whatsapp whats zap wpp mensag convers numero instanc', () => ({ title: 'WhatsApp', text: 'Conversas e Instâncias WhatsApp ainda são uma prévia: dá para ver como vai funcionar, mas sem enviar ou receber mensagens.', href: 'Instancias.dc.html', cta: 'Ver instâncias' })],
+        ['perfil', 'ajuda', 'Como altero meu perfil?', 'perfil nome foto senha 2fa autentic seguranc tema escuro claro aparenc', () => ({ title: 'Seu perfil', text: 'Em Meu perfil você muda nome, cargo, e-mail, telefone, fuso, notificações e segurança. O botão de meia-lua no topo alterna a aparência clara, escura ou automática.', href: 'Perfil.dc.html', cta: 'Abrir perfil' })],
+        ['ia', 'ajuda', 'Como conecto minha IA?', 'conect ia chatgpt claude gemini grok openai inteligencia api chave', () => ({ title: 'Conectar sua IA', text: 'Em Respostas do Cosmo, escolha Claude, ChatGPT, Gemini ou Grok e cole a chave de API da sua conta. O Cosmo passa a responder pela sua IA.', href: 'Cosmo.dc.html', cta: 'Conectar' })],
+        ['ajuda', 'ajuda', 'O que você sabe responder?', 'ajuda help sabe voce consegue comando funciona oque responde', () => ({ title: 'O que eu respondo', text: 'Vendas (receita, meta, funil, riscos, maiores negócios), tarefas e agenda, suporte e SLA, nível, ranking e missões, contatos e empresas pelo nome, equipe, plano e uso, e como fazer as coisas no CosmoDash.', href: 'Cosmo.dc.html', cta: 'Ver histórico' })],
+        ['oi', 'outros', 'Oi, Cosmo!', 'oi ola bom dia boa tarde noite hey eai salve', () => ({ title: Orb.greeting(), text: 'Sou o Cosmo. Posso ver riscos no funil, a previsão do mês, suas tarefas, o suporte e muito mais. Por onde começamos?', href: '', cta: '' })]
+      ];
+    },
+    cosmo(q) {
+      const lim = Orb.plan().limits.cosmo;
+      if (q.count !== false && lim !== null && O().usage.cosmo >= lim) return { topic: 'outros', title: 'Limite do plano', text: 'As ' + Orb.num(lim) + ' consultas do Cosmo deste mês acabaram.', href: 'Planos.dc.html', cta: 'Ver planos', hasLink: true, suggestions: [] };
+      if (q.count !== false) { O().usage.cosmo++; Orb.save(); }
+      const intents = Orb.cosmoIntents();
+      const done = (it, extra) => Object.assign({ topic: it[1] }, it[4](), extra || {});
+      const finish = (ans, skip, scores) => {
+        // Sugestões: primeiro as do mesmo assunto, depois as que mais se parecem com o que foi digitado.
+        const same = intents.filter((i) => i[1] === ans.topic && i[0] !== skip);
+        const close = scores.filter((x) => x.score > 0 && x.it[0] !== skip).map((x) => x.it);
+        const picks = [];
+        for (const i of close.concat(same, intents.filter((i) => ['risco', 'prev', 'tarefas', 'sup'].includes(i[0])))) if (i[0] !== skip && !picks.includes(i) && picks.length < 3) picks.push(i);
+        return Object.assign(ans, { hasLink: !!ans.href, suggestions: picks.map((i) => ({ id: i[0], label: i[2] })) });
+      };
+      if (q.id) { const it = intents.find((i) => i[0] === q.id); if (it) return finish(done(it), it[0], []); }
+      const t = unaccent((q.text || '').toLowerCase()).replace(/[^a-z0-9\s]/g, ' ');
+      const words = t.split(/\s+/).filter(Boolean);
+      const lev = (a, b) => {
+        const d = Array.from({ length: b.length + 1 }, (_, j) => j);
+        for (let i = 1; i <= a.length; i++) { let prev = d[0]; d[0] = i; for (let j = 1; j <= b.length; j++) { const tmp = d[j]; d[j] = Math.min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = tmp; } }
+        return d[b.length];
+      };
+      // Radical curto exige a palavra exata; radical longo aceita prefixo e 1 ou 2 letras trocadas depois das 2 primeiras.
+      // Devolve 1 para acerto exato, 0,5 para acerto com erro de digitação e 0 sem acerto.
+      const hit = (kw, slack) => {
+        if (words.some((w) => (kw.length <= 3 ? w === kw : w.startsWith(kw)))) return 1;
+        if (kw.length <= 3) return 0;
+        const tol = (kw.length >= 8 ? 2 : kw.length >= 5 ? 1 : 0) + slack;
+        return words.some((w) => w.slice(0, 2) === kw.slice(0, 2) && w.length >= kw.length - 1 && lev(w.slice(0, kw.length), kw) <= tol) ? 0.5 : 0;
+      };
+      const score = (it, slack) => {
+        let n = 0;
+        for (const kw of it[3].split(' ')) n += hit(kw, slack) * (kw.length >= 5 ? 2 : 1);
+        if (unaccent(it[2].toLowerCase()).replace(/[^a-z0-9\s]/g, ' ').trim() === t.trim()) n += 10;
+        return n;
+      };
+      const scores = intents.map((it) => ({ it, score: score(it, 0) })).sort((a, b) => b.score - a.score);
+      const best = scores[0];
+      const o = O();
+      const name = (n) => unaccent(n.toLowerCase()).replace(/^dra?\.?\s*/, '').split(/\s+/);
+      const person = o.contacts.find((c) => name(c.name).some((p) => p.length > 2 && words.includes(p)));
+      const GENERIC = ['grupo', 'banco', 'clinica', 'digital', 'energia', 'engenharia', 'logistica', 'textil', 'hoteis'];
+      const coNames = Array.from(new Set(o.deals.map((d) => d.co).concat(o.companies.map((c) => c[0]), o.contacts.map((c) => c.co))));
+      const company = coNames.find((co) => name(co).some((p) => p.length > 3 && !GENERIC.includes(p) && words.includes(p)));
+      if (person && best.score < 4) return finish({ topic: 'contato', title: person.name, text: person.role + ' em ' + person.co + '. E-mail ' + person.email + (person.phone ? ', telefone ' + person.phone : '') + '. Último contato há ' + person.days + ' dias.' + (person.tip ? ' Dica: ' + person.tip : ''), href: 'Contatos.dc.html?c=' + person.id, cta: 'Abrir ficha' }, '', scores);
+      if (company && best.score < 4) {
+        const ds = o.deals.filter((d) => d.co === company && d.status === 'open' && Orb.dealVisible(d));
+        const cs = o.contacts.filter((c) => c.co === company);
+        return finish({ topic: 'contato', title: company, text: (ds.length ? 'Negócios abertos: ' + ds.map((d) => Orb.mil(d.v) + ' em ' + SEED.stages[d.st] + ', ' + d.d + ' dias sem interação').join('; ') + '. ' : 'Nenhum negócio aberto. ') + (cs.length ? 'Contatos: ' + cs.map((c) => c.name + ' (' + c.role + ')').join(', ') + '.' : ''), href: ds.length ? 'Pipeline.dc.html?deal=' + ds[0].id : 'Contatos.dc.html', cta: ds.length ? 'Abrir negócio' : 'Abrir contatos' }, '', scores);
       }
-      if (person) return { topic: 'contato', title: person.name, text: person.role + ' em ' + person.co + '. E-mail ' + person.email + (person.phone ? ', telefone ' + person.phone : '') + '. Último contato há ' + person.days + ' dias.', href: 'Contatos.dc.html?c=' + person.id, cta: 'Abrir ficha', hasLink: true };
-      return { topic: 'outros', title: 'Não entendi', text: 'Por enquanto respondo sobre negócios em risco, previsão do mês, resumo da semana, suporte e dados de um contato pelo nome.', href: '', cta: '', hasLink: false };
+      if (best.score >= 2 || (best.score >= 1 && best.score > scores[1].score)) return finish(done(best.it), best.it[0], scores.slice(1));
+      // Nada claro: tenta de novo com mais tolerância. Um vencedor claro responde; senão, só sugere.
+      const loose = intents.map((it) => ({ it, score: score(it, 1) })).sort((a, b) => b.score - a.score);
+      if (loose[0].score >= 2 && loose[0].score > loose[1].score) return finish(done(loose[0].it), loose[0].it[0], loose.slice(1));
+      return finish({ topic: 'outros', title: 'Não achei uma resposta exata', text: loose[0].score ? 'Talvez você queira saber uma destas:' : 'Não entendi. Tente uma destas perguntas, ou pergunte "o que você sabe responder".', href: '', cta: '' }, '', loose);
     },
 
     // IA do cliente: ele conecta a própria conta (chave de API) e ela responde como o Cosmo.
@@ -332,7 +452,7 @@
       google: { n: 'Gemini (Google)', model: 'gemini-2.5-flash', keyUrl: 'https://aistudio.google.com/apikey' },
       xai: { n: 'Grok (xAI)', model: 'grok-4', keyUrl: 'https://console.x.ai' }
     },
-    TOPICS: { risco: 'Negócios em risco', prev: 'Previsão do mês', semana: 'Resumo da semana', sup: 'Suporte', contato: 'Contatos', outros: 'Outros assuntos' },
+    TOPICS: { risco: 'Negócios em risco', prev: 'Previsão do mês', semana: 'Resumo da semana', vendas: 'Vendas e funil', tarefas: 'Tarefas e agenda', sup: 'Suporte', metas: 'Metas e ranking', contato: 'Contatos e empresas', equipe: 'Equipe e organizações', plano: 'Plano e cobrança', ajuda: 'Como usar o CosmoDash', outros: 'Outros assuntos' },
     ai: () => db.ai || null,
     setAI(provider, key, model) {
       if (!Orb.AI[provider]) return 'Escolha um provedor.';
@@ -379,12 +499,12 @@
       return j.choices[0].message.content;
     },
     // Pergunta ao Cosmo: limite do plano e assunto pelas regras; resposta pela IA do cliente quando conectada.
-    async askCosmo(text, history = []) {
-      let ans = Orb.cosmo({ text });
+    async askCosmo(text, history = [], id = '') {
+      let ans = Orb.cosmo({ text, id });
       if (ans.title !== 'Limite do plano' && db.ai) {
         try {
           const reply = await Orb.askAI(history.concat([{ role: 'user', text }]));
-          ans = { topic: ans.topic, title: 'Cosmo · ' + Orb.AI[db.ai.provider].n, text: reply.trim(), href: ans.href, cta: ans.cta, hasLink: ans.hasLink, by: 'ia' };
+          ans = { topic: ans.topic, title: 'Cosmo · ' + Orb.AI[db.ai.provider].n, text: reply.trim(), href: ans.href, cta: ans.cta, hasLink: ans.hasLink, suggestions: ans.suggestions, by: 'ia' };
         } catch (e) {
           ans = Object.assign({}, ans, { text: 'Não consegui falar com ' + Orb.AI[db.ai.provider].n + ' (' + e.message + '). Pelas regras: ' + ans.text, by: 'erro' });
         }

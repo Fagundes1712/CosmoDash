@@ -85,9 +85,9 @@
       <div style="display:flex;gap:18px;padding:0 4px;margin-top:-8px"><sc-for list="{{bars}}" as="b"><span class="caption t2" style="flex:1;text-align:center">{{b.m}}</span></sc-for></div>
     </div>
 
-    <div class="glass card-pad" style="display:flex;flex-direction:column;gap:14px">
+    <div id="cosmo" class="glass card-pad" style="display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;align-items:center;gap:12px"><span class="orb" aria-hidden="true"></span><div><h2 class="h2">Cosmo</h2><div class="caption t2">Assistente de vendas · {{org.name}}</div></div></div>
-      <div class="well" style="flex:1;min-height:150px;padding:16px;display:flex;flex-direction:column;gap:10px">
+      <div class="well" style="flex:1;min-height:150px;padding:16px;display:flex;flex-direction:column;gap:10px" aria-live="polite">
         <div class="small ac" style="font-weight:600">{{ans.title}}</div>
         <p class="small" style="margin:0;line-height:1.4705882353;text-wrap:pretty">{{ans.text}}</p>
         <sc-if value="{{ans.hasLink}}"><a class="btn sm" href="{{ans.href}}" style="align-self:flex-start">{{ans.cta}} ›</a></sc-if>
@@ -182,6 +182,7 @@ class Component extends DCLogic {
   componentDidMount() {
     this._key = (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('cosmo-q').focus(); } };
     document.addEventListener('keydown', this._key);
+    if (location.hash === '#cosmo-q') setTimeout(() => document.getElementById('cosmo-q').focus());
   }
   componentWillUnmount() { document.removeEventListener('keydown', this._key); }
   renderVals() {
@@ -245,7 +246,7 @@ class Component extends DCLogic {
       toggleBell: () => this.setState({ bellOpen: !s.bellOpen }),
       readAll: () => { O.notifications.forEach((n) => { n.unread = false; }); Orb.save(); this.setState({}); },
       q: s.q, onQ: (e) => this.setState({ q: e.target.value }),
-      onKey: (e) => { if (e.key === 'Enter' && s.q.trim()) this.setState({ ans: Orb.cosmo({ text: s.q }), askId: '', q: '' }); }
+      onKey: (e) => { if (e.key === 'Enter' && s.q.trim()) { this.setState({ ans: Orb.cosmo({ text: s.q }), askId: '', q: '' }); document.getElementById('cosmo').scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
     });
   }
 }

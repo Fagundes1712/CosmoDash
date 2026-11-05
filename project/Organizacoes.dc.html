@@ -7,7 +7,6 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
@@ -23,15 +22,15 @@
   <section class="grid-a">
     <sc-for list="{{orgs}}" as="o">
       <div class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:14px;border-color:{{o.bd}}">
-        <div style="display:flex;gap:12px;align-items:center"><span class="orgmark" style="background:{{o.color}};width:44px;height:44px;flex-basis:44px;font-size:16px">{{o.mark}}</span><div><div style="font-weight:700;font-size:15px">{{o.name}}</div><div style="font-size:12px;color:#9AADC1">{{o.role}} · Plano {{o.plan}}</div></div></div>
-        <div style="display:flex;gap:16px;font-size:12.5px;color:#9AADC1"><span><b style="color:#E7EEF6">{{o.members}}</b> membros</span><span><b style="color:#E7EEF6">{{o.deals}}</b> negócios abertos</span></div>
+        <div style="display:flex;gap:12px;align-items:center"><span class="orgmark" style="background:{{o.color}};width:44px;height:44px;flex-basis:44px;font-size:16px">{{o.mark}}</span><div><div style="font-weight:600;font-size:15px">{{o.name}}</div><div style="font-size:12px;color:var(--label-2)">{{o.role}} · Plano {{o.plan}}</div></div></div>
+        <div style="display:flex;gap:16px;font-size:12.5px;color:var(--label-2)"><span><b style="color:var(--label)">{{o.members}}</b> membros</span><span><b style="color:var(--label)">{{o.deals}}</b> negócios abertos</span></div>
         <sc-if value="{{o.isCur}}"><span class="chip gr" style="align-self:flex-start">Organização atual</span></sc-if>
         <sc-if value="{{o.canEnter}}"><button class="btn sm" onClick="{{o.enter}}" style="align-self:flex-start">Entrar nesta organização</button></sc-if>
       </div>
     </sc-for>
-    <button class="glass" onClick="{{openOrg}}" style="padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;border-style:dashed;color:#9AADC1;cursor:pointer;min-height:170px;font:inherit">
+    <button class="glass" onClick="{{openOrg}}" style="padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;border-style:dashed;color:var(--label-2);cursor:pointer;min-height:170px;font:inherit">
       <span class="icob" style="border-radius:50%"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span>
-      <span style="font-weight:700;color:#E7EEF6">Criar organização</span><span style="font-size:12px">Dados, equipe e cobrança separados</span>
+      <span style="font-weight:600;color:var(--label)">Criar organização</span><span style="font-size:12px">Dados, equipe e cobrança separados</span>
     </button>
   </section>
 </main>
@@ -42,7 +41,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 id="no-t" class="disp" style="margin:0;font-size:22px">Nova organização</h2><button class="icob" data-close onClick="{{closeOrg}}" aria-label="Fechar"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <div><label class="lb" for="no-n">Nome</label><input id="no-n" class="inp" value="{{orgName}}" onChange="{{onOrgName}}" placeholder="Ex.: Mar Azul Turismo"></div>
-        <div style="font-size:12.5px;color:#9AADC1">Começa vazia, no plano Starter, com você como Admin.</div>
+        <div style="font-size:12.5px;color:var(--label-2)">Começa vazia, no plano Starter, com você como Admin.</div>
         <sc-if value="{{hasOrgErr}}"><div class="err" role="alert">Informe o nome da organização.</div></sc-if>
         <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" onClick="{{closeOrg}}">Cancelar</button><button class="btn pri" onClick="{{createOrg}}">Criar</button></div>
       </div>
@@ -58,7 +57,7 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
     const S = Orb.SEED, db = Orb.db();
-    const orgs = Object.keys(db.orgs).map((id) => { const o = db.orgs[id]; return { name: o.name, mark: o.mark, color: o.color, role: o.role, plan: S.plans[o.plan].n, members: Orb.orgMembers(o), deals: o.deals.filter((d) => d.status === 'open').length + Object.values(o.hid).flat().reduce((a, h) => a + h[0], 0), isCur: id === db.org, canEnter: id !== db.org, bd: id === db.org ? 'rgba(95,224,240,.35)' : 'rgba(150,200,255,.12)', enter: () => { Orb.setOrg(id); location.href = 'Organizacoes.dc.html'; } }; });
+    const orgs = Object.keys(db.orgs).map((id) => { const o = db.orgs[id]; return { name: o.name, mark: o.mark, color: o.color, role: o.role, plan: S.plans[o.plan].n, members: Orb.orgMembers(o), deals: o.deals.filter((d) => d.status === 'open').length + Object.values(o.hid).flat().reduce((a, h) => a + h[0], 0), isCur: id === db.org, canEnter: id !== db.org, bd: id === db.org ? 'var(--accent)' : 'var(--fill-q)', enter: () => { Orb.setOrg(id); location.href = 'Organizacoes.dc.html'; } }; });
     return Object.assign(Orb.shell(this, 'Organizacoes.dc.html'), {
       orgs, orgN: orgs.length,
       orgFormOpen: s.orgForm, orgName: s.orgName, hasOrgErr: s.orgErr, openOrg: () => this.setState({ orgForm: true, orgName: '', orgErr: false }), closeOrg: () => this.setState({ orgForm: false }), onOrgName: (e) => this.setState({ orgName: e.target.value }),

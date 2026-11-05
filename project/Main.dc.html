@@ -7,7 +7,6 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
@@ -21,105 +20,103 @@
       <div class="hud">{{date}} · {{org.name}}</div>
       <h1 class="h1">{{greet}}</h1>
     </div>
-    <label class="cmd" style="cursor:text">
+    <label class="cmd">
       <span class="orb" aria-hidden="true"></span>
       <input id="cosmo-q" type="text" value="{{q}}" onChange="{{onQ}}" onKeyDown="{{onKey}}" placeholder="Pergunte ao Cosmo — ex.: quais negócios estão em risco?" aria-label="Pergunte ao Cosmo">
       <span class="kbd">{{kbd}}</span>
     </label>
     <div style="display:flex;gap:10px;align-items:center;position:relative">
-      <a href="Metas.dc.html" class="glass" style="display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;text-decoration:none;color:#E7EEF6;min-height:44px">
-        <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(150,200,255,.15)" stroke-width="3"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="#ADA0FF" stroke-width="3" stroke-linecap="round" stroke-dasharray="{{ringDash}}" transform="rotate(-90 20 20)"></circle><text x="20" y="25" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="13">{{lvl}}</text></svg>
-        <span style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px"><svg class="ico s" viewBox="0 0 24 24" style="color:#FF9A62" aria-hidden="true"><path d="M12 22c4 0 7-2.7 7-7 0-4-3-6.5-4-9.5-1.5 2-2.5 3-3.5 3C11 6 10 4 10 2 6.5 4.5 5 9 5 13.5 5 18.8 8 22 12 22z"></path></svg>{{streak}} dias</span>
+      <a href="Metas.dc.html" class="pill">
+        <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle class="ring-track" cx="20" cy="20" r="16" fill="none" stroke-width="3"></circle><circle class="ring-val" cx="20" cy="20" r="16" fill="none" stroke-width="3" stroke-linecap="round" stroke-dasharray="{{ringDash}}" transform="rotate(-90 20 20)"></circle><text class="ring-txt" x="20" y="25" text-anchor="middle">{{lvl}}</text></svg>
+        <span class="small" style="display:flex;align-items:center;gap:6px;font-weight:600"><svg class="ico s warn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22c4 0 7-2.7 7-7 0-4-3-6.5-4-9.5-1.5 2-2.5 3-3.5 3C11 6 10 4 10 2 6.5 4.5 5 9 5 13.5 5 18.8 8 22 12 22z"></path></svg>{{streak}} dias</span>
       </a>
-      <button class="icob lg" onClick="{{toggleBell}}" aria-label="{{bellLabel}}" aria-expanded="{{bellOpen}}" style="position:relative"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><sc-if value="{{hasUnread}}"><span style="position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:#FF9A62;box-shadow:0 0 8px #FF9A62"></span></sc-if></button>
+      <button class="icob lg" onClick="{{toggleBell}}" aria-label="{{bellLabel}}" aria-expanded="{{bellOpen}}" style="position:relative"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><sc-if value="{{hasUnread}}"><span class="unread-dot"></span></sc-if></button>
       <sc-if value="{{bellOpen}}">
-        <div class="glass popover">
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px"><span class="hud">Notificações</span><button class="btn sm ghost" onClick="{{readAll}}">Marcar como lidas</button></div>
-          <sc-for list="{{notifs}}" as="n"><a class="rowb" href="{{n.href}}" onClick="{{n.read}}" style="text-decoration:none;padding:10px"><span style="width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:{{n.dot}}"></span><span style="font-size:13px;line-height:1.4">{{n.text}}</span></a></sc-for>
-          <sc-if value="{{noNotifs}}"><div style="padding:16px;text-align:center;color:#9AADC1;font-size:13px">Nenhuma notificação.</div></sc-if>
+        <div class="popover">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 6px 4px 10px"><span class="h2">Notificações</span><button class="btn sm ghost" onClick="{{readAll}}">Marcar como lidas</button></div>
+          <sc-for list="{{notifs}}" as="n"><a class="rowb" href="{{n.href}}" onClick="{{n.read}}"><span style="width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:{{n.dot}}"></span><span class="small">{{n.text}}</span></a></sc-for>
+          <sc-if value="{{noNotifs}}"><div class="small t2" style="padding:16px;text-align:center">Nenhuma notificação.</div></sc-if>
         </div>
       </sc-if>
     </div>
   </header>
 
   <section class="grid-a" aria-label="Indicadores principais">
-    <div class="glass lift scan" style="padding:20px;display:flex;flex-direction:column;gap:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Receita do mês</span><sc-if value="{{k.delta}}"><span class="chip gr">{{k.delta}}</span></sc-if></div>
-      <div class="disp" style="font-size:32px;font-weight:700;letter-spacing:.01em">{{k.rev}}</div>
+    <div class="glass lift card-pad kpi-card">
+      <div class="kpi-head"><span class="kpi-ico" style="--c:var(--amber)"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span><span class="small t2" style="flex:1">Receita do mês</span><sc-if value="{{k.delta}}"><span class="badge {{revTrend}}">{{k.delta}}</span></sc-if></div>
+      <div class="kpi-row"><div><div class="kpi">{{k.rev}}</div><div class="caption t2" style="margin-top:4px">{{prevRev}}</div></div><svg class="spark-area" viewBox="0 0 200 36" preserveAspectRatio="none" style="--c:{{revC}}" aria-hidden="true"><polygon class="area" points="{{revArea}}"></polygon><polyline class="line" points="{{revLine}}"></polyline></svg></div>
       <div class="bar"><i style="width:{{k.pctW}}"></i></div>
-      <div style="font-size:12.5px;color:#9AADC1">{{k.pct}}% {{k.meta}}</div>
+      <div class="caption t2">{{k.pct}}% {{k.meta}}</div>
     </div>
-    <a href="Pipeline.dc.html" class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:12px;text-decoration:none;color:#E7EEF6">
-      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Pipeline aberto</span><span class="chip cy">Ver funil</span></div>
-      <div class="disp" style="font-size:32px;font-weight:700">{{k.pipe}}</div>
-      <div style="display:flex;gap:3px;height:6px"><sc-for list="{{funnel}}" as="f"><span style="flex:{{f.n}};border-radius:4px;background:{{f.color}}"></span></sc-for></div>
-      <div style="font-size:12.5px;color:#9AADC1">{{k.deals}}</div>
+    <a href="Pipeline.dc.html" class="glass card-pad kpi-card">
+      <div class="kpi-head"><span class="kpi-ico" style="--c:var(--accent)"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z"></path></svg></span><span class="small t2" style="flex:1">Pipeline aberto</span><span class="badge">{{k.dealsShort}}</span></div>
+      <div class="kpi">{{k.pipe}}</div>
+      <div style="display:flex;gap:3px;height:6px"><sc-for list="{{funnel}}" as="f"><span style="flex:{{f.n}};border-radius:999px;background:{{f.color}}"></span></sc-for></div>
+      <div class="caption t2">Ver o funil completo ›</div>
     </a>
-    <div class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">Taxa de conversão</span><sc-if value="{{k.convDelta}}"><span class="{{k.convCls}}">{{k.convDelta}}</span></sc-if></div>
-      <div class="disp" style="font-size:32px;font-weight:700">{{k.conv}}</div>
-      <svg viewBox="0 0 200 36" preserveAspectRatio="none" style="width:100%;height:36px" aria-hidden="true"><polyline points="{{k.spark}}" fill="none" stroke="#5FE0F0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline></svg>
-      <div style="font-size:12.5px;color:#9AADC1">Lead → ganho, últimos 90 dias</div>
+    <div class="glass lift card-pad kpi-card">
+      <div class="kpi-head"><span class="kpi-ico" style="--c:var(--pink)"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"></path></svg></span><span class="small t2" style="flex:1">Taxa de conversão</span><sc-if value="{{k.convDelta}}"><span class="badge {{convTrend}}">{{k.convDelta}}</span></sc-if></div>
+      <div class="kpi-row"><div><div class="kpi">{{k.conv}}</div><div class="caption t2" style="margin-top:4px">Lead → ganho, 90 dias</div></div><svg class="spark-area" viewBox="0 0 200 36" preserveAspectRatio="none" style="--c:{{convC}}" aria-hidden="true"><polygon class="area" points="{{convArea}}"></polygon><polyline class="line" points="{{k.spark}}"></polyline></svg></div>
+      <div class="caption t2">Resposta média a leads: {{k.lead}}</div>
     </div>
-    <a href="Suporte.dc.html" class="glass lift" style="padding:20px;display:flex;flex-direction:column;gap:12px;text-decoration:none;color:#E7EEF6">
-      <div style="display:flex;justify-content:space-between;align-items:center"><span class="hud">SLA do suporte</span></div>
-      <div class="disp" style="font-size:32px;font-weight:700">{{k.sla}}</div>
+    <a href="Suporte.dc.html" class="glass card-pad kpi-card">
+      <div class="kpi-head"><span class="kpi-ico" style="--c:var(--teal)"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg></span><span class="small t2" style="flex:1">SLA do suporte</span><span class="badge">CSAT {{k.csat}}</span></div>
+      <div class="kpi">{{k.sla}}</div>
       <div class="bar gr"><i style="width:{{k.slaW}}"></i></div>
-      <div style="font-size:12.5px;color:#9AADC1">{{k.tickets}}</div>
+      <div class="caption t2">{{k.tickets}}</div>
     </a>
   </section>
 
   <section class="split">
-    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:18px">
+    <div class="glass card-pad" style="display:flex;flex-direction:column;gap:18px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
-        <div><h2 class="h2">Receita fechada por mês</h2><div style="font-size:12.5px;color:#9AADC1;margin-top:4px">Últimos 6 meses · linha tracejada = meta mensal ({{k.metaShort}})</div></div>
-        <div style="display:flex;gap:14px;font-size:12px;color:#9AADC1;align-items:center"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#5FE0F0"></span>Mês atual</span><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:rgba(150,200,255,.3)"></span>Meses anteriores</span></div>
+        <div><h2 class="h2">Receita fechada por mês</h2><div class="small t2" style="margin-top:4px">Últimos 6 meses · linha tracejada = meta mensal ({{k.metaShort}})</div></div>
+        <div class="caption t2" style="display:flex;gap:14px;align-items:center"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:var(--accent)"></span>Mês atual</span><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:var(--fill-q)"></span>Meses anteriores</span></div>
       </div>
-      <div style="position:relative;height:230px;display:flex;align-items:flex-end;gap:18px;padding:0 4px;border-bottom:1px solid rgba(150,200,255,.14)">
-        <div style="position:absolute;left:0;right:0;bottom:{{metaLine}};border-top:1.5px dashed rgba(255,154,98,.7)"><span class="hud" style="position:absolute;right:0;top:-20px;color:#FF9A62">Meta</span></div>
+      <div style="position:relative;height:230px;display:flex;align-items:flex-end;gap:18px;padding:0 4px;border-bottom:1px solid var(--separator)">
+        <div class="meta-line" style="position:absolute;left:0;right:0;bottom:{{metaLine}}"><span class="caption warn" style="position:absolute;right:0;top:-20px">Meta</span></div>
         <sc-for list="{{bars}}" as="b">
           <div style="flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px" title="{{b.full}}">
-            <span style="font:600 12px 'Chakra Petch',sans-serif;color:{{b.lc}}">{{b.v}}</span>
-            <div style="width:min(56px,100%);height:{{b.h}};border-radius:10px 10px 4px 4px;background:{{b.bg}};box-shadow:{{b.sh}}"></div>
+            <span class="caption" style="font-weight:600;color:{{b.lc}}">{{b.v}}</span>
+            <div style="width:min(40px,100%);height:{{b.h}};border-radius:999px;background:{{b.bg}};box-shadow:{{b.sh}}"></div>
           </div>
         </sc-for>
       </div>
-      <div style="display:flex;gap:18px;padding:0 4px;margin-top:-8px"><sc-for list="{{bars}}" as="b"><span class="hud" style="flex:1;text-align:center">{{b.m}}</span></sc-for></div>
+      <div style="display:flex;gap:18px;padding:0 4px;margin-top:-8px"><sc-for list="{{bars}}" as="b"><span class="caption t2" style="flex:1;text-align:center">{{b.m}}</span></sc-for></div>
     </div>
 
-    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden">
-      <div style="position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(95,224,240,.22),transparent 65%);pointer-events:none"></div>
-      <div style="display:flex;align-items:center;gap:12px"><span class="orb" aria-hidden="true"></span><div><h2 class="h2">Cosmo</h2><div class="hud" style="font-size:10px">Assistente de vendas · {{org.name}}</div></div></div>
-      <div style="flex:1;min-height:150px;border-radius:14px;background:rgba(4,8,14,.5);border:1px solid rgba(150,200,255,.1);padding:16px;display:flex;flex-direction:column;gap:12px">
-        <div class="hud" style="color:#5FE0F0">{{ans.title}}</div>
-        <p style="margin:0;font-size:14px;line-height:1.6;color:#D4DEE9;text-wrap:pretty">{{ans.text}}</p>
-        <sc-if value="{{ans.hasLink}}"><a class="btn sm" href="{{ans.href}}" style="align-self:flex-start">{{ans.cta}} →</a></sc-if>
+    <div class="glass card-pad" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:12px"><span class="orb" aria-hidden="true"></span><div><h2 class="h2">Cosmo</h2><div class="caption t2">Assistente de vendas · {{org.name}}</div></div></div>
+      <div class="well" style="flex:1;min-height:150px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div class="small ac" style="font-weight:600">{{ans.title}}</div>
+        <p class="small" style="margin:0;line-height:1.4705882353;text-wrap:pretty">{{ans.text}}</p>
+        <sc-if value="{{ans.hasLink}}"><a class="btn sm" href="{{ans.href}}" style="align-self:flex-start">{{ans.cta}} ›</a></sc-if>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         <sc-for list="{{asks}}" as="a"><button class="{{a.cls}}" onClick="{{a.go}}">{{a.label}}</button></sc-for>
       </div>
-      <div style="font-size:11.5px;color:#7A8EA3">Demonstração: respostas por regras sobre os dados da organização, ainda sem modelo de IA.</div>
+      <div class="caption t2">Demonstração: respostas por regras sobre os dados da organização, ainda sem modelo de IA.</div>
     </div>
   </section>
 
   <section class="tri">
-    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Funil · {{funnelName}}</h2><a href="Pipeline.dc.html" style="font-size:12.5px;font-weight:700;text-decoration:none">Abrir →</a></div>
+    <div class="glass card-pad" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 class="h2">Funil · {{funnelName}}</h2><a href="Pipeline.dc.html" class="small">Abrir ›</a></div>
       <sc-for list="{{funnel}}" as="f">
         <div style="display:flex;flex-direction:column;gap:6px">
-          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:600">{{f.stage}}</span><span style="color:#9AADC1">{{f.n}} · <span style="color:#E7EEF6;font-weight:700">{{f.val}}</span></span></div>
-          <div style="height:10px;border-radius:6px;background:rgba(150,200,255,.07)"><div style="height:100%;width:{{f.w}};border-radius:6px;background:{{f.color}}"></div></div>
+          <div class="small" style="display:flex;justify-content:space-between;gap:8px"><span>{{f.stage}}</span><span class="t2">{{f.n}} · <span style="color:var(--label);font-weight:600">{{f.val}}</span></span></div>
+          <div class="bar" style="height:8px"><i style="width:{{f.w}};background:{{f.color}}"></i></div>
         </div>
       </sc-for>
-      <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#9AADC1;padding-top:6px;border-top:1px solid rgba(150,200,255,.08)"><span>Ciclo médio {{k.cycle}} dias</span><span>Ticket médio {{k.ticket}}</span></div>
+      <div class="small t2 rule" style="display:flex;justify-content:space-between;gap:8px;padding-top:10px"><span>Ciclo médio {{k.cycle}} dias</span><span>Ticket médio {{k.ticket}}</span></div>
     </div>
 
-    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Missões de hoje</h2><span class="hud">Renova às 00:00</span></div>
+    <div class="glass card-pad" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 class="h2">Missões de hoje</h2><span class="caption t2">Renova às 00:00</span></div>
       <sc-for list="{{missions}}" as="m">
-        <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:rgba(4,8,14,.45);border:1px solid rgba(150,200,255,.08)">
+        <div class="well" style="display:flex;align-items:center;gap:12px;padding:12px">
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px">
-            <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px"><span style="font-weight:600">{{m.t}}</span><span style="color:#9AADC1;white-space:nowrap">{{m.p}}</span></div>
+            <div class="small" style="display:flex;justify-content:space-between;gap:8px"><span>{{m.t}}</span><span class="t2" style="white-space:nowrap">{{m.p}}</span></div>
             <div class="bar or"><i style="width:{{m.w}}"></i></div>
           </div>
           <sc-if value="{{m.canClaim}}"><button class="btn sm pri" onClick="{{m.claim}}">+{{m.xp}} XP</button></sc-if>
@@ -127,52 +124,52 @@
           <sc-if value="{{m.open}}"><span class="xp" style="min-width:58px;text-align:right">+{{m.xp}} XP</span></sc-if>
         </div>
       </sc-for>
-      <a href="Metas.dc.html" style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;border:1px dashed rgba(173,160,255,.35);text-decoration:none;color:#E7EEF6">
-        <div style="display:flex;justify-content:space-between;font-size:12.5px"><span class="hud" style="color:#ADA0FF">Meta do squad · mês</span><span style="color:#9AADC1">{{squadPct}}%</span></div>
-        <div style="font-size:13px;font-weight:600">{{squadName}} · {{squadGoal}} em fechamentos</div>
+      <a href="Metas.dc.html" class="dash-box" style="display:flex;flex-direction:column;gap:8px;padding:12px;color:var(--label)">
+        <div class="caption" style="display:flex;justify-content:space-between;gap:8px"><span class="pk" style="font-weight:600">Meta do squad · mês</span><span class="t2">{{squadPct}}%</span></div>
+        <div class="small" style="font-weight:600">{{squadName}} · {{squadGoal}} em fechamentos</div>
         <div class="bar vi"><i style="width:{{squadPct}}%"></i></div>
       </a>
     </div>
 
-    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+    <div class="glass card-pad" style="display:flex;flex-direction:column;gap:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 class="h2">Ranking · Temporada {{seasonName}}</h2>
-        <div class="seg"><button class="{{rkInd}}" onClick="{{showInd}}">Pessoas</button><button class="{{rkTeam}}" onClick="{{showTeam}}">Equipes</button></div>
+        <div class="seg" role="group" aria-label="Ranking por"><button class="{{rkInd}}" onClick="{{showInd}}">Pessoas</button><button class="{{rkTeam}}" onClick="{{showTeam}}">Equipes</button></div>
       </div>
       <sc-for list="{{ranking}}" as="r">
-        <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:12px;background:{{r.bg}}">
-          <span class="disp" style="width:22px;font-weight:700;color:{{r.pc}}">{{r.pos}}</span>
+        <div style="display:flex;align-items:center;gap:12px;padding:6px 10px;border-radius:6px;background:{{r.bg}}">
+          <span class="small disp" style="width:18px;font-weight:600;color:{{r.pc}}">{{r.pos}}</span>
           <span class="av sm" style="background:{{r.color}}">{{r.ini}}</span>
-          <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13px">{{r.name}}</span><span style="display:block;font-size:11.5px;color:#9AADC1">{{r.sub}}</span></span>
-          <span class="disp" style="font-weight:700;font-size:14px">{{r.xp}}</span>
+          <span style="flex:1;min-width:0"><span class="small" style="display:block;font-weight:600">{{r.name}}</span><span class="caption t2" style="display:block">{{r.sub}}</span></span>
+          <span class="small" style="font-weight:600">{{r.xp}}</span>
         </div>
       </sc-for>
-      <div style="font-size:12px;color:#9AADC1;margin-top:auto">XP por resultado: negócios ganhos, SLA cumprido e atividades registradas. Visível apenas para sua organização.</div>
+      <div class="caption t2" style="margin-top:auto">XP por resultado: negócios ganhos, SLA cumprido e atividades registradas. Visível apenas para sua organização.</div>
     </div>
   </section>
 
   <section class="split">
-    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:4px">
+    <div class="glass card-pad" style="display:flex;flex-direction:column;gap:2px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h2 class="h2">Atividade da equipe</h2></div>
       <sc-for list="{{feed}}" as="f">
-        <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(150,200,255,.06)">
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--separator)">
           <span class="av sm" style="background:{{f.color}}">{{f.ini}}</span>
-          <div style="flex:1;min-width:0;font-size:13.5px;line-height:1.45"><span style="font-weight:700">{{f.who}}</span> <span style="color:#B7C5D4">{{f.what}}</span></div>
+          <div class="small" style="flex:1;min-width:0"><span style="font-weight:600">{{f.who}}</span> <span class="t2">{{f.what}}</span></div>
           <sc-if value="{{f.hasXp}}"><span class="xp">{{f.xp}}</span></sc-if>
-          <span style="font-size:12px;color:#7A8EA3;white-space:nowrap">{{f.when}}</span>
+          <span class="caption t2" style="white-space:nowrap">{{f.when}}</span>
         </div>
       </sc-for>
-      <sc-if value="{{noFeed}}"><div style="padding:24px;text-align:center;color:#9AADC1;font-size:13px">Sem atividade ainda.</div></sc-if>
+      <sc-if value="{{noFeed}}"><div class="small t2" style="padding:24px;text-align:center">Sem atividade ainda.</div></sc-if>
     </div>
-    <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Próximas tarefas</h2><a href="Tarefas.dc.html" style="font-size:12.5px;font-weight:700;text-decoration:none">{{tasksDone}} de {{tasksTotal}} feitas →</a></div>
+    <div class="glass card-pad" style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px"><h2 class="h2">Próximas tarefas</h2><a href="Tarefas.dc.html" class="small">{{tasksDone}} de {{tasksTotal}} feitas ›</a></div>
       <sc-for list="{{tasks}}" as="t">
-        <a href="Tarefas.dc.html" class="rowb" style="text-decoration:none">
-          <span class="disp" style="font-size:13px;color:#5FE0F0;width:44px">{{t.h}}</span>
-          <span style="flex:1;min-width:0"><span style="display:block;font-weight:600;font-size:13.5px">{{t.t}}</span><span style="display:block;font-size:12px;color:#9AADC1">{{t.ctx}}</span></span>
+        <a href="Tarefas.dc.html" class="rowb">
+          <span class="small ac" style="width:44px;font-weight:600">{{t.h}}</span>
+          <span style="flex:1;min-width:0"><span class="small" style="display:block;font-weight:600">{{t.t}}</span><span class="caption t2" style="display:block">{{t.ctx}}</span></span>
           <span class="xp">+{{t.xp}}</span>
         </a>
       </sc-for>
-      <sc-if value="{{noTasks}}"><div style="padding:24px;text-align:center;color:#9AADC1;font-size:13px">Nada pendente para hoje.</div></sc-if>
+      <sc-if value="{{noTasks}}"><div class="small t2" style="padding:24px;text-align:center">Nada pendente para hoje.</div></sc-if>
     </div>
   </section>
 </main>
@@ -192,17 +189,22 @@ class Component extends DCLogic {
     const O = Orb.data(), K = O.k, S = Orb.SEED, T = Orb.totals(), lv = Orb.level();
     const prefs = Orb.profile().prefs;
     const pct = Math.round(T.won / K.goal * 100);
-    const k = { rev: Orb.brl(T.won), meta: 'da meta de ' + Orb.brl(K.goal), metaShort: Orb.mil(K.goal), pct, pctW: Math.min(100, pct) + '%', delta: K.delta ? K.delta + ' vs ' + Orb.monthName(-1).slice(0, 3) : '', pipe: Orb.mil(T.open), deals: Orb.pl(T.count, 'negócio aberto', 'negócios abertos'),conv: K.conv, convDelta: K.convDelta, convCls: K.up ? 'chip gr' : 'chip rd', spark: K.spark, sla: K.sla, slaW: K.sla === '—' ? '0%' : K.sla, tickets: Orb.pl(Orb.ticketsOpen(), 'ticket aberto', 'tickets abertos') + ' · CSAT ' + K.csat, cycle: K.cycleDays, ticket: T.wonCount ? Orb.brl(T.won / T.wonCount) : '—' };
+    const k = { rev: Orb.brl(T.won), meta: 'da meta de ' + Orb.brl(K.goal), metaShort: Orb.mil(K.goal), pct, pctW: Math.min(100, pct) + '%', delta: K.delta ? K.delta + ' vs ' + Orb.monthName(-1).slice(0, 3) : '', pipe: Orb.mil(T.open), deals: Orb.pl(T.count, 'negócio aberto', 'negócios abertos'), dealsShort: Orb.pl(T.count, 'negócio', 'negócios'), lead: K.leadReply, conv: K.conv, convDelta: K.convDelta, convCls: K.up ? 'chip gr' : 'chip rd', spark: K.spark, sla: K.sla, slaW: K.sla === '—' ? '0%' : K.sla, tickets: Orb.pl(Orb.ticketsOpen(), 'ticket aberto', 'tickets abertos'), csat: K.csat, cycle: K.cycleDays, ticket: T.wonCount ? Orb.brl(T.won / T.wonCount) : '—' };
     const M = Orb.months();
     const values = O.bars.concat([Math.round(T.won / 1000)]);
     const scale = Math.max(K.goal / 1000, ...values) * 1.04;
-    const bars = values.map((v, i) => { const cur = i === 5; return { m: M[i], v: v + 'k', full: 'R$ ' + v + ' mil', h: Math.round(v / scale * 190) + 'px', bg: cur ? 'linear-gradient(180deg,#9CF4FB,#2BB8CC)' : 'rgba(150,200,255,.22)', sh: cur ? '0 0 24px rgba(95,224,240,.5)' : 'none', lc: cur ? '#5FE0F0' : '#9AADC1' }; });
+    const bars = values.map((v, i) => { const cur = i === 5; return { m: M[i], v: v + 'k', full: 'R$ ' + v + ' mil', h: Math.round(v / scale * 190) + 'px', bg: cur ? 'var(--bar-cur)' : 'var(--bar)', sh: cur ? 'var(--bar-glow)' : 'none', lc: cur ? 'var(--accent-text)' : 'var(--label-2)' }; });
     const metaLine = Math.round(K.goal / 1000 / scale * 190) + 'px';
+    // Mini-gráficos (área) dos cartões de indicador, no mesmo quadro 200x36 da série de conversão.
+    const lo = Math.min(...values), hi = Math.max(...values);
+    const revLine = values.map((v, i) => Math.round(i / (values.length - 1) * 200) + ',' + Math.round(33 - (v - lo) / ((hi - lo) || 1) * 28)).join(' ');
+    const revTrend = /^[-−]/.test(String(K.delta || '').trim()) ? 'neg' : 'pos';
+    const convTrend = K.up ? 'pos' : 'neg';
+    const trendC = (t) => (t === 'pos' ? 'var(--teal)' : '#ef4444');
 
-    const FC = ['#2BB8CC', '#45CDE0', '#5FE0F0', '#ADA0FF', '#FF9A62'];
     const stats = Orb.funnelStats(O.funnels[0].id);
     const maxV = Math.max(1, ...stats.map((f) => f.sum));
-    const funnel = stats.map((f, i) => ({ stage: f.name, n: f.count, val: Orb.mil(f.sum), w: Math.round(f.sum / maxV * 100) + '%', color: FC[i] }));
+    const funnel = stats.map((f) => ({ stage: f.name, n: f.count, val: Orb.mil(f.sum), w: Math.round(f.sum / maxV * 100) + '%', color:'var(--accent)' }));
 
     const ask = (id) => { this.setState({ askId: id, ans: Orb.cosmo({ id }) }); };
     const ans = s.ans || Orb.cosmo({ id: s.askId, count: false });
@@ -220,13 +222,13 @@ class Component extends DCLogic {
     const anon = !prefs.showLvl;
     const ranking = (s.rank === 'ind'
       ? Orb.ranking().slice(0, 5).map((r) => (r.me && anon ? Object.assign({}, r, { name: 'Anônimo', ini: '?', sub: 'Você (oculto no ranking)' }) : r))
-      : Orb.squads().map((q) => ({ name: q.name, ini: q.ini, color: q.me ? '#5FE0F0' : '#9AADC1', sub: q.members, season: q.season, me: q.me }))
-    ).map((r, i) => ({ pos: i + 1, name: r.name, ini: r.ini, color: r.color, sub: r.sub, xp: Orb.num(r.season), bg: r.me ? 'rgba(95,224,240,.08)' : 'transparent', pc: i === 0 ? '#F3D06E' : '#7A8EA3' }));
+      : Orb.squads().map((q) => ({ name: q.name, ini: q.ini, color: q.me ? 'var(--accent)' : 'var(--amber)', sub: q.members, season: q.season, me: q.me }))
+    ).map((r, i) => ({ pos: i + 1, name: r.name, ini: r.ini, color: r.color, sub: r.sub, xp: Orb.num(r.season), bg: r.me ? 'var(--fill-q)' : 'transparent', pc: i === 0 ? 'var(--orange)' : 'var(--label-2)' }));
 
     const feed = O.feed.filter((f) => prefs.peers || !f.peer).slice(0, 5).map((f) => ({ ini: f.ini === 'CA' ? Orb.ini(Orb.profile().name) : f.ini, color: Orb.person(f.ini).c, who: f.who, what: f.what, xp: '+' + f.xp + ' XP', hasXp: !!f.xp, when: Orb.ago(f.ts) }));
     const today = Orb.tasksToday();
     const pendingTasks = today.filter((t) => !t.done).sort((a, b) => a.h.localeCompare(b.h)).slice(0, 3);
-    const notifs = O.notifications.map((n) => ({ text: n.text, href: n.href, dot: n.unread ? '#FF9A62' : 'rgba(150,200,255,.2)', read: () => { n.unread = false; Orb.save(); } }));
+    const notifs = O.notifications.map((n) => ({ text: n.text, href: n.href, dot: n.unread ? 'var(--accent)' : 'var(--separator)', read: () => { n.unread = false; Orb.save(); } }));
     const unread = O.notifications.filter((n) => n.unread).length;
     const mac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
     const sq = O.squad;
@@ -234,7 +236,7 @@ class Component extends DCLogic {
 
     return Object.assign(Orb.shell(this, 'Main.dc.html'), {
       date: Orb.headerDate(), greet: Orb.greeting(), kbd: mac ? '⌘K' : 'Ctrl K',
-      k, bars, metaLine, funnel, funnelName: O.funnels[0].name, ans, asks, missions, ranking, feed, noFeed: feed.length === 0,
+      k, bars, metaLine, funnel, revLine, revArea: revLine + ' 200,36 0,36', convArea: K.spark + ' 200,36 0,36', revTrend, convTrend, revC: trendC(revTrend), convC: trendC(convTrend), prevRev: 'Mês anterior: ' + Orb.mil(O.bars[4] * 1000), funnelName: O.funnels[0].name, ans, asks, missions, ranking, feed, noFeed: feed.length === 0,
       tasks: pendingTasks, noTasks: pendingTasks.length === 0, tasksDone: today.filter((t) => t.done).length, tasksTotal: today.length,
       rkInd: s.rank === 'ind' ? 'on' : '', rkTeam: s.rank === 'team' ? 'on' : '', showInd: () => this.setState({ rank: 'ind' }), showTeam: () => this.setState({ rank: 'team' }),
       lvl: lv.lvl, streak: O.me.streak, ringDash: Math.round(lv.pct / 100 * 100.5) + ' 200', seasonName: Orb.seasonName(),

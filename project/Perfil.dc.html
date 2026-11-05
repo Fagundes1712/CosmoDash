@@ -7,7 +7,6 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
@@ -19,7 +18,7 @@
   <header class="top" style="justify-content:space-between">
     <div><div class="hud">Conta · Configurações pessoais</div><h1 class="h1">Meu perfil</h1></div>
     <div style="display:flex;gap:10px;align-items:center">
-      <sc-if value="{{dirty}}"><span style="font-size:12.5px;color:#F3D06E">Alterações não salvas</span><button class="btn ghost" onClick="{{discard}}">Descartar</button></sc-if>
+      <sc-if value="{{dirty}}"><span style="font-size:12.5px;color:var(--orange)">Alterações não salvas</span><button class="btn ghost" onClick="{{discard}}">Descartar</button></sc-if>
       <button class="{{saveCls}}" onClick="{{save}}">Salvar alterações</button>
     </div>
   </header>
@@ -28,13 +27,13 @@
 
   <section class="glass" style="padding:24px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden">
     <div style="position:relative">
-      <span class="av" style="width:92px;height:92px;font-size:30px;background:radial-gradient(circle at 35% 30%,#B8F7FC,#5FE0F0 55%,#1E9AAB);box-shadow:0 0 0 4px rgba(173,160,255,.35),0 0 30px rgba(95,224,240,.35);{{userPhoto}}">{{userIni}}</span>
-      <label class="icob" for="pf-photo" style="position:absolute;right:-4px;bottom:-4px;border-radius:50%;background:#0B1422" aria-label="Trocar foto" title="Trocar foto"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v13H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path></svg></label>
+      <span class="av me" style="width:92px;height:92px;font-size:30px;{{userPhoto}}">{{userIni}}</span>
+      <label class="icob" for="pf-photo" style="position:absolute;right:-4px;bottom:-4px;border-radius:50%;background:var(--card)" aria-label="Trocar foto" title="Trocar foto"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v13H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path></svg></label>
       <input id="pf-photo" type="file" accept="image/*" onChange="{{photo}}" style="position:absolute;width:1px;height:1px;opacity:0" aria-label="Escolher foto de perfil">
     </div>
     <div style="flex:1 1 240px;min-width:0">
-      <div class="disp" style="font-size:28px;font-weight:700">{{saved.name}}</div>
-      <div style="font-size:14px;color:#9AADC1;margin-top:2px">{{saved.title}} · {{org.name}} · {{squad}}</div>
+      <div class="disp" style="font-size:28px;font-weight:600">{{saved.name}}</div>
+      <div style="font-size:14px;color:var(--label-2);margin-top:2px">{{saved.title}} · {{org.name}} · {{squad}}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><span class="chip vi">{{xpTier}}</span><span class="chip or">{{streak}} dias de sequência</span></div>
     </div>
     <a href="Metas.dc.html" class="btn">Ver conquistas</a>
@@ -68,29 +67,29 @@
       <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:4px">
         <h2 class="h2" style="margin-bottom:8px">Experiência</h2>
         <sc-for list="{{prefs}}" as="p">
-          <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(150,200,255,.07)">
-            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px">{{p.n}}</div><div style="font-size:12px;color:#9AADC1">{{p.d}}</div></div>
+          <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--separator)">
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px">{{p.n}}</div><div style="font-size:12px;color:var(--label-2)">{{p.d}}</div></div>
             <button class="{{p.cls}}" onClick="{{p.flip}}" role="switch" aria-checked="{{p.on}}" aria-label="{{p.n}}"></button>
           </div>
         </sc-for>
         <div style="display:flex;align-items:center;gap:14px;padding:12px 0 2px">
-          <div style="flex:1"><div style="font-weight:600;font-size:13.5px">Meta diária de atividades</div><div style="font-size:12px;color:#9AADC1">Base da sua sequência</div></div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13.5px">Meta diária de atividades</div><div style="font-size:12px;color:var(--label-2)">Base da sua sequência</div></div>
           <div class="seg"><sc-for list="{{goalOpts}}" as="g"><button class="{{g.cls}}" onClick="{{g.pick}}">{{g.v}}</button></sc-for></div>
         </div>
       </section>
 
       <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
         <h2 class="h2">Segurança</h2>
-        <div style="padding:12px;border-radius:12px;background:rgba(243,208,110,.08);border:1px solid rgba(243,208,110,.3);font-size:12.5px;line-height:1.5">Demonstração sem login real: senha, 2FA e sessões passam a valer quando a autenticação for criada.</div>
+        <div style="padding:12px;border-radius:12px;background:var(--fill-q);border:1px solid var(--orange);font-size:12.5px;line-height:1.5">Demonstração sem login real: senha, 2FA e sessões passam a valer quando a autenticação for criada.</div>
         <div class="hud" style="margin-top:4px">Sessões ativas</div>
         <sc-for list="{{sessions}}" as="x">
-          <div style="display:flex;align-items:center;gap:12px;font-size:13px"><span style="flex:1"><b>{{x.d}}</b><br><span style="color:#9AADC1;font-size:12px">{{x.w}}</span></span><sc-if value="{{x.cur}}"><span class="chip gr">Esta sessão</span></sc-if><sc-if value="{{x.other}}"><button class="btn sm ghost" onClick="{{x.end}}">Encerrar</button></sc-if></div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:13px"><span style="flex:1"><b>{{x.d}}</b><br><span style="color:var(--label-2);font-size:12px">{{x.w}}</span></span><sc-if value="{{x.cur}}"><span class="chip gr">Esta sessão</span></sc-if><sc-if value="{{x.other}}"><button class="btn sm ghost" onClick="{{x.end}}">Encerrar</button></sc-if></div>
         </sc-for>
       </section>
 
       <section class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
         <h2 class="h2">Dados da demonstração</h2>
-        <div style="font-size:12.5px;color:#9AADC1;line-height:1.5">As alterações ficam salvas neste navegador. Restaurar apaga tudo o que você mudou em todas as organizações.</div>
+        <div style="font-size:12.5px;color:var(--label-2);line-height:1.5">As alterações ficam salvas neste navegador. Restaurar apaga tudo o que você mudou em todas as organizações.</div>
         <button class="btn" onClick="{{resetAll}}" style="align-self:flex-start">Restaurar dados originais</button>
       </section>
     </div>

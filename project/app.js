@@ -11,7 +11,7 @@
   const MONTHS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
   const WEEK = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   const unaccent = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const TIERS = [['Operador', 1, 5, 'Painel pessoal e missões diárias', '#9AADC1'], ['Especialista', 6, 10, 'Desafios semanais e mentoria', '#5ADFA4'], ['Estrategista', 11, 15, 'Acesso antecipado a leads inbound', '#ADA0FF'], ['Elite', 16, 20, 'Destaque mensal na organização', '#5FE0F0'], ['Vanguarda', 21, 25, 'Participa da definição de metas', '#FF9A62'], ['Cosmos', 26, 30, 'Recompensa definida pela empresa', '#F3D06E']];
+  const TIERS = [['Operador', 1, 5, 'Painel pessoal e missões diárias', 'var(--label-2)'], ['Especialista', 6, 10, 'Desafios semanais e mentoria', 'var(--accent-text)'], ['Estrategista', 11, 15, 'Acesso antecipado a leads inbound', 'var(--pink)'], ['Elite', 16, 20, 'Destaque mensal na organização', 'var(--accent)'], ['Vanguarda', 21, 25, 'Participa da definição de metas', 'var(--orange)'], ['Cosmos', 26, 30, 'Recompensa definida pela empresa', 'var(--label-2)']];
   const XP_PER_LEVEL = 3000;
   const ACTIVITY_CAP = 5;
 
@@ -123,7 +123,7 @@
     counted: (key) => O().counters[key + ':' + Orb.today()] || 0,
     activityXp(xp = 10) { const n = Orb.count('activity'); if (n > ACTIVITY_CAP) return 0; Orb.award('act-' + Orb.today() + '-' + n, xp); return xp; },
 
-    person(i) { if (i === 'CA') return { n: db.profile.name, c: SEED.colors.CA }; const p = O().people.find((x) => x.i === i); return p ? { n: p.n, c: p.c } : { n: i, c: '#9AADC1' }; },
+    person(i) { if (i === 'CA') return { n: db.profile.name, c: SEED.colors.CA }; const p = O().people.find((x) => x.i === i); return p ? { n: p.n, c: p.c } : { n: i, c: 'var(--accent)' }; },
     feed(item) { O().feed.unshift(Object.assign({ ts: Date.now(), xp: 0 }, item)); },
     ranking() {
       const list = O().people.map((p) => ({ name: Orb.person(p.i).n, ini: p.i === 'CA' ? Orb.ini(db.profile.name) : p.i, color: p.c, sub: (p.i === 'CA' ? 'Você · ' : p.role + ' · ') + p.sq, season: p.i === 'CA' ? Orb.season() : p.season, me: p.i === 'CA' }));
@@ -236,11 +236,11 @@
 
     // Suporte
     slaInfo(t) {
-      if (t.status === 'resolved') return { txt: t.inSla ? 'Cumprido' : 'Fora do SLA', c: t.inSla ? '#5ADFA4' : '#FF7A8A', w: '100%', min: 0 };
+      if (t.status === 'resolved') return { txt: t.inSla ? 'Cumprido' : 'Fora do SLA', c: t.inSla ? 'var(--accent-text)' : 'var(--orange)', w: '100%', min: 0 };
       const min = Math.round((t.due - Date.now()) / 60000);
-      if (min <= 0) return { txt: 'Vencido', c: '#FF7A8A', w: '100%', min };
+      if (min <= 0) return { txt: 'Vencido', c: 'var(--orange)', w: '100%', min };
       const txt = min < 60 ? min + ' min' : Math.floor(min / 60) + 'h' + (min % 60 ? ' ' + pad(min % 60) + 'min' : '');
-      return { txt, c: min < 60 ? '#FF9A62' : min < 240 ? '#F3D06E' : '#5ADFA4', w: Math.max(4, Math.min(100, Math.round((1 - min / t.tot) * 100))) + '%', min };
+      return { txt, c: min < 60 ? 'var(--orange)' : min < 240 ? 'var(--label-2)' : 'var(--accent-text)', w: Math.max(4, Math.min(100, Math.round((1 - min / t.tot) * 100))) + '%', min };
     },
     ticketsOpen: () => O().tickets.filter((t) => t.status === 'open').length + Object.values(O().hidTickets).reduce((a, b) => a + b, 0),
     resolveTicket(id) {
@@ -329,7 +329,7 @@
     createOrg(name) {
       const id = 'o' + Date.now();
       const clean = name.trim();
-      db.orgs[id] = { name: clean, mark: Orb.ini(clean) || 'NO', color: '#5ADFA4', role: 'Admin', plan: 'starter', cycle: 'm', pay: 'c', cardLabel: 'Sem cartão cadastrado',
+      db.orgs[id] = { name: clean, mark: Orb.ini(clean) || 'NO', color: 'var(--accent-text)', role: 'Admin', plan: 'starter', cycle: 'm', pay: 'c', cardLabel: 'Sem cartão cadastrado',
         me: { lvl: 1, xp: 0, season: 0, streak: 0, squad: 'Geral', won: 0, goalWon: 10000, created: 0, createdGoal: 5, acts: 0, actsGoal: 20 },
         k: { wonBase: 0, wonCount: 0, goal: 10000, delta: '', conv: '—', convDelta: '', up: true, sla: '—', first: '—', csat: '—', spark: '0,36 200,36', cycleDays: 0, weekWon: 0, weekVal: 0, weekActs: 0, leadReply: '—' },
         bars: [0, 0, 0, 0, 0], funnels: [{ id: 'b2b', name: 'Vendas' }], hid: {}, deals: [], people: [{ i: 'CA', n: db.profile.name, e: db.profile.email, sq: 'Geral', lv: 1, last: 'agora', tfa: true, c: SEED.colors.CA, role: 'Admin', season: 0 }], hidMembers: 0, invites: [], squads: ['Geral'], squad: { lvl: 1, pct: 0, won: 0, goalWon: 10000, wins: 0, winsGoal: 3, resp: '—', respGoal: '—' }, contactsBase: 0, companies: [], contacts: [], tasks: [], teamToday: [], hidTickets: {}, tickets: [], feed: [], notifications: [], usage: { cosmo: 0, storage: 0 }, invoices: [], perms: clone(SEED.perms), xpLog: {}, audit: [], counters: {}, joined: {}, claimed: {} };
@@ -348,12 +348,17 @@
       const IC = { dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', pipe: 'M3 4h18l-7 8.5V19l-4 2v-8.5z', cont: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', task: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11', sup: 'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z', goal: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3', team: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4', plan: 'M2 5h20v14H2zM2 10h20M6 15h4', chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', wpp: 'M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM11 18h2', org: 'M3 21h18M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17M15 9h3a1 1 0 0 1 1 1v11M9 7h2M9 11h2M9 15h2', user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' };
       const pending = Orb.tasksPending();
       const NAV = [['Main.dc.html', 'Painel', 'dash'], ['Conversas.dc.html', 'Conversas', 'chat'], ['Contatos.dc.html', 'Contatos', 'cont'], ['Pipeline.dc.html', 'Funil de vendas', 'pipe', String(Orb.totals().count)], ['Tarefas.dc.html', 'Tarefas', 'task', pending ? String(pending) : ''], ['Instancias.dc.html', 'Instâncias WhatsApp', 'wpp'], ['Metas.dc.html', 'Metas e conquistas', 'goal'], ['Organizacoes.dc.html', 'Organizações', 'org'], ['Equipe.dc.html', 'Equipe e permissões', 'team'], ['Planos.dc.html', 'Planos e pagamentos', 'plan'], ['Perfil.dc.html', 'Meu perfil', 'user'], ['Suporte.dc.html', 'Suporte interno', 'sup', String(Orb.ticketsOpen())]];
-      const nav = NAV.map((a) => ({ href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === cur ? 'nav on' : 'nav', current: a[0] === cur ? 'page' : false }));
-      // Em telas estreitas as abas rolam na horizontal; deixa a ativa à vista depois do desenho e das fontes, que mudam as larguras.
+      const nav = NAV.map((a) => ({ link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === cur ? 'nav on' : 'nav', current: a[0] === cur ? 'page' : false }));
+      const links = nav.filter((n) => n.link);
+      // No celular a barra .rail rola na horizontal; deixa a tela ativa à vista depois do desenho e das fontes, que mudam as larguras.
       if (typeof document !== 'undefined' && !c._navShown) {
         c._navShown = true;
-        setTimeout(() => document.fonts.ready.then(() => { const n = document.querySelector('.side-nav'), a = n && n.querySelector('.nav.on'); if (a) n.scrollLeft += a.getBoundingClientRect().left - n.getBoundingClientRect().left - 16; }));
+        setTimeout(() => document.fonts.ready.then(() => { const r = document.querySelector('.rail'), a = r && r.querySelector('.rail-btn.on'); if (a && r.scrollWidth > r.clientWidth) r.scrollLeft += a.getBoundingClientRect().left - r.getBoundingClientRect().left - 16; }));
       }
+      const SHORT = { 'Pipeline.dc.html': 'Funil' };
+      // Aparência: o botão do topo alterna automática, clara e escura.
+      const SCH = { auto: ['light', 'Aparência automática', 'M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM12 3v18'], light: ['dark', 'Aparência clara', 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'], dark: ['auto', 'Aparência escura', 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'] };
+      const sch = SCH[db.profile.prefs.scheme] ? db.profile.prefs.scheme : 'auto';
       const o = O();
       const lv = Orb.level();
       const name = db.profile.name;
@@ -363,52 +368,55 @@
         shell: db.collapsed ? 'collapsed' : '', chev: db.collapsed ? 'M9 6l6 6-6 6' : 'M15 6l-6 6 6 6',
         toggle: () => { db.collapsed = !db.collapsed; Orb.save(); c.setState({}); },
         nav, org: orgView, orgOpen: !!s.orgOpen, orgList, toggleOrg: () => c.setState({ orgOpen: !s.orgOpen }),
-        userIni: Orb.ini(name), userPhoto: db.profile.photo ? "background-image:url('" + db.profile.photo + "');background-size:cover;color:transparent;" : '',
+        userName: name, userIni: Orb.ini(name), userPhoto: db.profile.photo ? "background-image:url('" + db.profile.photo + "');background-size:cover;color:transparent;" : '',
         xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
         xpLabel: Orb.num(lv.xp) + ' / ' + Orb.num(lv.max), xpPct: lv.pct + '%', xpLeft: Orb.num(lv.left),
+        rail: links.map((n) => Object.assign({}, n, { cls: n.href === cur ? 'rail-btn on' : 'rail-btn' })),
+        tabs: links.slice(0, 4).map((n) => Object.assign({}, n, { cls: n.href === cur ? 'tab on' : 'tab glass', short: SHORT[n.href] || n.label })),
+        schemeIcon: SCH[sch][2], schemeLabel: SCH[sch][1] + '. Clique para trocar',
+        cycleScheme: () => { db.profile.prefs.scheme = SCH[sch][0]; Orb.save(); if (Orb.applyPrefs) Orb.applyPrefs(); c.setState({}); },
         hasToast: !!s.toast, toast: s.toast || ''
       };
     },
 
     templates: {
-      sidebar: `<aside class="side">
-  <div class="side-head">
-    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04141A" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></div>
-    <div class="hide-c" style="flex:1;min-width:0"><div class="disp" style="font-size:15px;font-weight:700;letter-spacing:.1em">COSMODASH</div><div class="hud" style="font-size:9.5px">CRM · Cosmo IA</div></div>
-    <button class="icob hide-m" onClick="{{toggle}}" aria-label="Recolher ou expandir menu"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chev}}"></path></svg></button>
+      sidebar: `<aside class="rail glass" aria-label="Navegação principal">
+  <sc-for list="{{rail}}" as="n">
+    <a href="{{n.href}}" class="{{n.cls}}" aria-label="{{n.label}}" aria-current="{{n.current}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="tip">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="dot">{{n.badge}}</span></sc-if></a>
+  </sc-for>
+</aside>
+<header class="topbar">
+  <div class="tb-side">
+    <a href="Main.dc.html" class="circle brand-mark" aria-label="CosmoDash: início"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"></ellipse></svg></a>
+    <div class="orgwrap">
+      <button class="org glass" onClick="{{toggleOrg}}" aria-label="Trocar organização" aria-expanded="{{orgOpen}}">
+        <span class="orgmark" style="background:{{org.color}}">{{org.mark}}</span>
+        <span class="org-txt" style="min-width:0"><span class="org-name">{{org.name}}</span><span class="org-sub">{{org.role}} · Plano {{org.planName}}</span></span>
+        <svg class="ico s org-txt" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+      </button>
+      <sc-if value="{{orgOpen}}">
+        <div class="orgmenu">
+          <div class="caption t2" style="padding:6px 8px">Suas organizações</div>
+          <sc-for list="{{orgList}}" as="o">
+            <button class="{{o.cls}}" onClick="{{o.pick}}" style="padding:8px">
+              <span class="orgmark" style="background:{{o.color}}">{{o.mark}}</span>
+              <span style="flex:1;min-width:0"><span class="om-name">{{o.name}}</span><span class="om-sub">{{o.role}} · {{o.plan}}</span></span>
+            </button>
+          </sc-for>
+          <a class="btn ghost sm" href="Organizacoes.dc.html?new=1" style="justify-content:flex-start">+ Nova organização</a>
+        </div>
+      </sc-if>
+    </div>
   </div>
-  <div class="orgwrap">
-    <button class="org" onClick="{{toggleOrg}}" aria-label="Trocar organização" aria-expanded="{{orgOpen}}">
-      <span class="orgmark" style="background:{{org.color}}">{{org.mark}}</span>
-      <span class="hide-c org-txt" style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13.5px">{{org.name}}</span><span style="display:block;font-size:11.5px;color:#9AADC1">{{org.role}} · Plano {{org.planName}}</span></span>
-      <svg class="ico s hide-c org-txt" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
-    </button>
-    <sc-if value="{{orgOpen}}">
-      <div class="glass orgmenu">
-        <div class="hud" style="padding:6px 8px">Suas organizações</div>
-        <sc-for list="{{orgList}}" as="o">
-          <button class="{{o.cls}}" onClick="{{o.pick}}" style="padding:8px">
-            <span class="orgmark" style="background:{{o.color}};width:28px;height:28px;flex-basis:28px;font-size:12px">{{o.mark}}</span>
-            <span style="flex:1;min-width:0"><span style="display:block;font-weight:700;font-size:13px">{{o.name}}</span><span style="display:block;font-size:11px;color:#9AADC1">{{o.role}} · {{o.plan}}</span></span>
-          </button>
-        </sc-for>
-        <a class="btn ghost sm" href="Organizacoes.dc.html?new=1" style="justify-content:flex-start">+ Nova organização</a>
-      </div>
-    </sc-if>
-  </div>
-  <nav class="side-nav" style="display:flex;flex-direction:column;gap:2px">
-    <sc-for list="{{nav}}" as="n">
-      <a href="{{n.href}}" class="{{n.cls}}" title="{{n.label}}" aria-current="{{n.current}}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.d}}"></path></svg><span class="hide-c lbl" style="flex:1">{{n.label}}</span><sc-if value="{{n.hasBadge}}"><span class="hide-c chip" style="height:20px;padding:0 8px;font-size:11px">{{n.badge}}</span></sc-if></a>
-    </sc-for>
+  <nav class="tabs" aria-label="Comercial">
+    <sc-for list="{{tabs}}" as="t"><a href="{{t.href}}" class="{{t.cls}}" aria-current="{{t.current}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{t.d}}"></path></svg><span class="lbl">{{t.short}}</span></a></sc-for>
   </nav>
-  <div class="side-foot" style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
-    <a href="Metas.dc.html" class="glass hide-c hide-m" style="padding:14px;border-radius:16px;text-decoration:none;color:#E7EEF6;display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="hud" style="color:#ADA0FF">{{xpTier}}</span><span class="xp" style="white-space:nowrap">{{xpLabel}}</span></div>
-      <div class="bar vi"><i style="width:{{xpPct}}"></i></div>
-      <div style="font-size:11.5px;color:#9AADC1">Faltam {{xpLeft}} XP para o Nível {{xpNext}}</div>
-    </a>
+  <div class="tb-side end">
+    <a href="Main.dc.html#cosmo-q" class="circle glass" aria-label="Perguntar ao Cosmo"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"></path></svg></a>
+    <button class="circle glass" onClick="{{cycleScheme}}" aria-label="{{schemeLabel}}" title="{{schemeLabel}}"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="{{schemeIcon}}"></path></svg></button>
+    <a href="Perfil.dc.html" class="circle" aria-label="Meu perfil: {{userName}}"><span class="av me" style="width:38px;height:38px;flex-basis:38px;{{userPhoto}}">{{userIni}}</span><span class="status-dot"></span></a>
   </div>
-</aside>`,
+</header>`,
       toast: `<sc-if value="{{hasToast}}"><div class="toast" role="status"><span class="orb" style="width:22px;height:22px;flex-basis:22px" aria-hidden="true"></span><span style="font-weight:700;font-size:13.5px">{{toast}}</span></div></sc-if>`
     }
   };
@@ -422,6 +430,8 @@
     const p = db.profile.prefs;
     document.documentElement.classList.toggle('no-motion', !p.motion);
     document.documentElement.classList.toggle('compact', !!p.compact);
+    // Aparência das telas no padrão Apple: auto segue o sistema; light e dark fixam.
+    document.documentElement.setAttribute('data-color-scheme', p.scheme || 'auto');
   };
   Orb.applyPrefs = applyPrefs;
   applyPrefs();

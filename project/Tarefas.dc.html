@@ -7,7 +7,6 @@
 <script src="./support.js"></script>
 <script src="./data.js"></script>
 <script src="./app.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="./CosmoDash.css">
 </head>
 <body>
@@ -32,12 +31,12 @@
 
       <sc-for list="{{groups}}" as="g">
         <div class="glass" style="padding:16px;display:flex;flex-direction:column;gap:4px">
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 10px"><span class="hud" style="color:{{g.c}}">{{g.name}}</span><span style="font-size:12px;color:#9AADC1">{{g.sum}}</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 10px"><span class="hud" style="color:{{g.c}}">{{g.name}}</span><span style="font-size:12px;color:var(--label-2)">{{g.sum}}</span></div>
           <sc-for list="{{g.items}}" as="t">
             <div style="display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:14px;opacity:{{t.op}};flex-wrap:wrap">
               <button class="{{t.chk}}" onClick="{{t.flip}}" aria-label="{{t.aria}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></button>
-              <span class="disp" style="font-size:13px;color:#5FE0F0;width:44px">{{t.h}}</span>
-              <span style="flex:1 1 160px;min-width:0"><span style="display:block;font-weight:600;font-size:14px;text-decoration:{{t.td}}">{{t.t}}</span><span style="display:block;font-size:12px;color:#9AADC1">{{t.ctx}}</span></span>
+              <span class="disp" style="font-size:13px;color:var(--accent-text);width:44px">{{t.h}}</span>
+              <span style="flex:1 1 160px;min-width:0"><span style="display:block;font-weight:600;font-size:14px;text-decoration:{{t.td}}">{{t.t}}</span><span style="display:block;font-size:12px;color:var(--label-2)">{{t.ctx}}</span></span>
               <span class="{{t.typeCls}}">{{t.type}}</span>
               <sc-if value="{{t.hi}}"><span class="chip or">Alta</span></sc-if>
               <span class="xp" style="width:52px;text-align:right">+{{t.xpShow}}</span>
@@ -46,40 +45,40 @@
           </sc-for>
         </div>
       </sc-for>
-      <sc-if value="{{noGroups}}"><div class="glass" style="padding:32px;text-align:center;color:#9AADC1">Nenhuma tarefa nesta visão.</div></sc-if>
+      <sc-if value="{{noGroups}}"><div class="glass" style="padding:32px;text-align:center;color:var(--label-2)">Nenhuma tarefa nesta visão.</div></sc-if>
     </section>
 
     <aside style="flex:1 1 300px;display:flex;flex-direction:column;gap:16px;min-width:0">
       <div class="glass scan" style="padding:22px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
         <div class="hud">Progresso de hoje</div>
         <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="{{doneN}} de {{totalN}} tarefas concluídas">
-          <circle cx="75" cy="75" r="62" fill="none" stroke="rgba(150,200,255,.1)" stroke-width="10"></circle>
-          <circle cx="75" cy="75" r="62" fill="none" stroke="#5FE0F0" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{dash}}" transform="rotate(-90 75 75)" style="filter:drop-shadow(0 0 8px rgba(95,224,240,.6));transition:stroke-dasharray .4s"></circle>
-          <circle cx="75" cy="75" r="48" fill="none" stroke="rgba(150,200,255,.08)" stroke-width="1" stroke-dasharray="2 5"></circle>
-          <text x="75" y="80" text-anchor="middle" fill="#E7EEF6" font-family="Chakra Petch" font-weight="700" font-size="32">{{doneN}}/{{totalN}}</text>
-          <text x="75" y="102" text-anchor="middle" fill="#9AADC1" font-family="Manrope" font-weight="600" font-size="12">concluídas</text>
+          <circle cx="75" cy="75" r="62" fill="none" stroke-width="10" style="stroke:var(--separator)"></circle>
+          <circle cx="75" cy="75" r="62" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{dash}}" transform="rotate(-90 75 75)" style="stroke:var(--accent);transition:stroke-dasharray .4s"></circle>
+          <circle cx="75" cy="75" r="48" fill="none" stroke-width="1" stroke-dasharray="2 5" style="stroke:var(--separator)"></circle>
+          <text x="75" y="80" text-anchor="middle" font-family="SF Pro Display, system-ui, -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="600" font-size="32" style="fill:var(--label)">{{doneN}}/{{totalN}}</text>
+          <text x="75" y="102" text-anchor="middle" font-family="SF Pro Display, system-ui, -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="600" font-size="12" style="fill:var(--label-2)">concluídas</text>
         </svg>
         <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%">
-          <div style="padding:12px;border-radius:12px;background:rgba(4,8,14,.45)"><div class="xp" style="font-size:20px">+{{xpToday}}</div><div style="font-size:11.5px;color:#9AADC1">XP hoje</div></div>
-          <div style="padding:12px;border-radius:12px;background:rgba(4,8,14,.45)"><div class="disp" style="font-size:20px;font-weight:700;color:#FF9A62">{{streak}} dias</div><div style="font-size:11.5px;color:#9AADC1">sequência</div></div>
+          <div style="padding:12px;border-radius:12px;background:var(--page)"><div class="xp" style="font-size:20px">+{{xpToday}}</div><div style="font-size:11.5px;color:var(--label-2)">XP hoje</div></div>
+          <div style="padding:12px;border-radius:12px;background:var(--page)"><div class="disp" style="font-size:20px;font-weight:600;color:var(--orange)">{{streak}} dias</div><div style="font-size:11.5px;color:var(--label-2)">sequência</div></div>
         </div>
-        <div style="font-size:12.5px;color:#9AADC1;line-height:1.5">{{hint}}</div>
+        <div style="font-size:12.5px;color:var(--label-2);line-height:1.5">{{hint}}</div>
       </div>
 
       <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:12px">
         <h2 class="h2">Equipe hoje</h2>
         <sc-for list="{{team}}" as="m">
-          <div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="font-weight:600">{{m.n}}</span><span style="color:#9AADC1">{{m.p}}</span></div><div class="bar"><i style="width:{{m.w}}"></i></div></div></div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="font-weight:600">{{m.n}}</span><span style="color:var(--label-2)">{{m.p}}</span></div><div class="bar"><i style="width:{{m.w}}"></i></div></div></div>
         </sc-for>
       </div>
 
-      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:#C9D5E1;line-height:1.5">
+      <div class="glass" style="padding:20px;display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--label-2);line-height:1.5">
         <h2 class="h2" style="margin-bottom:4px">Como as tarefas pontuam</h2>
         <div style="display:flex;justify-content:space-between"><span>Ligação ou e-mail registrado</span><span class="xp">+10</span></div>
         <div style="display:flex;justify-content:space-between"><span>Reunião realizada</span><span class="xp">+15</span></div>
         <div style="display:flex;justify-content:space-between"><span>Tarefa de alta prioridade no prazo</span><span class="xp">+20</span></div>
         <div style="display:flex;justify-content:space-between"><span>Fechar o dia com tudo concluído</span><span class="xp">+30</span></div>
-        <div style="color:#7A8EA3;font-size:11.5px">Tarefas concluídas com atraso valem metade. Tarefas apagadas não somam.</div>
+        <div style="color:var(--label-2);font-size:11.5px">Tarefas concluídas com atraso valem metade. Tarefas apagadas não somam.</div>
       </div>
     </aside>
   </div>
@@ -104,7 +103,7 @@ class Component extends DCLogic {
     const groups = order.map((p) => {
       const items = vis.filter((t) => period(t) === p);
       const d = items.filter((t) => t.done).length;
-      return { name: p, c: s.view === 'a' ? '#FF9A62' : '#7A8EA3', sum: d + ' de ' + items.length + ' concluídas', items: items.map((t) => ({
+      return { name: p, c: s.view === 'a' ? 'var(--orange)' : 'var(--label-2)', sum: d + ' de ' + items.length + ' concluídas', items: items.map((t) => ({
         h: t.h, t: t.t, ctx: t.ctx, type: t.type, typeCls: TC[t.type], xpShow: t.date < todayStr ? Math.round(t.xp / 2) : t.xp, hi: !!t.hi && !t.done,
         chk: t.done ? 'chk on' : 'chk', op: t.done ? '.55' : '1', td: t.done ? 'line-through' : 'none', aria: (t.done ? 'Desmarcar ' : 'Concluir ') + t.t,
         flip: () => { const r = Orb.toggleTask(t.id); if (r.done) Orb.flash(this, r.dayBonus ? 'Dia completo! +' + r.xp + ' XP e bônus de +30 XP' : r.xp ? 'Tarefa concluída · +' + r.xp + ' XP' + (r.late ? ' (metade, pela demora)' : '') : 'Tarefa concluída'); else this.setState({}); },

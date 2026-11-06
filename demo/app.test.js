@@ -198,9 +198,14 @@ test('Cosmo entende erros de digitação e outras formas de perguntar, e sugere 
   const r = ask('minhas tarefas');
   assert.ok(r.suggestions.some((x) => x.id === 'atrasadas'));
   assert.ok(!r.suggestions.some((x) => x.id === 'tarefas'));
-  for (const it of Orb.cosmoIntents()) {
+  let total = 0;
+  for (const it of Orb.cosmoIntents('')) {
     const a = Orb.cosmo({ id: it[0], count: false });
     assert.ok(a.title && a.text && Orb.TOPICS[a.topic], it[0]);
-    assert.strictEqual(Orb.cosmo({ text: it[2], count: false }).title, a.title, it[2]);
+    // Cada pergunta pronta (a sugerida e as outras formas) volta para a própria resposta.
+    for (const q of [it[2]].concat((Orb.COSMO_QS[it[0]] || '').split('|').filter(Boolean))) { total++; assert.strictEqual(Orb.cosmo({ text: q, count: false }).intent, it[0], q); }
   }
+  assert.ok(total >= 300, total + ' perguntas prontas');
+  const extra = { 'qual o maior faturamento que eu tive': 'melhorMes', 'em que mes eu mais vendi': 'melhorMes', 'quem ta sem 2fa': 'tfa', 'tenho reuniao amanha': 'amanha', 'valeu cosmo': 'obrigado' };
+  for (const q in extra) assert.strictEqual(ask(q).intent, extra[q], q);
 });

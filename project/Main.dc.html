@@ -212,6 +212,7 @@ class Component extends DCLogic {
   componentWillUnmount() { document.removeEventListener('keydown', this._key); }
   renderVals() {
     const s = this.state;
+    document.documentElement.classList.toggle('cosmo-open', !!s.chatOpen);
     const O = Orb.data(), K = O.k, S = Orb.SEED, T = Orb.totals(), lv = Orb.level();
     const prefs = Orb.profile().prefs;
     const pct = Math.round(T.won / K.goal * 100);

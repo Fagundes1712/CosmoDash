@@ -897,10 +897,12 @@
   applyPrefs();
 
   // Movimento: entrada em onda, números subindo do zero, barras, anéis e linhas se construindo,
-  // e a pílula das abas deslizando entre as opções. "Reduzir movimento" (sistema ou perfil) desliga tudo.
+  // e a pílula das abas deslizando entre as opções. A opção "Animações de interface" do perfil desliga tudo.
   const Motion = (() => {
     const html = document.documentElement;
-    const reduce = () => html.classList.contains('no-motion') || (g.matchMedia && g.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    // Quem decide é a opção "Animações de interface" do perfil (ligada por padrão). O ajuste de animações do
+    // sistema não desliga mais tudo: no Windows ele vem desligado em muitos computadores, e o site ficava parado.
+    const reduce = () => html.classList.contains('no-motion');
     const EASE = 'cubic-bezier(.16,1,.3,1)';
     const WAVE = 'cubic-bezier(.34,1.32,.64,1)';
     const NUM = /\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?/g;

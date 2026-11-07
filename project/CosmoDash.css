@@ -328,7 +328,6 @@ select.inp{appearance:none;cursor:pointer}
 .compact .rowb{padding:6px 10px}
 .compact .tbl td{padding:7px 14px}
 .no-motion *,.no-motion *:before,.no-motion *:after{animation:none!important;transition:none!important}
-@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 
 @media (max-height:780px) and (min-width:761px){.rail{gap:2px;padding:6px}.rail-btn{width:36px;height:36px;flex-basis:36px}}
 @media (max-width:1100px){.split,.tri{grid-template-columns:minmax(0,1fr)}.tabs .lbl{display:none}.tab{padding:0 11px}}

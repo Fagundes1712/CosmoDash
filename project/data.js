@@ -47,6 +47,8 @@
         squads: ['Squad Alfa', 'Squad Ômega', 'Atendimento'],
         squad: { lvl: 9, pct: 64, won: 164300, goalWon: 200000, wins: 6, winsGoal: 8, resp: '9 min', respGoal: '15 min' },
         contactsBase: 1274,
+        // Clientes que já fecharam com a organização: base do histórico de receita da aba Resultados.
+        clients: [['Grupo Lumen', 'Varejo'], ['Solaris Energia', 'Energia'], ['Casa Moura', 'Varejo'], ['Vale Norte Agro', 'Agronegócio'], ['Mosaico Arquitetura', 'Serviços'], ['Brisa Turismo', 'Turismo'], ['Cobalto Sistemas', 'Tecnologia'], ['Lince Transportes', 'Logística'], ['Delta Saúde', 'Saúde'], ['Prisma Educação', 'Educação'], ['Rota Sul Logística', 'Logística'], ['Faro Seguros', 'Financeiro'], ['Ipê Construtora', 'Construção'], ['Maré Alta Pescados', 'Alimentos'], ['Aurea Joias', 'Varejo'], ['Trilha Outdoor', 'Varejo']],
         companies: [['Grupo Lumen', 'Varejo', 'Cliente', 'R$ 186 mil'], ['Solaris Energia', 'Energia', 'Cliente', 'R$ 54 mil'], ['Atlas Engenharia', 'Construção', 'Oportunidade', '—'], ['Polo Têxtil', 'Indústria', 'Oportunidade', '—'], ['Banco Ária', 'Financeiro', 'Oportunidade', '—'], ['Pátio Digital', 'Tecnologia', 'Oportunidade', '—'], ['Ferraz Logística', 'Logística', 'Oportunidade', '—'], ['Clínica Viva', 'Saúde', 'Oportunidade', '—']],
         contacts: [
           k('helena', 'Helena Duarte', 'Dir. Comercial', 'Grupo Lumen', 12, 42, 'CA', ['Cliente', 'Expansão'], 'Pulso caiu 18 pontos em 2 semanas: 12 dias sem contato e tickets abertos. Resolva o suporte antes de falar de preço.'),
@@ -92,6 +94,7 @@
         hidMembers: 19, invites: [], squads: ['Comercial Sul', 'Comercial Norte', 'Atendimento'],
         squad: { lvl: 12, pct: 41, won: 98200, goalWon: 140000, wins: 4, winsGoal: 7, resp: '18 min', respGoal: '20 min' },
         contactsBase: 3180,
+        clients: [['Porto Verde', 'Logística'], ['Serra Foods', 'Alimentos'], ['Granito Engenharia', 'Construção'], ['Rede Uno', 'Varejo'], ['Atol Seguros', 'Financeiro'], ['Fiorde Têxtil', 'Indústria'], ['Mirante Saúde', 'Saúde'], ['Quartzo Tech', 'Tecnologia'], ['Pampa Agro', 'Agronegócio'], ['Nimbus Educação', 'Educação']],
         companies: [['Serra Foods', 'Alimentos', 'Oportunidade', '—'], ['Tríade Seguros', 'Financeiro', 'Oportunidade', '—'], ['Rede Uno', 'Varejo', 'Oportunidade', '—']],
         contacts: [k('luis', 'Luís Vidal', 'Gerente de TI', 'Serra Foods', 2, 71, 'CA', ['Inbound'], 'Pediu comparação com a ferramenta atual. Envie antes da próxima reunião.'), k('caio', 'Caio Rangel', 'CFO', 'Tríade Seguros', 6, 64, 'CA', ['Decisor'], 'Quer proposta com pagamento trimestral.'), k('elisa', 'Elisa Bento', 'COO', 'Rede Uno', 12, 44, 'SV', ['Indicação'], 'Sem resposta há 12 dias. Peça apoio de quem indicou.')],
         tasks: [t(1, 0, '10:00', 'Revisar proposta da Tríade', 'Tríade Seguros · Negociação', 'E-mail', 15, true), t(2, 0, '16:00', 'Ligar para Luís Vidal', 'Serra Foods · Qualificação', 'Ligação', 10), t(3, 1, '09:00', 'Reunião de pipeline', 'Comercial Sul', 'Reunião', 5)],
@@ -115,6 +118,7 @@
         hidMembers: 0, invites: [], squads: ['Franquias'],
         squad: { lvl: 3, pct: 55, won: 54300, goalWon: 90000, wins: 3, winsGoal: 5, resp: '42 min', respGoal: '30 min' },
         contactsBase: 620,
+        clients: [['Franquia Litoral', 'Franquias'], ['Franquia Centro-Oeste', 'Franquias'], ['Franquia Serra', 'Franquias'], ['Franquia Vale', 'Franquias'], ['Franquia Capital', 'Franquias'], ['Franquia Interior', 'Franquias'], ['Franquia Praia', 'Franquias'], ['Franquia Planalto', 'Franquias']],
         companies: [['Franquia Norte', 'Franquias', 'Oportunidade', '—'], ['Franquia Oeste', 'Franquias', 'Oportunidade', '—']],
         contacts: [k('hugo', 'Hugo Paz', 'Investidor', 'Franquia Norte', 15, 36, 'CA', ['Indicação'], 'Parado há 15 dias. Retome com a simulação de retorno.'), k('enzo', 'Enzo Faro', 'Investidor', 'Franquia Oeste', 2, 83, 'CA', ['Decisor'], 'Contrato em revisão. Pergunte sobre o prazo de assinatura.')],
         tasks: [t(1, 0, '11:00', 'Enviar simulação de retorno', 'Franquia Norte · Proposta', 'E-mail', 15), t(2, 1, '14:00', 'Revisar contrato', 'Franquia Oeste · Fechamento', 'Follow-up', 20)],

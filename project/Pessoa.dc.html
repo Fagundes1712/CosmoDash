@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CosmoDash · Perfil</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="./CosmoDash.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">{{crumb}}</div><h1 class="h1">{{title}}</h1></div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <a href="{{backHref}}" class="btn ghost">{{backLabel}}</a>
+      <sc-if value="{{isMe}}"><a href="Perfil.dc.html" class="btn pri">Editar meu perfil</a></sc-if>
+    </div>
+  </header>
+
+  <sc-if value="{{missing}}">
+    <section class="glass card-pad" style="text-align:center;padding:48px 24px"><h2 class="h2">Pessoa não encontrada</h2><p class="small t2" style="margin:8px 0 16px">Ela pode ter saído da organização.</p><a href="Equipe.dc.html" class="btn">Ver a equipe</a></section>
+  </sc-if>
+
+  <sc-if value="{{found}}">
+    <section class="glass" style="padding:24px;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
+      <span class="av" style="width:92px;height:92px;flex-basis:92px;font-size:30px;background:{{p.color}};{{p.photo}}">{{p.ini}}</span>
+      <div style="flex:1 1 240px;min-width:0">
+        <div class="disp" style="font-size:28px;font-weight:600">{{p.name}}</div>
+        <div style="font-size:14px;color:var(--label-2);margin-top:2px">{{p.title}} · {{p.org}} · {{p.squad}}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><span class="chip vi">Nível {{p.lvl}} · {{p.tier}}</span><sc-if value="{{p.streak}}"><span class="chip or">{{p.streak}} dias de sequência</span></sc-if><span class="chip gr">Visto {{p.last}}</span></div>
+      </div>
+      <a href="Metas.dc.html" class="btn">Ver ranking</a>
+    </section>
+
+    <section class="grid-a stats" aria-label="Desempenho">
+      <sc-for list="{{stats}}" as="x">
+        <div class="glass lift stat"><div class="stat-head"><span>{{x.n}}</span><sc-if value="{{x.badge}}"><span class="badge {{x.bc}}">{{x.badge}}</span></sc-if></div><div class="kpi">{{x.v}}</div><div class="caption t2">{{x.sub}}</div></div>
+      </sc-for>
+    </section>
+
+    <div class="split">
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <section class="glass" style="padding:24px;display:flex;flex-direction:column;gap:16px">
+          <h2 class="h2">Dados</h2>
+          <div class="ro-grid">
+            <sc-for list="{{fields}}" as="f"><div><div class="lb">{{f.l}}</div><div class="ro">{{f.v}}</div></div></sc-for>
+          </div>
+        </section>
+
+        <section class="glass" style="padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 class="h2">Negócios abertos</h2><span class="caption t2">{{dealsSub}}</span></div>
+          <sc-if value="{{dealsHidden}}"><div class="small t2">Só gestores e administradores veem os negócios de outras pessoas.</div></sc-if>
+          <sc-if value="{{noDeals}}"><div class="small t2">Nenhum negócio aberto agora.</div></sc-if>
+          <sc-for list="{{deals}}" as="d">
+            <div class="hrow" data-wave><span class="hrow-top"><span style="flex:1;min-width:0"><b class="small">{{d.co}}</b><span class="caption t2"> · {{d.stage}} · {{d.days}}</span></span><b class="small">{{d.v}}</b></span><span class="bar"><i style="width:{{d.w}}"></i></span></div>
+          </sc-for>
+        </section>
+
+        <section class="glass" style="padding:24px;display:flex;flex-direction:column;gap:4px">
+          <h2 class="h2" style="margin-bottom:6px">Atividade recente</h2>
+          <sc-if value="{{noFeed}}"><div class="small t2">Sem atividade registrada nos últimos dias.</div></sc-if>
+          <sc-for list="{{feed}}" as="f"><div class="deal" data-wave><span class="small" style="flex:1">{{f.what}}</span><sc-if value="{{f.xp}}"><span class="xp">+{{f.xp}} XP</span></sc-if><span class="caption t2" style="min-width:64px;text-align:right">{{f.ago}}</span></div></sc-for>
+        </section>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <section class="glass" style="padding:24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+          <div class="hud">Nível</div>
+          <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="Nível {{p.lvl}}, {{p.xpPct}} do próximo">
+            <circle cx="75" cy="75" r="62" fill="none" stroke-width="10" style="stroke:var(--separator)"></circle>
+            <circle cx="75" cy="75" r="62" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{p.ring}}" transform="rotate(-90 75 75)" style="stroke:var(--pink)"></circle>
+            <text x="75" y="70" text-anchor="middle" font-size="12" style="fill:var(--label-2)">Nível</text>
+            <text x="75" y="102" text-anchor="middle" font-weight="600" font-size="38" style="fill:var(--label)">{{p.lvl}}</text>
+          </svg>
+          <div class="small" style="font-weight:600">{{p.tier}}</div>
+          <div class="bar vi" style="height:8px;width:100%"><i style="width:{{p.xpPct}}"></i></div>
+          <div class="caption t2">{{p.xpLine}}</div>
+        </section>
+
+        <sc-if value="{{hasToday}}">
+          <section class="glass" style="padding:24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+            <div class="hud">Progresso de hoje</div>
+            <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="{{today.done}} de {{today.total}} tarefas concluídas">
+              <circle cx="75" cy="75" r="62" fill="none" stroke-width="10" style="stroke:var(--separator)"></circle>
+              <circle cx="75" cy="75" r="62" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{today.dash}}" transform="rotate(-90 75 75)" style="stroke:var(--accent)"></circle>
+              <text x="75" y="80" text-anchor="middle" font-weight="600" font-size="32" style="fill:var(--label)">{{today.done}}/{{today.total}}</text>
+              <text x="75" y="102" text-anchor="middle" font-size="12" style="fill:var(--label-2)">tarefas</text>
+            </svg>
+            <div class="caption t2">{{today.sub}}</div>
+          </section>
+        </sc-if>
+
+        <section class="glass" style="padding:24px;display:flex;flex-direction:column;gap:10px">
+          <h2 class="h2">Ranking da temporada</h2>
+          <sc-for list="{{rank}}" as="r"><a href="{{r.href}}" class="rk-row" data-wave style="background:{{r.bg}}"><span class="small disp" style="width:18px;font-weight:600">{{r.pos}}</span><span class="av sm" style="background:{{r.color}}">{{r.ini}}</span><span class="small" style="flex:1;font-weight:600">{{r.name}}</span><span class="small">{{r.xp}}</span></a></sc-for>
+        </section>
+      </div>
+    </div>
+  </sc-if>
+</main>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null };
+  renderVals() {
+    const S = Orb.SEED, db = Orb.db(), prof = Orb.profile();
+    const oid = db.orgs[Orb.param('o')] ? Orb.param('o') : Orb.orgId();
+    const org = db.orgs[oid], isCur = oid === Orb.orgId();
+    const u = Orb.param('u') || 'CA';
+    const p = org.people.find((x) => x.i === u);
+    const shell = Orb.shell(this, 'Equipe.dc.html');
+    if (!p) return Object.assign(shell, { crumb: 'Equipe', title: 'Perfil', missing: true, found: false, backHref: 'Equipe.dc.html', backLabel: 'Voltar à equipe', isMe: false });
+
+    // Perfil público: o mesmo que a pessoa vê no próprio perfil, sem notificações, preferências e segurança.
+    const me = u === 'CA';
+    const ROLE = { Admin: 'Administração', Gestor: 'Gestão comercial', Vendedor: 'Vendas', Suporte: 'Suporte ao cliente', Leitor: 'Leitura' };
+    const lvNow = me && isCur ? Orb.level() : null;
+    const lvl = lvNow ? lvNow.lvl : me ? org.me.lvl : p.lv;
+    const tier = Orb.TIERS.find((t) => lvl <= t[2]) || Orb.TIERS[5];
+    const season = me ? (isCur ? Orb.season() : org.me.season) : p.season;
+    const xpIn = lvNow ? lvNow.xp : me ? org.me.xp : season % 3000;
+    const xpPct = Math.round(xpIn / 3000 * 1000) / 10;
+    const seasonOf = (x) => (x.i === 'CA' ? (isCur ? Orb.season() : org.me.season) : x.season);
+    const nameOf = (x) => (x.i === 'CA' ? prof.name : x.n);
+    const order = org.people.slice().sort((a, b) => seasonOf(b) - seasonOf(a));
+    const pos = order.findIndex((x) => x.i === u) + 1;
+    const name = nameOf(p);
+    const canAll = me || !!(org.perms.all || [])[S.roles.indexOf(org.role)];
+    const open = org.deals.filter((d) => d.o === u && d.status === 'open');
+    const openSum = open.reduce((a, d) => a + d.v, 0);
+    let won = null;
+    if (isCur) { const cur = Orb.history(1)[0]; const mine = cur.deals.filter((d) => d.o === u); won = { v: mine.reduce((a, d) => a + d.v, 0), n: mine.length, m: cur.m }; }
+    const tt = me && isCur ? (() => { const t = Orb.tasksToday(); return [u, t.filter((x) => x.done).length, t.length]; })() : (org.teamToday || []).find((x) => x[0] === u);
+    const tickets = org.tickets.filter((t) => t.agent === name && t.status === 'open').length + ((org.hidTickets || {})[name] || 0);
+    const feed = org.feed.filter((f) => f.ini === u).slice(0, 6).map((f) => ({ what: (me ? 'Você ' : nameOf(p).split(' ')[0] + ' ') + f.what, xp: f.xp || 0, ago: Orb.ago(f.ts || Date.now()) }));
+
+    return Object.assign(shell, {
+      crumb: 'Equipe · ' + org.name, title: me ? 'Meu perfil público' : 'Perfil de ' + name.split(' ')[0], missing: false, found: true, isMe: me,
+      backHref: 'Equipe.dc.html', backLabel: 'Voltar à equipe',
+      p: {
+        name, ini: me ? Orb.ini(prof.name) : p.i, color: p.c || 'var(--accent)', photo: me && prof.photo ? "background-image:url('" + prof.photo + "');background-size:cover;color:transparent;" : '',
+        title: me ? prof.title : ROLE[p.role] || p.role, org: org.name, squad: p.sq, lvl, tier: tier[0], streak: me ? org.me.streak : 0, last: me ? 'agora' : p.last,
+        ring: (xpPct / 100 * 389.6).toFixed(1) + ' 400', xpPct: xpPct + '%', xpLine: Orb.num(xpIn) + ' de 3.000 XP · faltam ' + Orb.num(3000 - xpIn) + ' para o nível ' + (lvl + 1)
+      },
+      stats: [
+        { n: 'XP da temporada', v: Orb.num(season), sub: 'Temporada ' + Orb.seasonName(), badge: '' },
+        { n: 'Posição no ranking', v: pos + 'º', sub: 'de ' + order.length + ' pessoas em ' + org.name, badge: pos === 1 ? 'líder' : '', bc: 'pos' },
+        { n: won ? 'Ganhos em ' + won.m : 'Negócios abertos', v: won ? Orb.mil(won.v) : String(open.length), sub: won ? Orb.pl(won.n, 'negócio ganho', 'negócios ganhos') : 'no funil', badge: '' },
+        { n: 'Tickets em atendimento', v: String(tickets), sub: tickets ? 'abertos agora' : 'nenhum aberto', badge: '' }
+      ],
+      fields: [
+        { l: 'Nome completo', v: name }, { l: 'Função', v: me ? prof.title : ROLE[p.role] || p.role }, { l: 'E-mail', v: me ? prof.email : p.e },
+        { l: 'Papel na organização', v: p.role }, { l: 'Equipe', v: p.sq }, { l: 'Organização', v: org.name }
+      ],
+      dealsSub: canAll ? Orb.pl(open.length, 'negócio', 'negócios') + ' · ' + Orb.mil(openSum) : '', dealsHidden: !canAll, noDeals: canAll && !open.length,
+      deals: canAll ? open.sort((a, b) => b.v - a.v).map((d) => ({ co: d.co, stage: S.stages[d.st], days: d.d ? 'parado há ' + Orb.pl(d.d, 'dia', 'dias') : 'movido hoje', v: Orb.brl(d.v), w: ((d.st + 1) / S.stages.length * 100) + '%' })) : [],
+      feed, noFeed: !feed.length,
+      hasToday: !!(tt && tt[2]), today: tt ? { done: tt[1], total: tt[2], dash: (tt[2] ? tt[1] / tt[2] * 389.6 : 0).toFixed(1) + ' 400', sub: tt[1] === tt[2] ? 'Tudo concluído hoje' : Orb.pl(tt[2] - tt[1], 'tarefa pendente', 'tarefas pendentes') } : {},
+      rank: order.slice(0, 6).map((x, i) => ({ pos: i + 1, name: nameOf(x), ini: x.i === 'CA' ? Orb.ini(prof.name) : x.i, color: x.c, xp: Orb.num(seasonOf(x)), bg: x.i === u ? 'var(--fill-q)' : 'transparent', href: 'Pessoa.dc.html?u=' + encodeURIComponent(x.i) + (isCur ? '' : '&o=' + oid) }))
+    });
+  }
+}
+</script>
+</body>
+</html>

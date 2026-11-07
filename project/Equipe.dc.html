@@ -42,7 +42,7 @@
         <tbody>
           <sc-for list="{{members}}" as="m">
             <tr>
-              <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div><div style="font-weight:600">{{m.n}}</div><div style="font-size:12px;color:var(--label-2)">{{m.e}}</div></div></div></td>
+              <td><div style="display:flex;align-items:center;gap:10px"><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><div><a class="plink" href="{{m.href}}" style="font-weight:600">{{m.n}}</a><div style="font-size:12px;color:var(--label-2)">{{m.e}}</div></div></div></td>
               <td><sc-if value="{{m.locked}}"><span class="chip cy">{{m.roleLabel}}</span></sc-if><sc-if value="{{m.editable}}"><select class="inp" style="height:36px;width:140px;font-size:13px" value="{{m.role}}" onChange="{{m.setRole}}" aria-label="Papel de {{m.n}}"><option value="Admin">Admin</option><option value="Gestor">Gestor</option><option value="Vendedor">Vendedor</option><option value="Suporte">Suporte</option><option value="Leitor">Leitor</option></select></sc-if></td>
               <td style="color:var(--label-2)">{{m.sq}}</td>
               <td><span class="disp" style="font-weight:600;color:var(--pink)">Nv {{m.lv}}</span></td>
@@ -131,7 +131,7 @@ class Component extends DCLogic {
     const O = Orb.data(), S = Orb.SEED;
     const canUsers = Orb.can('users');
     const name = (p) => Orb.person(p.i).n;
-    const members = O.people.map((m) => ({ i: m.i === 'CA' ? Orb.ini(Orb.profile().name) : m.i, n: name(m), e: m.e, sq: m.sq, lv: m.i === 'CA' ? Orb.level().lvl : m.lv, last: m.last, tfa: m.tfa ? 'Ativo' : 'Pendente', tfaCls: m.tfa ? 'chip gr' : 'chip or', c: m.c, role: m.role,
+    const members = O.people.map((m) => ({ href: 'Pessoa.dc.html?u=' + encodeURIComponent(m.i), i: m.i === 'CA' ? Orb.ini(Orb.profile().name) : m.i, n: name(m), e: m.e, sq: m.sq, lv: m.i === 'CA' ? Orb.level().lvl : m.lv, last: m.last, tfa: m.tfa ? 'Ativo' : 'Pendente', tfaCls: m.tfa ? 'chip gr' : 'chip or', c: m.c, role: m.role,
       locked: m.i === 'CA' || !canUsers, editable: m.i !== 'CA' && canUsers, roleLabel: m.role + (m.i === 'CA' ? ' · você' : ''),
       setRole: (e) => {
         const v = e.target.value;

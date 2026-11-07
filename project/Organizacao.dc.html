@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CosmoDash · Perfil da organização</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="./CosmoDash.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Organizações · Perfil</div><h1 class="h1">{{o.name}}</h1></div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <a href="Organizacoes.dc.html" class="btn ghost">Todas as organizações</a>
+      <sc-if value="{{isCur}}"><a href="Resultados.dc.html" class="btn pri">Ver resultados</a></sc-if>
+      <sc-if value="{{notCur}}"><button class="btn pri" onClick="{{enter}}">Entrar nesta organização</button></sc-if>
+    </div>
+  </header>
+
+  <section class="glass" style="padding:24px;display:flex;gap:22px;align-items:center;flex-wrap:wrap">
+    <span class="orgmark" style="width:92px;height:92px;flex-basis:92px;font-size:30px;background:{{o.color}}">{{o.mark}}</span>
+    <div style="flex:1 1 240px;min-width:0">
+      <div class="disp" style="font-size:28px;font-weight:600">{{o.name}}</div>
+      <div style="font-size:14px;color:var(--label-2);margin-top:2px">{{o.members}} · {{o.squads}} · plano {{o.plan}}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><span class="chip vi">Seu papel: {{o.role}}</span><sc-if value="{{isCur}}"><span class="chip gr">Organização atual</span></sc-if><span class="chip">{{o.cycle}}</span></div>
+    </div>
+  </section>
+
+  <section class="grid-a stats" aria-label="Indicadores da organização">
+    <sc-for list="{{stats}}" as="x">
+      <div class="glass lift stat"><div class="stat-head"><span>{{x.n}}</span><sc-if value="{{x.badge}}"><span class="badge {{x.bc}}">{{x.badge}}</span></sc-if></div><div class="kpi">{{x.v}}</div><div class="caption t2">{{x.sub}}</div><sc-if value="{{x.w}}"><div class="bar"><i style="width:{{x.w}}"></i></div></sc-if></div>
+    </sc-for>
+  </section>
+
+  <div class="split">
+    <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+      <section class="glass card-pad" style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><h2 class="h2">Receita fechada por mês</h2><div class="small t2" style="margin-top:4px">Últimos 6 meses · linha tracejada = meta mensal ({{goal}})</div></div><sc-if value="{{isCur}}"><a href="Resultados.dc.html" class="small">Detalhar ›</a></sc-if></div>
+        <div style="position:relative;height:200px;display:flex;align-items:flex-end;gap:18px;padding:0 4px;border-bottom:1px solid var(--separator)">
+          <div class="meta-line" style="position:absolute;left:0;right:0;bottom:{{metaLine}}"></div>
+          <sc-for list="{{bars}}" as="b"><a href="{{b.href}}" class="mbar" title="{{b.full}}"><span class="caption" style="font-weight:600;color:{{b.lc}}">{{b.v}}</span><div data-grow="y" style="width:min(40px,100%);height:{{b.h}};border-radius:999px;background:{{b.bg}};box-shadow:{{b.sh}}"></div></a></sc-for>
+        </div>
+        <div style="display:flex;gap:18px;padding:0 4px;margin-top:-8px"><sc-for list="{{bars}}" as="b"><span class="caption t2" style="flex:1;text-align:center">{{b.m}}</span></sc-for></div>
+      </section>
+
+      <section class="glass card-pad" style="display:flex;flex-direction:column;gap:12px">
+        <h2 class="h2">Equipes</h2>
+        <sc-for list="{{squads}}" as="q">
+          <div class="hrow" data-wave>
+            <span class="hrow-top"><b class="small" style="flex:1">{{q.name}}</b><span class="caption t2">{{q.n}}</span><b class="small" style="min-width:80px;text-align:right">{{q.xp}} XP</b></span>
+            <span class="hbar"><i data-grow="x" style="width:{{q.w}};background:var(--s1)"></i></span>
+            <span style="display:flex;gap:4px;flex-wrap:wrap"><sc-for list="{{q.people}}" as="m"><a href="{{m.href}}" class="av sm" style="background:{{m.c}};width:28px;height:28px;flex-basis:28px;text-decoration:none" title="{{m.n}}" aria-label="Perfil de {{m.n}}">{{m.i}}</a></sc-for></span>
+          </div>
+        </sc-for>
+      </section>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+      <section class="glass card-pad" style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h2 class="h2">Pessoas</h2><span class="caption t2">{{peopleSub}}</span></div>
+        <sc-for list="{{people}}" as="m"><a href="{{m.href}}" class="rk-row" data-wave><span class="av sm" style="background:{{m.c}}">{{m.i}}</span><span style="flex:1;min-width:0"><span class="small" style="display:block;font-weight:600">{{m.n}}</span><span class="caption t2" style="display:block">{{m.sub}}</span></span><span class="caption t2">Nível {{m.lv}}</span></a></sc-for>
+      </section>
+
+      <section class="glass card-pad" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h2">Plano e uso</h2><span class="chip">{{o.plan}}</span></div>
+        <sc-for list="{{usage}}" as="x"><div class="hrow"><span class="hrow-top"><span style="flex:1">{{x.n}}</span><b class="small">{{x.v}}</b></span><span class="bar"><i style="width:{{x.w}}"></i></span></div></sc-for>
+      </section>
+    </div>
+  </div>
+</main>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null };
+  renderVals() {
+    const S = Orb.SEED, db = Orb.db(), prof = Orb.profile();
+    const id = db.orgs[Orb.param('o')] ? Orb.param('o') : Orb.orgId();
+    const o = db.orgs[id], isCur = id === Orb.orgId();
+    const plan = S.plans[o.plan];
+    const won = o.k.wonBase + o.deals.filter((d) => d.status === 'won').reduce((a, d) => a + d.v, 0);
+    const seasonOf = (p) => (p.i === 'CA' ? (isCur ? Orb.season() : o.me.season) : p.season);
+    const nameOf = (p) => (p.i === 'CA' ? prof.name : p.n);
+    const iniOf = (p) => (p.i === 'CA' ? Orb.ini(prof.name) : p.i);
+    const href = (p) => 'Pessoa.dc.html?u=' + encodeURIComponent(p.i) + (isCur ? '' : '&o=' + id);
+    const members = o.people.length + (o.hidMembers || 0);
+    const values = (o.bars || []).concat([Math.round(won / 1000)]);
+    const M = Orb.months().slice(-values.length);
+    const scale = Math.max(...values, Math.round((o.k.goal || 0) / 1000), 1) * 1.1;
+    const squadXp = o.squads.map((name) => { const ms = o.people.filter((p) => p.sq === name); return { name, ms, xp: ms.reduce((a, p) => a + seasonOf(p), 0) }; }).sort((a, b) => b.xp - a.xp);
+    const topXp = Math.max(...squadXp.map((q) => q.xp), 1);
+    const lim = plan.limits;
+    const used = o.people.length + (o.hidMembers || 0) + o.invites.length;
+    const contacts = o.contacts.length + (o.contactsBase || 0);
+    const pct = (a, b) => (b ? Math.min(100, Math.round(a / b * 100)) : 12) + '%';
+    const goalPct = o.k.goal ? Math.round(won / o.k.goal * 100) : 0;
+    return Object.assign(Orb.shell(this, 'Organizacoes.dc.html'), {
+      isCur, notCur: !isCur, enter: () => { Orb.setOrg(id); location.href = 'Main.dc.html'; },
+      o: { name: o.name, mark: o.mark, color: o.color, role: o.role, plan: plan.n, members: Orb.pl(members, 'membro', 'membros'), squads: Orb.pl(o.squads.length, 'equipe', 'equipes'), cycle: o.cycle === 'a' ? 'Cobrança anual' : 'Cobrança mensal' },
+      stats: [
+        { n: 'Receita do mês', v: Orb.mil(won), sub: o.k.goal ? goalPct + '% da meta de ' + Orb.mil(o.k.goal) : 'sem meta definida', badge: o.k.delta, bc: /^[-−]/.test(o.k.delta || '') ? 'neg' : 'pos', w: o.k.goal ? Math.min(100, goalPct) + '%' : '' },
+        { n: 'Conversão', v: o.k.conv, sub: 'Lead → ganho, 90 dias', badge: o.k.convDelta, bc: o.k.up ? 'pos' : 'neg', w: '' },
+        { n: 'SLA do suporte', v: o.k.sla, sub: 'CSAT ' + o.k.csat + ' · 1ª resposta ' + o.k.first, badge: '', w: /\d/.test(o.k.sla) ? o.k.sla : '' },
+        { n: 'Negócios ganhos', v: String(o.k.wonCount + o.deals.filter((d) => d.status === 'won').length), sub: 'no mês, ciclo médio de ' + o.k.cycleDays + ' dias', badge: '', w: '' }
+      ],
+      goal: Orb.mil(o.k.goal || 0), metaLine: Math.round((o.k.goal || 0) / 1000 / scale * 170) + 'px',
+      bars: values.map((v, i) => { const cur = i === values.length - 1; return { m: M[i], v: v + 'k', full: 'R$ ' + v + ' mil', href: isCur ? 'Resultados.dc.html?m=' + (values.length - 1 - i) : '#', h: Math.round(v / scale * 170) + 'px', bg: cur ? 'var(--bar-cur)' : 'var(--bar)', sh: cur ? 'var(--bar-glow)' : 'none', lc: cur ? 'var(--accent-text)' : 'var(--label-2)' }; }),
+      squads: squadXp.map((q) => ({ name: q.name, n: Orb.pl(q.ms.length, 'pessoa', 'pessoas'), xp: Orb.num(q.xp), w: (q.xp / topXp * 100).toFixed(1) + '%', people: q.ms.map((p) => ({ i: iniOf(p), n: nameOf(p), c: p.c, href: href(p) })) })),
+      peopleSub: o.hidMembers ? Orb.pl(o.people.length, 'pessoa', 'pessoas') + ' em destaque de ' + members : Orb.pl(members, 'pessoa', 'pessoas'),
+      people: o.people.slice().sort((a, b) => seasonOf(b) - seasonOf(a)).map((p) => ({ i: iniOf(p), n: nameOf(p), c: p.c, sub: p.role + ' · ' + p.sq, lv: p.i === 'CA' && isCur ? Orb.level().lvl : p.i === 'CA' ? o.me.lvl : p.lv, href: href(p) })),
+      usage: [
+        { n: 'Usuários', v: lim.seats ? used + ' de ' + lim.seats : used + ' · ilimitado', w: pct(used, lim.seats) },
+        { n: 'Contatos', v: lim.contacts ? Orb.num(contacts) + ' de ' + Orb.num(lim.contacts) : Orb.num(contacts) + ' · ilimitado', w: pct(contacts, lim.contacts) },
+        { n: 'Armazenamento', v: String(o.usage.storage).replace('.', ',') + ' de ' + lim.storage + ' GB', w: pct(o.usage.storage, lim.storage) },
+        { n: 'Consultas ao Cosmo no mês', v: lim.cosmo ? Orb.num(o.usage.cosmo) + ' de ' + Orb.num(lim.cosmo) : Orb.num(o.usage.cosmo) + ' · ilimitado', w: pct(o.usage.cosmo, lim.cosmo) }
+      ]
+    });
+  }
+}
+</script>
+</body>
+</html>

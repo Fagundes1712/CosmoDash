@@ -129,7 +129,7 @@ class Component extends DCLogic {
     const f = s.f || saved;
     const dirty = !!s.f && JSON.stringify(s.f) !== JSON.stringify(saved);
     const on = {}; FIELDS.forEach((k) => { on[k] = (e) => this.setState({ f: Object.assign({}, f, { [k]: e.target.value }), err: '' }); });
-    const PR = [['cosmo', 'Cosmo proativo', 'Sugestões automáticas nos negócios e contatos'], ['compact', 'Modo compacto', 'Mais linhas por tela em tabelas e listas'], ['motion', 'Animações de interface', 'Brilhos e transições; desative para foco total'], ['showLvl', 'Mostrar meu nome no ranking', 'Desativado, você aparece como anônimo'], ['peers', 'Conquistas de colegas', 'Ver no feed quando alguém desbloqueia algo']];
+    const PR = [['cosmo', 'Cosmo proativo', 'Sugestões automáticas nos negócios e contatos'], ['compact', 'Modo compacto', 'Mais linhas por tela em tabelas e listas'], ['motion', 'Animações de interface', 'Entradas em onda, números e gráficos se construindo e troca de abas animada. Desligue se o movimento incomodar'], ['showLvl', 'Mostrar meu nome no ranking', 'Desativado, você aparece como anônimo'], ['peers', 'Conquistas de colegas', 'Ver no feed quando alguém desbloqueia algo']];
     const prefs = PR.map((p) => { const v = !!P.prefs[p[0]]; return { n: p[1], d: p[2], on: v ? 'true' : 'false', cls: v ? 'tog on' : 'tog', flip: () => { P.prefs[p[0]] = !v; Orb.save(); Orb.applyPrefs(); this.setState({}); } }; });
     const CH = ['app', 'e-mail', 'WhatsApp'];
     const NT = [['won', 'Negócio ganho na equipe'], ['risk', 'Negócio meu em risco'], ['tk', 'Ticket do meu cliente'], ['ach', 'Conquista ou nível novo'], ['dig', 'Resumo semanal do Cosmo']];

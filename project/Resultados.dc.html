@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CosmoDash · Resultados</title>
+<script src="./support.js"></script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+<link rel="stylesheet" href="./CosmoDash.css">
+</head>
+<body>
+<template data-dc><x-dc>
+<div class="app {{shell}}">
+<sc-include name="sidebar"></sc-include>
+
+<main class="main">
+  <header class="top" style="justify-content:space-between">
+    <div><div class="hud">Análise · {{org.name}}</div><h1 class="h1">Resultados</h1></div>
+    <div class="seg" role="group" aria-label="Visão" data-scope="main"><sc-for list="{{views}}" as="o"><button class="{{o.cls}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}">{{o.label}}</button></sc-for></div>
+  </header>
+
+  <section class="glass filters" aria-label="Filtros">
+    <sc-if value="{{showPer}}"><div class="fgroup"><span class="caption t2">Período</span><div class="seg" role="group" aria-label="Período" data-scope="main"><sc-for list="{{pers}}" as="o"><button class="{{o.cls}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}">{{o.label}}</button></sc-for></div></div></sc-if>
+    <sc-if value="{{showGrp}}"><div class="fgroup"><span class="caption t2">Agrupar por</span><div class="seg" role="group" aria-label="Agrupar por" data-scope="main"><sc-for list="{{grps}}" as="o"><button class="{{o.cls}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}">{{o.label}}</button></sc-for></div></div></sc-if>
+    <sc-if value="{{showChart}}"><div class="fgroup"><span class="caption t2">Gráfico</span><div class="seg" role="group" aria-label="Tipo de gráfico" data-scope="main"><sc-for list="{{charts}}" as="o"><button class="{{o.cls}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}">{{o.label}}</button></sc-for></div></div></sc-if>
+    <span class="caption t2" style="margin-left:auto">{{hint}}</span>
+  </section>
+
+  <sc-if value="{{empty}}">
+    <section class="glass card-pad" style="text-align:center;padding:48px 24px"><h2 class="h2">Ainda não há negócios ganhos</h2><p class="small t2" style="margin:8px 0 0">Quando a organização fechar o primeiro negócio, os gráficos aparecem aqui.</p></section>
+  </sc-if>
+
+  <!-- Receita fechada por mês -->
+  <sc-if value="{{isRec}}">
+    <section class="grid-a stats" aria-label="Resumo do período">
+      <sc-for list="{{recStats}}" as="x">
+        <div class="glass lift stat"><div class="stat-head"><span>{{x.n}}</span><sc-if value="{{x.badge}}"><span class="badge {{x.bc}}">{{x.badge}}</span></sc-if></div><div class="kpi">{{x.v}}</div><div class="caption t2">{{x.sub}}</div></div>
+      </sc-for>
+    </section>
+
+    <section class="split rsplit">
+      <div class="glass card-pad" style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div><h2 class="h2">Receita fechada por mês</h2><div class="small t2" style="margin-top:4px">Por {{grpName}} · clique num mês para ver o que compõe a barra · linha tracejada = meta mensal ({{goalShort}})</div></div>
+        </div>
+        <div class="legend" role="group" aria-label="Legenda: clique para mostrar ou esconder">
+          <sc-for list="{{legend}}" as="l"><button class="{{l.cls}}" onClick="{{l.toggle}}" aria-pressed="{{l.on}}" title="{{l.title}}"><span class="ldot" style="background:{{l.c}}"></span>{{l.name}}</button></sc-for>
+        </div>
+
+        <sc-if value="{{isStack}}">
+          <div class="rchart" role="group" aria-label="Receita fechada por mês, barras empilhadas">
+            <div class="meta-line" style="position:absolute;left:0;right:0;bottom:{{metaPos}}"><span class="caption warn" style="position:absolute;right:0;top:-20px">Meta</span></div>
+            <sc-for list="{{months}}" as="m">
+              <div class="{{m.cls}}">
+                <span class="rval">{{m.v}}</span>
+                <span class="rstack" data-grow="y" style="height:{{m.h}}">
+                  <sc-for list="{{m.segs}}" as="g"><button class="{{g.cls}}" style="flex:{{g.v}} 1 0;background:{{g.c}}" onClick="{{g.pick}}" aria-label="{{g.tip}}"><span class="vtip">{{g.tip}}</span></button></sc-for>
+                </span>
+                <button class="rlab" onClick="{{m.pick}}" aria-pressed="{{m.sel}}" aria-label="{{m.aria}}">{{m.short}}</button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isLines}}">
+          <div class="lchart">
+            <svg viewBox="0 0 640 240" role="img" aria-label="Receita fechada por mês, linhas por {{grpName}}">
+              <sc-for list="{{grid}}" as="y"><line x1="30" x2="610" y1="{{y.y}}" y2="{{y.y}}" class="gridl"></line><text x="26" y="{{y.ty}}" text-anchor="end" class="axis">{{y.t}}</text></sc-for>
+              <line x1="30" x2="610" y1="{{metaY}}" y2="{{metaY}}" class="goall"></line>
+              <polyline points="{{totalPts}}" class="ln tot" data-draw></polyline>
+              <sc-for list="{{lines}}" as="l"><polyline points="{{l.pts}}" class="{{l.cls}}" style="stroke:{{l.c}}" data-draw></polyline></sc-for>
+              <sc-for list="{{lines}}" as="l"><sc-for list="{{l.dots}}" as="d"><circle cx="{{d.x}}" cy="{{d.y}}" r="{{d.r}}" class="{{d.cls}}" style="fill:{{l.c}}" onClick="{{d.pick}}" data-pop><title>{{d.t}}</title></circle></sc-for></sc-for>
+            </svg>
+            <div class="xlabels"><sc-for list="{{months}}" as="m"><button class="{{m.lcls}}" onClick="{{m.pick}}" aria-pressed="{{m.sel}}" aria-label="{{m.aria}}">{{m.short}}</button></sc-for></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isTable}}">
+          <div class="tblw"><table class="tbl rt">
+            <thead><tr><th>{{grpName}}</th><sc-for list="{{months}}" as="m"><th class="{{m.th}}"><button class="rlab" onClick="{{m.pick}}" aria-pressed="{{m.sel}}">{{m.short}}</button></th></sc-for><th style="text-align:right">Total</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r"><tr><td><span class="ldot" style="background:{{r.c}}"></span>{{r.name}}</td><sc-for list="{{r.cells}}" as="c"><td class="{{c.cls}}">{{c.v}}</td></sc-for><td style="text-align:right;font-weight:600">{{r.total}}</td></tr></sc-for>
+              <tr class="tot"><td>Total</td><sc-for list="{{months}}" as="m"><td class="{{m.td}}">{{m.v}}</td></sc-for><td style="text-align:right">{{periodTotal}}</td></tr>
+            </tbody>
+          </table></div>
+        </sc-if>
+      </div>
+
+      <aside class="glass card-pad detail" data-scene="{{detailKey}}" aria-live="polite">
+        <div class="hud">{{d.label}}</div>
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><div class="kpi" style="font-size:2rem">{{d.total}}</div><sc-if value="{{d.delta}}"><span class="badge {{d.dc}}">{{d.delta}}</span></sc-if></div>
+        <div class="caption t2">{{d.sub}}</div>
+        <div class="bar" style="height:8px"><i style="width:{{d.goalW}}"></i></div>
+        <div class="caption t2" style="margin-top:-6px">{{d.goal}}</div>
+        <div class="hud" style="margin-top:6px">Composição da barra</div>
+        <div class="cbar" aria-hidden="true"><sc-for list="{{d.comp}}" as="c"><span data-grow="x" style="width:{{c.w}};background:{{c.c}}" class="{{c.dim}}"></span></sc-for></div>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{d.comp}}" as="c"><button class="{{c.cls}}" onClick="{{c.pick}}" aria-pressed="{{c.on}}"><span class="ldot" style="background:{{c.c}}"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{c.name}}</span><span class="caption t2">{{c.pct}}</span><b class="small" style="min-width:68px;text-align:right">{{c.v}}</b></button></sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><div class="hud">{{d.dealsTitle}}</div><sc-if value="{{d.focus}}"><button class="btn sm ghost" onClick="{{clearFocus}}">Limpar filtro</button></sc-if></div>
+        <div style="display:flex;flex-direction:column;gap:2px;max-height:320px;overflow:auto">
+          <sc-for list="{{d.deals}}" as="x"><div class="deal" data-wave><span class="ldot" style="background:{{x.c}}"></span><span style="flex:1;min-width:0"><span class="small" style="display:block;font-weight:600">{{x.co}}</span><span class="caption t2" style="display:block">{{x.sub}}</span></span><span style="text-align:right"><span class="small" style="display:block;font-weight:600">{{x.v}}</span><span class="caption t2">{{x.day}}</span></span></div></sc-for>
+        </div>
+      </aside>
+    </section>
+  </sc-if>
+
+  <!-- Receita do mês -->
+  <sc-if value="{{isMes}}">
+    <section class="split rsplit2">
+      <div class="glass card-pad" style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+        <svg width="168" height="168" viewBox="0 0 168 168" role="img" aria-label="{{mes.pct}}% da meta do mês">
+          <circle cx="84" cy="84" r="70" fill="none" stroke-width="12" style="stroke:var(--separator)"></circle>
+          <circle cx="84" cy="84" r="70" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="{{mes.dash}}" transform="rotate(-90 84 84)" style="stroke:var(--accent)"></circle>
+          <text x="84" y="88" text-anchor="middle" font-weight="600" font-size="34" style="fill:var(--label)">{{mes.pct}}%</text>
+          <text x="84" y="110" text-anchor="middle" font-size="12" style="fill:var(--label-2)">da meta</text>
+        </svg>
+        <div style="flex:1 1 220px;display:flex;flex-direction:column;gap:8px;min-width:0">
+          <div class="hud">Receita de {{mes.month}}</div>
+          <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><div class="kpi" style="font-size:2.25rem">{{mes.won}}</div><sc-if value="{{mes.delta}}"><span class="badge {{mes.dc}}">{{mes.delta}}</span></sc-if></div>
+          <div class="small t2">Meta {{mes.goal}} · faltam {{mes.left}}</div>
+          <div class="mini-stats">
+            <div><div class="kpi" style="font-size:1.25rem">{{mes.deals}}</div><div class="caption t2">negócios ganhos</div></div>
+            <div><div class="kpi" style="font-size:1.25rem">{{mes.ticket}}</div><div class="caption t2">ticket médio</div></div>
+            <div><div class="kpi" style="font-size:1.25rem">{{mes.daysLeft}}</div><div class="caption t2">dias restantes</div></div>
+            <div><div class="kpi" style="font-size:1.25rem">{{mes.need}}</div><div class="caption t2">por dia para bater</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="glass card-pad" style="display:flex;flex-direction:column;gap:10px;min-width:0">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2 class="h2">Ritmo do mês</h2><div class="small t2" style="margin-top:4px">Receita acumulada por dia</div></div>
+          <div class="caption t2" style="display:flex;gap:14px;align-items:center"><span class="lkey"><span class="lline" style="background:var(--accent)"></span>{{mes.month}}</span><span class="lkey"><span class="lline dashed"></span>{{mes.prevMonth}}</span></div></div>
+        <svg viewBox="0 0 640 230" role="img" aria-label="Receita acumulada de {{mes.month}} comparada com {{mes.prevMonth}}" class="lchart-svg">
+          <sc-for list="{{mes.grid}}" as="y"><line x1="40" x2="620" y1="{{y.y}}" y2="{{y.y}}" class="gridl"></line><text x="36" y="{{y.ty}}" text-anchor="end" class="axis">{{y.t}}</text></sc-for>
+          <line x1="40" x2="620" y1="{{mes.goalY}}" y2="{{mes.goalY}}" class="goall"></line><text x="620" y="{{mes.goalTy}}" text-anchor="end" class="axis warn-t">Meta</text>
+          <polyline points="{{mes.prevPts}}" class="ln prev" data-draw></polyline>
+          <polygon points="{{mes.area}}" class="larea" data-fade></polygon>
+          <polyline points="{{mes.pts}}" class="ln" style="stroke:var(--accent)" data-draw></polyline>
+          <circle cx="{{mes.todayX}}" cy="{{mes.todayY}}" r="5" style="fill:var(--accent)" data-pop><title>Hoje: {{mes.won}}</title></circle>
+          <sc-for list="{{mes.xl}}" as="x"><text x="{{x.x}}" y="226" text-anchor="middle" class="axis">{{x.t}}</text></sc-for>
+        </svg>
+      </div>
+    </section>
+    <section class="split rsplit">
+      <div class="glass card-pad" style="display:flex;flex-direction:column;gap:12px">
+        <div><h2 class="h2">Por {{grpName}}</h2><div class="small t2" style="margin-top:4px">Clique numa linha para ver só os negócios dela</div></div>
+        <sc-for list="{{mes.by}}" as="b"><button class="{{b.cls}}" onClick="{{b.pick}}" aria-pressed="{{b.on}}"><span class="hrow-top"><span class="ldot" style="background:{{b.c}}"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{b.name}}</span><span class="caption t2">{{b.pct}}</span><b class="small">{{b.v}}</b></span><span class="hbar"><i data-grow="x" style="width:{{b.w}};background:{{b.c}}"></i></span></button></sc-for>
+      </div>
+      <div class="glass card-pad" style="display:flex;flex-direction:column;gap:8px" data-scene="{{mes.key}}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 class="h2">{{mes.dealsTitle}}</h2><sc-if value="{{mes.filtered}}"><button class="btn sm ghost" onClick="{{clearMg}}">Ver todos</button></sc-if></div>
+        <sc-for list="{{mes.list}}" as="x"><div class="deal" data-wave><span class="ldot" style="background:{{x.c}}"></span><span style="flex:1;min-width:0"><span class="small" style="display:block;font-weight:600">{{x.co}}</span><span class="caption t2" style="display:block">{{x.sub}}</span></span><span style="text-align:right"><span class="small" style="display:block;font-weight:600">{{x.v}}</span><span class="caption t2">{{x.day}}</span></span></div></sc-for>
+      </div>
+    </section>
+  </sc-if>
+
+  <!-- Conversão -->
+  <sc-if value="{{isConv}}">
+    <section class="grid-a stats" aria-label="Indicadores de conversão">
+      <sc-for list="{{convStats}}" as="x">
+        <div class="glass lift stat"><div class="stat-head"><span>{{x.n}}</span><sc-if value="{{x.badge}}"><span class="badge {{x.bc}}">{{x.badge}}</span></sc-if></div><div class="kpi">{{x.v}}</div><div class="caption t2">{{x.sub}}</div></div>
+      </sc-for>
+    </section>
+    <section class="split rsplit">
+      <div class="glass card-pad" style="display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div><h2 class="h2">Taxa de conversão por mês</h2><div class="small t2" style="margin-top:4px">Leads que viraram negócio ganho · clique num ponto para ver o mês</div></div>
+        <div class="lchart">
+          <svg viewBox="0 0 640 220" role="img" aria-label="Taxa de conversão mensal">
+            <sc-for list="{{cv.grid}}" as="y"><line x1="30" x2="610" y1="{{y.y}}" y2="{{y.y}}" class="gridl"></line><text x="26" y="{{y.ty}}" text-anchor="end" class="axis">{{y.t}}</text></sc-for>
+            <polygon points="{{cv.area}}" class="larea" style="fill:var(--s7)" data-fade></polygon>
+            <polyline points="{{cv.pts}}" class="ln" style="stroke:var(--s7)" data-draw></polyline>
+            <sc-for list="{{cv.dots}}" as="d"><circle cx="{{d.x}}" cy="{{d.y}}" r="{{d.r}}" class="{{d.cls}}" style="fill:var(--s7)" onClick="{{d.pick}}" data-pop><title>{{d.t}}</title></circle></sc-for>
+            <text x="{{cv.selX}}" y="{{cv.selTy}}" text-anchor="middle" class="axis strong">{{cv.selT}}</text>
+          </svg>
+          <div class="xlabels"><sc-for list="{{months}}" as="m"><button class="{{m.lcls}}" onClick="{{m.pick}}" aria-pressed="{{m.sel}}" aria-label="{{m.aria}}">{{m.short}}</button></sc-for></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px"><h3 class="h2" style="font-size:1rem">Leads e negócios ganhos</h3>
+          <div class="caption t2" style="display:flex;gap:14px"><span class="lkey"><span class="ldot" style="background:var(--s1)"></span>Leads</span><span class="lkey"><span class="ldot" style="background:var(--s3)"></span>Ganhos</span></div></div>
+        <div class="gchart">
+          <sc-for list="{{cv.cols}}" as="c"><button class="{{c.cls}}" onClick="{{c.pick}}" aria-label="{{c.aria}}"><span class="gpair"><i data-grow="y" style="height:{{c.lh}};background:var(--s1)"></i><i data-grow="y" style="height:{{c.wh}};background:var(--s3)"></i></span><span class="caption t2">{{c.short}}</span></button></sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <aside class="glass card-pad detail" data-scene="{{cvKey}}">
+          <div class="hud">{{cv.label}}</div>
+          <div style="display:flex;align-items:baseline;gap:10px"><div class="kpi" style="font-size:2rem">{{cv.rate}}</div><sc-if value="{{cv.delta}}"><span class="badge {{cv.dc}}">{{cv.delta}}</span></sc-if></div>
+          <div class="caption t2">{{cv.sub}}</div>
+          <div class="hud" style="margin-top:6px">Por origem do lead</div>
+          <sc-for list="{{cv.src}}" as="r"><div class="hrow" data-wave><span class="hrow-top"><span style="flex:1">{{r.src}}</span><span class="caption t2">{{r.sub}}</span><b class="small" style="min-width:48px;text-align:right">{{r.rate}}</b></span><span class="hbar"><i data-grow="x" style="width:{{r.w}};background:var(--s7)"></i></span></div></sc-for>
+        </aside>
+        <div class="glass card-pad" style="display:flex;flex-direction:column;gap:10px">
+          <div><h2 class="h2">Funil por etapa</h2><div class="small t2" style="margin-top:4px">Negócios que chegaram a cada etapa, hoje</div></div>
+          <sc-for list="{{stages}}" as="r"><div class="hrow"><span class="hrow-top"><span style="flex:1">{{r.name}}</span><span class="caption t2">{{r.pct}}</span><b class="small" style="min-width:36px;text-align:right">{{r.n}}</b></span><span class="hbar"><i data-grow="x" style="width:{{r.w}};background:var(--s1)"></i></span></div></sc-for>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+</main>
+<sc-include name="toast"></sc-include>
+</div>
+</x-dc></template>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  state = { orgOpen: false, toast: null, v: ['receita', 'mes', 'conv'].includes(Orb.param('v')) ? Orb.param('v') : 'receita', per: 6, grp: 'co', chart: 'stack', sel: null, focus: null, hide: {}, mg: null };
+  renderVals() {
+    const s = this.state, O = Orb.data(), K = O.k;
+    const H = Orb.history(12), last = H.length - 1;
+    const pct1 = (v) => (v * 100).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+    const signed = (v, suf) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + suf;
+    const k1 = (v) => (v >= 1000000 ? (v / 1000000).toFixed(2).replace('.', ',') + ' mi' : Math.round(v / 1000) + 'k');
+    const cap = (t) => t[0].toUpperCase() + t.slice(1);
+    const pad = (n) => String(n).padStart(2, '0');
+
+    // Mês selecionado: vem do clique ou do link do painel (?m=meses atrás).
+    const back = Number(Orb.param('m'));
+    const first = H.length - s.per;
+    let sel = s.sel != null ? s.sel : Orb.param('m') !== null && back >= 0 && back <= last ? last - back : last;
+    if (sel < first) sel = last;
+
+    // Cor fixa por entidade: a ordem vem do total dos 12 meses, então filtrar não repinta ninguém.
+    const GK = { co: (d) => d.co, who: (d) => d.who, src: (d) => d.src, seg: (d) => d.seg };
+    const GN = { co: 'empresa', who: 'vendedor', src: 'origem', seg: 'setor' };
+    const key = GK[s.grp];
+    const tot = {};
+    H.forEach((m) => m.deals.forEach((d) => { const k = key(d); tot[k] = (tot[k] || 0) + d.v; }));
+    const ranked = Object.keys(tot).sort((a, b) => tot[b] - tot[a]);
+    const top = ranked.slice(0, 7);
+    const color = (g) => { const i = top.indexOf(g); return i >= 0 ? 'var(--s' + (i + 1) + ')' : 'var(--s-other)'; };
+    const bucket = (k) => (top.includes(k) ? k : 'Outros');
+    const groups = top.concat(ranked.length > 7 ? ['Outros'] : []);
+    const shown = groups.filter((g) => !s.hide[g]);
+
+    const view = H.slice(first).map((m, j) => {
+      const idx = first + j, sums = {};
+      m.deals.forEach((d) => { const b = bucket(key(d)); if (!s.hide[b]) sums[b] = (sums[b] || 0) + d.v; });
+      return { m, idx, j, sums, total: Object.values(sums).reduce((a, b) => a + b, 0) };
+    });
+    const max = Math.max(K.goal || 0, ...view.map((x) => x.total), 1) * 1.08;
+    const pick = (idx) => () => this.setState({ sel: idx, focus: s.focus });
+    const months = view.map((x) => {
+      const on = x.idx === sel;
+      return {
+        short: cap(x.m.short), v: k1(x.total), h: (x.total / max * 100).toFixed(2) + '%', sel: on ? 'true' : 'false',
+        cls: 'rcol' + (on ? ' on' : '') + (x.idx === last ? ' cur' : ''), lcls: on ? 'xl on' : 'xl', th: on ? 'on' : '', td: on ? 'on num' : 'num',
+        aria: cap(x.m.m) + ' de ' + x.m.y + ': ' + Orb.brl(x.total) + ', ' + Orb.pl(x.m.deals.length, 'negócio', 'negócios'), pick: pick(x.idx),
+        segs: shown.filter((g) => x.sums[g]).map((g) => ({ v: x.sums[g], c: color(g), tip: g + ' · ' + Orb.mil(x.sums[g]), cls: 'rseg' + (s.focus && bucket(s.focus) !== g ? ' dim' : ''), pick: () => this.setState({ sel: x.idx, focus: s.focus === g ? null : g }) }))
+      };
+    });
+
+    // Linhas: um eixo só (R$), uma linha por grupo e o total tracejado.
+    const X = (j) => +(30 + j * (580 / Math.max(1, view.length - 1))).toFixed(1);
+    const Y = (v) => +(214 - v / max * 196).toFixed(1);
+    const grid = [0, 0.25, 0.5, 0.75, 1].map((f) => ({ y: Y(max / 1.08 * f), ty: Y(max / 1.08 * f) + 4, t: k1(max / 1.08 * f) }));
+    const lines = shown.map((g) => ({ c: color(g), cls: 'ln' + (s.focus && bucket(s.focus) !== g ? ' dim' : ''), pts: view.map((x) => X(x.j) + ',' + Y(x.sums[g] || 0)).join(' '),
+      dots: view.map((x) => ({ x: X(x.j), y: Y(x.sums[g] || 0), r: x.idx === sel ? 5.5 : 3.5, cls: 'pt' + (s.focus && bucket(s.focus) !== g ? ' dim' : ''), t: g + ' · ' + cap(x.m.short) + ': ' + Orb.mil(x.sums[g] || 0), pick: () => this.setState({ sel: x.idx, focus: s.focus === g ? null : g }) })) }));
+
+    // Tabela
+    const rows = shown.map((g) => ({ name: g, c: color(g), cells: view.map((x) => ({ v: x.sums[g] ? k1(x.sums[g]) : '—', cls: x.idx === sel ? 'on num' : 'num' })), total: k1(view.reduce((a, x) => a + (x.sums[g] || 0), 0)) }));
+
+    // Painel do mês selecionado: o que compõe a barra.
+    const M = H[sel], P = H[sel - 1];
+    const dsum = {};
+    M.deals.forEach((d) => { const k = key(d); dsum[k] = (dsum[k] || 0) + d.v; });
+    const comp = Object.keys(dsum).sort((a, b) => (top.includes(b) - top.includes(a)) || dsum[b] - dsum[a]).map((g) => ({ name: g, c: color(g), v: Orb.mil(dsum[g]), pct: Math.round(dsum[g] / (M.total || 1) * 100) + '%', w: (dsum[g] / (M.total || 1) * 100).toFixed(2) + '%', on: s.focus === g ? 'true' : 'false', dim: s.focus && s.focus !== g ? 'dim' : '', cls: 'crow' + (s.focus === g ? ' on' : ''), pick: () => this.setState({ focus: s.focus === g ? null : g }) }));
+    const inFocus = (d) => !s.focus || (s.focus === 'Outros' ? bucket(key(d)) === 'Outros' : key(d) === s.focus);
+    const dl = M.deals.filter(inFocus);
+    const delta = P && P.total ? (M.total - P.total) / P.total * 100 : null;
+    const d = {
+      label: cap(M.m) + ' de ' + M.y + (sel === last ? ' · mês atual' : ''), total: Orb.brl(M.total),
+      sub: Orb.pl(M.deals.length, 'negócio ganho', 'negócios ganhos') + ' · ticket médio ' + Orb.mil(M.total / Math.max(1, M.deals.length)),
+      delta: delta == null ? '' : signed(delta, '%') + ' vs ' + P.short, dc: delta >= 0 ? 'pos' : 'neg',
+      goalW: Math.min(100, M.total / (K.goal || 1) * 100).toFixed(1) + '%', goal: K.goal ? Math.round(M.total / K.goal * 100) + '% da meta mensal de ' + Orb.mil(K.goal) : '',
+      comp, focus: !!s.focus, dealsTitle: s.focus ? s.focus + ' em ' + M.short : 'Negócios fechados em ' + M.short,
+      deals: dl.map((x) => ({ co: x.co, sub: x.seg + ' · ' + x.who + ' · ' + x.src, v: Orb.brl(x.v), day: pad(x.day) + '/' + pad(M.mi + 1), c: color(bucket(key(x))) }))
+    };
+
+    // Resumo do período, comparado ao período anterior do mesmo tamanho.
+    const sumP = view.reduce((a, x) => a + x.m.total, 0);
+    const prevP = first >= s.per ? H.slice(first - s.per, first).reduce((a, m) => a + m.total, 0) : 0;
+    const best = view.reduce((a, x) => (x.m.total > a.m.total ? x : a), view[0]);
+    const nDeals = view.reduce((a, x) => a + x.m.deals.length, 0);
+    const pDelta = prevP ? (sumP - prevP) / prevP * 100 : null;
+    const recStats = [
+      { n: 'Receita no período', v: Orb.mil(sumP), sub: 'Últimos ' + s.per + ' meses, com o atual', badge: pDelta == null ? '' : signed(pDelta, '%'), bc: pDelta >= 0 ? 'pos' : 'neg' },
+      { n: 'Média por mês', v: Orb.mil(sumP / s.per), sub: K.goal ? Math.round(sumP / s.per / K.goal * 100) + '% da meta mensal' : '', badge: '' },
+      { n: 'Melhor mês', v: Orb.mil(best.m.total), sub: cap(best.m.m) + ' de ' + best.m.y, badge: '' },
+      { n: 'Negócios ganhos', v: String(nDeals), sub: 'ticket médio ' + Orb.mil(sumP / Math.max(1, nDeals)), badge: '' }
+    ];
+
+    // Receita do mês: ritmo acumulado contra o mês anterior.
+    const C = H[last], PC = H[last - 1];
+    const fullDays = new Date(C.y, C.mi + 1, 0).getDate();
+    const cum = (m, upto) => { const out = []; let acc = 0; for (let dd = 1; dd <= upto; dd++) { acc += m.deals.filter((x) => x.day === dd).reduce((a, x) => a + x.v, 0); out.push(acc); } return out; };
+    const cc = cum(C, C.days), pc = PC ? cum(PC, PC.days) : [];
+    const mmax = Math.max(K.goal || 0, C.total, PC ? PC.total : 0, 1) * 1.08;
+    const MX = (dd) => +(40 + (dd - 1) * (580 / Math.max(1, fullDays - 1))).toFixed(1);
+    const MY = (v) => +(204 - v / mmax * 190).toFixed(1);
+    const pts = cc.map((v, i) => MX(i + 1) + ',' + MY(v)).join(' ');
+    const mg = s.mg;
+    const msum = {};
+    C.deals.forEach((x) => { const k = key(x); msum[k] = (msum[k] || 0) + x.v; });
+    const mby = Object.keys(msum).sort((a, b) => msum[b] - msum[a]);
+    const mlist = C.deals.filter((x) => !mg || key(x) === mg);
+    const leftV = Math.max(0, (K.goal || 0) - C.total), daysLeft = Orb.daysLeftInMonth();
+    const mdelta = PC && PC.total ? (C.total - PC.total) / PC.total * 100 : null;
+    const mes = {
+      key: (mg || 'todos') + s.grp, month: cap(C.m), prevMonth: PC ? cap(PC.m) : '', won: Orb.brl(C.total), goal: Orb.mil(K.goal || 0), left: Orb.mil(leftV),
+      pct: K.goal ? Math.round(C.total / K.goal * 100) : 0, dash: (Math.min(1, C.total / (K.goal || 1)) * 439.8).toFixed(1) + ' 440',
+      delta: mdelta == null ? '' : signed(mdelta, '%') + ' vs ' + (PC ? PC.short : ''), dc: mdelta >= 0 ? 'pos' : 'neg',
+      deals: String(C.deals.length), ticket: Orb.mil(C.total / Math.max(1, C.deals.length)), daysLeft: String(daysLeft), need: leftV ? Orb.mil(leftV / Math.max(1, daysLeft)) : 'meta batida',
+      grid: [0, 0.25, 0.5, 0.75, 1].map((f) => ({ y: MY(mmax / 1.08 * f), ty: MY(mmax / 1.08 * f) + 4, t: k1(mmax / 1.08 * f) })),
+      goalY: MY(K.goal || 0), goalTy: MY(K.goal || 0) - 6,
+      pts, area: pts + ' ' + MX(cc.length) + ',' + MY(0) + ' ' + MX(1) + ',' + MY(0),
+      prevPts: pc.map((v, i) => MX(Math.min(fullDays, i + 1)) + ',' + MY(v)).join(' '),
+      todayX: MX(cc.length), todayY: MY(cc[cc.length - 1] || 0),
+      xl: [1, 5, 10, 15, 20, 25, fullDays].map((dd) => ({ x: MX(dd), t: String(dd) })),
+      by: mby.map((g) => ({ name: g, c: color(g), v: Orb.mil(msum[g]), pct: Math.round(msum[g] / (C.total || 1) * 100) + '%', w: (msum[g] / msum[mby[0]] * 100).toFixed(1) + '%', on: mg === g ? 'true' : 'false', cls: 'hrow btnrow' + (mg === g ? ' on' : mg ? ' dim' : ''), pick: () => this.setState({ mg: mg === g ? null : g }) })),
+      filtered: !!mg, dealsTitle: mg ? mg + ' em ' + C.short : 'Negócios de ' + C.m,
+      list: mlist.map((x) => ({ co: x.co, sub: x.seg + ' · ' + x.who + ' · ' + x.src, v: Orb.brl(x.v), day: pad(x.day) + '/' + pad(C.mi + 1), c: color(bucket(key(x))) }))
+    };
+
+    // Conversão
+    const rmax = Math.max(...view.map((x) => x.m.rate), 0.05) * 1.25;
+    const CY = (r) => +(196 - r / rmax * 180).toFixed(1);
+    const cpts = view.map((x) => X(x.j) + ',' + CY(x.m.rate)).join(' ');
+    const lmax = Math.max(...view.map((x) => x.m.leads), 1);
+    const SM = H[sel], SP = H[sel - 1];
+    const srcMax = Math.max(...SM.bySrc.map((r) => (r.leads ? r.wins / r.leads : 0)), 0.01);
+    const cdelta = SP ? (SM.rate - SP.rate) * 100 : null;
+    const cv = {
+      grid: [0, 0.25, 0.5, 0.75, 1].map((f) => ({ y: CY(rmax / 1.25 * f), ty: CY(rmax / 1.25 * f) + 4, t: Math.round(rmax / 1.25 * f * 100) + '%' })),
+      pts: cpts, area: cpts + ' ' + X(view.length - 1) + ',' + CY(0) + ' ' + X(0) + ',' + CY(0),
+      dots: view.map((x) => ({ x: X(x.j), y: CY(x.m.rate), r: x.idx === sel ? 6 : 4, cls: 'pt', t: cap(x.m.short) + ': ' + pct1(x.m.rate) + ' (' + x.m.deals.length + ' de ' + x.m.leads + ' leads)', pick: pick(x.idx) })),
+      selX: X(sel - first), selTy: CY(SM.rate) - 12, selT: pct1(SM.rate),
+      cols: view.map((x) => ({ short: cap(x.m.short), lh: (x.m.leads / lmax * 100).toFixed(1) + '%', wh: (x.m.deals.length / lmax * 100).toFixed(1) + '%', cls: 'gcol' + (x.idx === sel ? ' on' : ''), aria: cap(x.m.m) + ': ' + x.m.leads + ' leads, ' + x.m.deals.length + ' ganhos', pick: pick(x.idx) })),
+      label: cap(SM.m) + ' de ' + SM.y, rate: pct1(SM.rate), delta: cdelta == null ? '' : signed(cdelta, ' pp'), dc: cdelta >= 0 ? 'pos' : 'neg',
+      sub: SM.deals.length + ' ganhos de ' + SM.leads + ' leads',
+      src: SM.bySrc.map((r) => ({ src: r.src, sub: r.wins + ' de ' + r.leads, rate: r.leads ? pct1(r.wins / r.leads) : '—', w: ((r.leads ? r.wins / r.leads : 0) / srcMax * 100).toFixed(1) + '%' }))
+    };
+    let reach = [];
+    O.funnels.forEach((f) => Orb.funnelStats(f.id).forEach((st, i) => { reach[i] = (reach[i] || 0) + st.count; }));
+    const wonNow = H[last].deals.length;
+    let acc = wonNow;
+    const atLeast = reach.map((_, i) => reach.slice(i).reduce((a, b) => a + b, 0) + wonNow);
+    const stages = Orb.SEED.stages.map((name, i) => ({ name, n: String(atLeast[i]), pct: Math.round(atLeast[i] / (atLeast[0] || 1) * 100) + '%', w: (atLeast[i] / (atLeast[0] || 1) * 100).toFixed(1) + '%' })).concat([{ name: 'Ganho em ' + H[last].short, n: String(acc), pct: Math.round(acc / (atLeast[0] || 1) * 100) + '%', w: (acc / (atLeast[0] || 1) * 100).toFixed(1) + '%' }]);
+    const convStats = [
+      { n: 'Taxa de conversão', v: K.conv, sub: 'Lead → ganho, 90 dias', badge: K.convDelta, bc: K.up ? 'pos' : 'neg' },
+      { n: 'Leads no mês', v: String(H[last].leads), sub: 'Entraram em ' + H[last].m, badge: '' },
+      { n: 'Negócios ganhos', v: String(wonNow), sub: 'Em ' + H[last].m, badge: '' },
+      { n: 'Ciclo médio', v: K.cycleDays + ' dias', sub: 'Do primeiro contato ao ganho', badge: '' }
+    ];
+
+    const opt = (list, cur, set) => list.map(([v, label]) => ({ label, on: cur === v ? 'true' : 'false', cls: cur === v ? 'on' : '', pick: () => this.setState(Object.assign({ [set]: v }, set === 'grp' ? { focus: null, hide: {}, mg: null } : {})) }));
+    const hints = { receita: 'Clique numa barra, num ponto ou numa fatia para detalhar', mes: 'Mês atual até hoje, comparado ao mês anterior', conv: 'Clique num mês para ver a conversão por origem' };
+    return Object.assign(Orb.shell(this, 'Resultados.dc.html'), {
+      views: opt([['receita', 'Receita fechada'], ['mes', 'Receita do mês'], ['conv', 'Conversão']], s.v, 'v'),
+      pers: opt([[3, '3 meses'], [6, '6 meses'], [12, '12 meses']], s.per, 'per'),
+      grps: opt([['co', 'Empresa'], ['who', 'Vendedor'], ['src', 'Origem'], ['seg', 'Setor']], s.grp, 'grp'),
+      charts: opt([['stack', 'Barras'], ['lines', 'Linhas'], ['table', 'Tabela']], s.chart, 'chart'),
+      showPer: s.v !== 'mes', showGrp: s.v !== 'conv', showChart: s.v === 'receita', hint: hints[s.v],
+      empty: !H.some((m) => m.total), isRec: s.v === 'receita' && H.some((m) => m.total), isMes: s.v === 'mes' && H.some((m) => m.total), isConv: s.v === 'conv' && H.some((m) => m.total),
+      isStack: s.chart === 'stack', isLines: s.chart === 'lines', isTable: s.chart === 'table',
+      grpName: GN[s.grp], goalShort: Orb.mil(K.goal || 0), metaPos: (K.goal / max * 100).toFixed(2) + '%', metaY: Y(K.goal || 0),
+      legend: groups.map((g) => ({ name: g, c: color(g), on: s.hide[g] ? 'false' : 'true', title: s.hide[g] ? 'Mostrar ' + g : 'Esconder ' + g, cls: 'lchip' + (s.hide[g] ? ' off' : ''), toggle: () => this.setState({ hide: Object.assign({}, s.hide, { [g]: !s.hide[g] }) }) })),
+      months, grid, lines, totalPts: view.map((x) => X(x.j) + ',' + Y(x.total)).join(' '), rows, periodTotal: k1(view.reduce((a, x) => a + x.total, 0)),
+      d, detailKey: sel + '|' + s.grp + '|' + (s.focus || ''), clearFocus: () => this.setState({ focus: null }),
+      recStats, mes, clearMg: () => this.setState({ mg: null }), cv, cvKey: String(sel), stages, convStats
+    });
+  }
+}
+</script>
+</body>
+</html>

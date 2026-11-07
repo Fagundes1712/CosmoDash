@@ -42,23 +42,23 @@
   </header>
 
   <section class="grid-a" aria-label="Indicadores principais">
-    <div class="glass lift card-pad kpi-card">
+    <a href="Resultados.dc.html?v=mes" class="glass card-pad kpi-card" aria-label="Receita do mês: abrir em Resultados">
       <div class="kpi-head"><span class="kpi-ico" style="--c:var(--amber)"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span><span class="small t2" style="flex:1">Receita do mês</span><sc-if value="{{k.delta}}"><span class="badge {{revTrend}}">{{k.delta}}</span></sc-if></div>
       <div class="kpi-row"><div><div class="kpi">{{k.rev}}</div><div class="caption t2" style="margin-top:4px">{{prevRev}}</div></div><svg class="spark-area" viewBox="0 0 200 36" preserveAspectRatio="none" style="--c:{{revC}}" aria-hidden="true"><polygon class="area" points="{{revArea}}"></polygon><polyline class="line" points="{{revLine}}"></polyline></svg></div>
       <div class="bar"><i style="width:{{k.pctW}}"></i></div>
-      <div class="caption t2">{{k.pct}}% {{k.meta}}</div>
-    </div>
+      <div class="caption t2">{{k.pct}}% {{k.meta}} · ver detalhes ›</div>
+    </a>
     <a href="Pipeline.dc.html" class="glass card-pad kpi-card">
       <div class="kpi-head"><span class="kpi-ico" style="--c:var(--accent)"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z"></path></svg></span><span class="small t2" style="flex:1">Pipeline aberto</span><span class="badge">{{k.dealsShort}}</span></div>
       <div class="kpi">{{k.pipe}}</div>
       <div style="display:flex;gap:3px;height:6px"><sc-for list="{{funnel}}" as="f"><span style="flex:{{f.n}};border-radius:999px;background:{{f.color}}"></span></sc-for></div>
       <div class="caption t2">Ver o funil completo ›</div>
     </a>
-    <div class="glass lift card-pad kpi-card">
+    <a href="Resultados.dc.html?v=conv" class="glass card-pad kpi-card" aria-label="Taxa de conversão: abrir em Resultados">
       <div class="kpi-head"><span class="kpi-ico" style="--c:var(--pink)"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"></path></svg></span><span class="small t2" style="flex:1">Taxa de conversão</span><sc-if value="{{k.convDelta}}"><span class="badge {{convTrend}}">{{k.convDelta}}</span></sc-if></div>
       <div class="kpi-row"><div><div class="kpi">{{k.conv}}</div><div class="caption t2" style="margin-top:4px">Lead → ganho, 90 dias</div></div><svg class="spark-area" viewBox="0 0 200 36" preserveAspectRatio="none" style="--c:{{convC}}" aria-hidden="true"><polygon class="area" points="{{convArea}}"></polygon><polyline class="line" points="{{k.spark}}"></polyline></svg></div>
-      <div class="caption t2">Resposta média a leads: {{k.lead}}</div>
-    </div>
+      <div class="caption t2">Resposta média a leads: {{k.lead}} · ver detalhes ›</div>
+    </a>
     <a href="Suporte.dc.html" class="glass card-pad kpi-card">
       <div class="kpi-head"><span class="kpi-ico" style="--c:var(--teal)"><svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg></span><span class="small t2" style="flex:1">SLA do suporte</span><span class="badge">CSAT {{k.csat}}</span></div>
       <div class="kpi">{{k.sla}}</div>
@@ -70,16 +70,16 @@
   <section class="split">
     <div class="glass card-pad" style="display:flex;flex-direction:column;gap:18px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
-        <div><h2 class="h2">Receita fechada por mês</h2><div class="small t2" style="margin-top:4px">Últimos 6 meses · linha tracejada = meta mensal ({{k.metaShort}})</div></div>
+        <div><h2 class="h2">Receita fechada por mês</h2><div class="small t2" style="margin-top:4px">Últimos 6 meses · linha tracejada = meta mensal ({{k.metaShort}}) · <a href="Resultados.dc.html">clique num mês para detalhar</a></div></div>
         <div class="caption t2" style="display:flex;gap:14px;align-items:center"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:var(--accent)"></span>Mês atual</span><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:var(--fill-q)"></span>Meses anteriores</span></div>
       </div>
       <div style="position:relative;height:230px;display:flex;align-items:flex-end;gap:18px;padding:0 4px;border-bottom:1px solid var(--separator)">
         <div class="meta-line" style="position:absolute;left:0;right:0;bottom:{{metaLine}}"><span class="caption warn" style="position:absolute;right:0;top:-20px">Meta</span></div>
         <sc-for list="{{bars}}" as="b">
-          <div style="flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px" title="{{b.full}}">
+          <a href="{{b.href}}" class="mbar" title="{{b.full}} · ver empresas do mês" aria-label="{{b.full}}: ver o que compõe">
             <span class="caption" style="font-weight:600;color:{{b.lc}}">{{b.v}}</span>
-            <div style="width:min(40px,100%);height:{{b.h}};border-radius:999px;background:{{b.bg}};box-shadow:{{b.sh}}"></div>
-          </div>
+            <div data-grow="y" style="width:min(40px,100%);height:{{b.h}};border-radius:999px;background:{{b.bg}};box-shadow:{{b.sh}}"></div>
+          </a>
         </sc-for>
       </div>
       <div style="display:flex;gap:18px;padding:0 4px;margin-top:-8px"><sc-for list="{{bars}}" as="b"><span class="caption t2" style="flex:1;text-align:center">{{b.m}}</span></sc-for></div>
@@ -136,12 +136,12 @@
         <div class="seg" role="group" aria-label="Ranking por"><button class="{{rkInd}}" onClick="{{showInd}}">Pessoas</button><button class="{{rkTeam}}" onClick="{{showTeam}}">Equipes</button></div>
       </div>
       <sc-for list="{{ranking}}" as="r">
-        <div style="display:flex;align-items:center;gap:12px;padding:6px 10px;border-radius:6px;background:{{r.bg}}">
+        <a href="{{r.href}}" class="rk-row" data-wave style="background:{{r.bg}}" aria-label="{{r.aria}}">
           <span class="small disp" style="width:18px;font-weight:600;color:{{r.pc}}">{{r.pos}}</span>
           <span class="av sm" style="background:{{r.color}}">{{r.ini}}</span>
           <span style="flex:1;min-width:0"><span class="small" style="display:block;font-weight:600">{{r.name}}</span><span class="caption t2" style="display:block">{{r.sub}}</span></span>
           <span class="small" style="font-weight:600">{{r.xp}}</span>
-        </div>
+        </a>
       </sc-for>
       <div class="caption t2" style="margin-top:auto">XP por resultado: negócios ganhos, SLA cumprido e atividades registradas. Visível apenas para sua organização.</div>
     </div>
@@ -220,7 +220,7 @@ class Component extends DCLogic {
     const M = Orb.months();
     const values = O.bars.concat([Math.round(T.won / 1000)]);
     const scale = Math.max(K.goal / 1000, ...values) * 1.04;
-    const bars = values.map((v, i) => { const cur = i === 5; return { m: M[i], v: v + 'k', full: 'R$ ' + v + ' mil', h: Math.round(v / scale * 190) + 'px', bg: cur ? 'var(--bar-cur)' : 'var(--bar)', sh: cur ? 'var(--bar-glow)' : 'none', lc: cur ? 'var(--accent-text)' : 'var(--label-2)' }; });
+    const bars = values.map((v, i) => { const cur = i === 5; return { m: M[i], href: 'Resultados.dc.html?m=' + (5 - i), v: v + 'k', full: 'R$ ' + v + ' mil', h: Math.round(v / scale * 190) + 'px', bg: cur ? 'var(--bar-cur)' : 'var(--bar)', sh: cur ? 'var(--bar-glow)' : 'none', lc: cur ? 'var(--accent-text)' : 'var(--label-2)' }; });
     const metaLine = Math.round(K.goal / 1000 / scale * 190) + 'px';
     // Mini-gráficos (área) dos cartões de indicador, no mesmo quadro 200x36 da série de conversão.
     const lo = Math.min(...values), hi = Math.max(...values);
@@ -250,7 +250,7 @@ class Component extends DCLogic {
     const ranking = (s.rank === 'ind'
       ? Orb.ranking().slice(0, 5).map((r) => (r.me && anon ? Object.assign({}, r, { name: 'Anônimo', ini: '?', sub: 'Você (oculto no ranking)' }) : r))
       : Orb.squads().map((q) => ({ name: q.name, ini: q.ini, color: q.me ? 'var(--accent)' : 'var(--amber)', sub: q.members, season: q.season, me: q.me }))
-    ).map((r, i) => ({ pos: i + 1, name: r.name, ini: r.ini, color: r.color, sub: r.sub, xp: Orb.num(r.season), bg: r.me ? 'var(--fill-q)' : 'transparent', pc: i === 0 ? 'var(--orange)' : 'var(--label-2)' }));
+    ).map((r, i) => ({ pos: i + 1, name: r.name, ini: r.ini, color: r.color, sub: r.sub, xp: Orb.num(r.season), bg: r.me ? 'var(--fill-q)' : 'transparent', pc: i === 0 ? 'var(--orange)' : 'var(--label-2)', href: r.i ? 'Pessoa.dc.html?u=' + encodeURIComponent(r.i) : 'Organizacao.dc.html', aria: (r.i ? 'Abrir o perfil de ' : 'Abrir o perfil da organização: ') + r.name }));
 
     const feed = O.feed.filter((f) => prefs.peers || !f.peer).slice(0, 5).map((f) => ({ ini: f.ini === 'CA' ? Orb.ini(Orb.profile().name) : f.ini, color: Orb.person(f.ini).c, who: f.who, what: f.what, xp: '+' + f.xp + ' XP', hasXp: !!f.xp, when: Orb.ago(f.ts) }));
     const today = Orb.tasksToday();

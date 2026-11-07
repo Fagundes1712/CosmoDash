@@ -132,7 +132,7 @@ a.glass:hover,.lift:hover{transform:translateY(-5px);box-shadow:var(--glass-shad
 .pill-ghost .dot{background-color:#ef4444!important;color:#fff!important}
 .pill-ghost .tip{display:none!important}
 .pill-run > .on:not(.pill-ghost){background:none!important;box-shadow:none!important;color:var(--label-2)!important}
-.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.top{position:relative;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:16px}
 .grid-a{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr))}
 .split{display:grid;gap:20px;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}
 .tri{display:grid;gap:20px;grid-template-columns:repeat(3,minmax(0,1fr))}

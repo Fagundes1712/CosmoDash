@@ -25,7 +25,7 @@
         <div style="display:flex;gap:12px;align-items:center"><span class="orgmark" style="background:{{o.color}};width:44px;height:44px;flex-basis:44px;font-size:16px">{{o.mark}}</span><div><div style="font-weight:600;font-size:15px">{{o.name}}</div><div style="font-size:12px;color:var(--label-2)">{{o.role}} · Plano {{o.plan}}</div></div></div>
         <div style="display:flex;gap:16px;font-size:12.5px;color:var(--label-2)"><span><b style="color:var(--label)">{{o.members}}</b> membros</span><span><b style="color:var(--label)">{{o.deals}}</b> negócios abertos</span></div>
         <sc-if value="{{o.isCur}}"><span class="chip gr" style="align-self:flex-start">Organização atual</span></sc-if>
-        <sc-if value="{{o.canEnter}}"><button class="btn sm" onClick="{{o.enter}}" style="align-self:flex-start">Entrar nesta organização</button></sc-if>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto"><a class="btn sm" href="{{o.href}}">Ver perfil</a><sc-if value="{{o.canEnter}}"><button class="btn sm ghost" onClick="{{o.enter}}">Entrar nesta organização</button></sc-if></div>
       </div>
     </sc-for>
     <button class="glass" onClick="{{openOrg}}" style="padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;border-style:dashed;color:var(--label-2);cursor:pointer;min-height:170px;font:inherit">
@@ -57,7 +57,7 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
     const S = Orb.SEED, db = Orb.db();
-    const orgs = Object.keys(db.orgs).map((id) => { const o = db.orgs[id]; return { name: o.name, mark: o.mark, color: o.color, role: o.role, plan: S.plans[o.plan].n, members: Orb.orgMembers(o), deals: o.deals.filter((d) => d.status === 'open').length + Object.values(o.hid).flat().reduce((a, h) => a + h[0], 0), isCur: id === db.org, canEnter: id !== db.org, bd: id === db.org ? 'var(--accent)' : 'var(--fill-q)', enter: () => { Orb.setOrg(id); location.href = 'Organizacoes.dc.html'; } }; });
+    const orgs = Object.keys(db.orgs).map((id) => { const o = db.orgs[id]; return { href: 'Organizacao.dc.html?o=' + id, name: o.name, mark: o.mark, color: o.color, role: o.role, plan: S.plans[o.plan].n, members: Orb.orgMembers(o), deals: o.deals.filter((d) => d.status === 'open').length + Object.values(o.hid).flat().reduce((a, h) => a + h[0], 0), isCur: id === db.org, canEnter: id !== db.org, bd: id === db.org ? 'var(--accent)' : 'var(--fill-q)', enter: () => { Orb.setOrg(id); location.href = 'Organizacoes.dc.html'; } }; });
     return Object.assign(Orb.shell(this, 'Organizacoes.dc.html'), {
       orgs, orgN: orgs.length,
       orgFormOpen: s.orgForm, orgName: s.orgName, hasOrgErr: s.orgErr, openOrg: () => this.setState({ orgForm: true, orgName: '', orgErr: false }), closeOrg: () => this.setState({ orgForm: false }), onOrgName: (e) => this.setState({ orgName: e.target.value }),

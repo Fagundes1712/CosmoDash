@@ -5,10 +5,10 @@ const Orb = require('../project/app.js');
 
 const fresh = (org = 'v') => { Orb.reset(); Orb.db().org = org; return Orb.data(); };
 
-test('menu tem as 13 abas na ordem, cada uma com tela, e marca só a ativa', () => {
+test('menu tem as 14 abas na ordem, cada uma com tela, e marca só a ativa', () => {
   fresh();
   const { nav } = Orb.shell({ state: {} }, 'Tarefas.dc.html');
-  assert.deepStrictEqual(nav.map((n) => n.label), ['Painel', 'Conversas', 'Contatos', 'Funil de vendas', 'Tarefas', 'Respostas do Cosmo', 'Instâncias WhatsApp', 'Metas e conquistas', 'Organizações', 'Equipe e permissões', 'Planos e pagamentos', 'Meu perfil', 'Suporte interno']);
+  assert.deepStrictEqual(nav.map((n) => n.label), ['Painel', 'Resultados', 'Conversas', 'Contatos', 'Funil de vendas', 'Tarefas', 'Respostas do Cosmo', 'Instâncias WhatsApp', 'Metas e conquistas', 'Organizações', 'Equipe e permissões', 'Planos e pagamentos', 'Meu perfil', 'Suporte interno']);
   for (const n of nav) {
     assert.ok(require('fs').existsSync(require('path').join(__dirname, '..', 'project', n.href)), n.href);
     assert.ok(n.d, n.label);
@@ -208,4 +208,36 @@ test('Cosmo entende erros de digitação e outras formas de perguntar, e sugere 
   assert.ok(total >= 300, total + ' perguntas prontas');
   const extra = { 'qual o maior faturamento que eu tive': 'melhorMes', 'em que mes eu mais vendi': 'melhorMes', 'quem ta sem 2fa': 'tfa', 'tenho reuniao amanha': 'amanha', 'valeu cosmo': 'obrigado' };
   for (const q in extra) assert.strictEqual(ask(q).intent, extra[q], q);
+});
+
+test('histórico de Resultados bate com o painel e não muda entre leituras', () => {
+  fresh();
+  const H = Orb.history(12);
+  assert.strictEqual(H.length, 12);
+  const O = Orb.data();
+  // Os 5 meses anteriores são as barras do painel; o mês atual é a receita ganha até agora.
+  assert.deepStrictEqual(H.slice(6, 11).map((m) => m.total / 1000), O.bars);
+  assert.strictEqual(H[11].total, Orb.totals().won);
+  assert.strictEqual(H[11].deals.length, O.k.wonCount);
+  for (const m of H) assert.strictEqual(m.deals.reduce((a, d) => a + d.v, 0), m.total, m.key);
+  assert.ok(H[11].deals.some((d) => d.co === 'Solaris Energia' && d.v === 54000), 'vitória do feed entra no mês atual');
+  assert.strictEqual(Math.round(H[11].rate * 1000), 246);
+  assert.deepStrictEqual(Orb.history(12).map((m) => m.total), H.map((m) => m.total));
+});
+
+test('negócio ganho na demonstração entra no mês atual de Resultados', () => {
+  const O = fresh();
+  const before = Orb.history(1)[0];
+  Orb.closeDeal('atlas', 'won');
+  const after = Orb.history(1)[0];
+  assert.strictEqual(after.total, before.total + 62000);
+  assert.ok(after.deals.some((d) => d.co === 'Atlas Engenharia' && d.real));
+  assert.strictEqual(O.deals.find((d) => d.id === 'atlas').status, 'won');
+});
+
+test('ranking leva ao perfil de cada pessoa', () => {
+  fresh();
+  const r = Orb.ranking();
+  assert.ok(r.every((x) => x.i), 'cada linha sabe quem é');
+  assert.ok(r.some((x) => x.i === 'CA' && x.me));
 });

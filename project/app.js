@@ -13,6 +13,8 @@
   const unaccent = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '');
   const TIERS = [['Operador', 1, 5, 'Painel pessoal e missões diárias', 'var(--label-2)'], ['Especialista', 6, 10, 'Desafios semanais e mentoria', 'var(--accent-text)'], ['Estrategista', 11, 15, 'Acesso antecipado a leads inbound', 'var(--pink)'], ['Elite', 16, 20, 'Destaque mensal na organização', 'var(--accent)'], ['Vanguarda', 21, 25, 'Participa da definição de metas', 'var(--orange)'], ['Cosmos', 26, 30, 'Recompensa definida pela empresa', 'var(--label-2)']];
   const XP_PER_LEVEL = 3000;
+  // Sorteio determinístico (mulberry32): o mesmo mês da mesma organização gera sempre os mesmos números.
+  const rng = (seed) => { let h = 1779033703; for (const ch of String(seed)) h = Math.imul(h ^ ch.charCodeAt(0), 3432918353), h = (h << 13) | (h >>> 19); let a = h >>> 0; return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
   const ACTIVITY_CAP = 5;
 
   function seedOrg(o) {
@@ -126,7 +128,7 @@
     person(i) { if (i === 'CA') return { n: db.profile.name, c: SEED.colors.CA }; const p = O().people.find((x) => x.i === i); return p ? { n: p.n, c: p.c } : { n: i, c: 'var(--accent)' }; },
     feed(item) { O().feed.unshift(Object.assign({ ts: Date.now(), xp: 0 }, item)); },
     ranking() {
-      const list = O().people.map((p) => ({ name: Orb.person(p.i).n, ini: p.i === 'CA' ? Orb.ini(db.profile.name) : p.i, color: p.c, sub: (p.i === 'CA' ? 'Você · ' : p.role + ' · ') + p.sq, season: p.i === 'CA' ? Orb.season() : p.season, me: p.i === 'CA' }));
+      const list = O().people.map((p) => ({ i: p.i, name: Orb.person(p.i).n, ini: p.i === 'CA' ? Orb.ini(db.profile.name) : p.i, color: p.c, sub: (p.i === 'CA' ? 'Você · ' : p.role + ' · ') + p.sq, season: p.i === 'CA' ? Orb.season() : p.season, me: p.i === 'CA' }));
       return list.sort((a, b) => b.season - a.season);
     },
     squads() {
@@ -703,6 +705,83 @@
       return ans;
     },
 
+    // Resultados: histórico mensal de receita fechada e de conversão.
+    // shortcut: o histórico sai determinístico dos totais do seed (barras do painel e receita do mês); com backend, vem do banco.
+    PALETTE: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6'],
+    SOURCES: ['Inbound · site', 'Indicação', 'Outbound', 'Evento', 'Inbound · webinar'],
+    history(n = 12) {
+      const o = O(), id = db.org, now = new Date();
+      const seedOrg = SEED.orgs[id] || {};
+      const clients = (o.clients || seedOrg.clients || o.companies.map((c) => [c[0], c[1]])).slice();
+      if (!clients.length) clients.push(['Cliente avulso', 'Outros']);
+      const sector = (co) => { const c = clients.find((x) => x[0] === co) || o.companies.find((x) => x[0] === co); return c ? c[1] : 'Outros'; };
+      const sellers = o.people.filter((p) => p.role !== 'Suporte' && p.role !== 'Leitor');
+      const seller = (i) => Orb.person(i).n;
+      const T = Orb.totals();
+      const bars = o.bars || [];
+      const avg = o.k.wonCount ? o.k.wonBase / o.k.wonCount : 25000;
+      const pct = (t) => { const m = String(t || '').replace('−', '-').match(/-?\d+(?:,\d+)?/); return m ? Number(m[0].replace(',', '.')) / 100 : 0; };
+      const conv = pct(o.k.conv), convPrev = conv - pct(o.k.convDelta);
+      const out = [];
+      for (let back = n - 1; back >= 0; back--) {
+        const dt = new Date(now.getFullYear(), now.getMonth() - back, 1);
+        const key = dt.getFullYear() + '-' + pad(dt.getMonth() + 1);
+        const rnd = rng(id + ':' + key);
+        const days = back === 0 ? now.getDate() : new Date(dt.getFullYear(), dt.getMonth() + 1, 0).getDate();
+        let total;
+        if (back === 0) total = T.won;
+        else if (back <= bars.length) total = bars[bars.length - back] * 1000;
+        else total = Math.round((bars[0] || 0) * 1000 * Math.pow(0.95, back - bars.length) * (0.92 + rnd() * 0.12) / 100) * 100;
+        const deals = [];
+        let rest = total, count;
+        if (back === 0) {
+          // Mês atual: negócios ganhos de verdade nesta demonstração, as vitórias do feed e o restante da base.
+          o.deals.filter((d) => d.status === 'won').forEach((d) => { deals.push({ co: d.co, v: d.v, o: d.o, src: d.src, seg: sector(d.co), day: new Date(d.closedAt || Date.now()).getDate(), real: true }); });
+          rest = o.k.wonBase;
+          (seedOrg.feed || []).forEach((f) => { const m = f.ini !== 'CA' && f.what.match(/^ganhou (.+) · R\$ ([\d.]+)/); if (m && Number(m[2].replace(/\./g, '')) < rest) { const v = Number(m[2].replace(/\./g, '')); deals.push({ co: m[1], v, o: f.ini, src: Orb.SOURCES[Math.floor(rnd() * 5)], seg: sector(m[1]), day: Math.max(1, days - 1) }); rest -= v; } });
+          count = Math.max(rest > 0 ? 1 : 0, o.k.wonCount - deals.filter((d) => !d.real).length);
+        } else count = rest > 0 ? Math.max(3, Math.round(total / avg * (0.85 + rnd() * 0.3))) : 0;
+        // Divide um valor em negócios de tamanhos variados, com clientes sem repetir no mês enquanto der.
+        const order = clients.map((c, i) => [rnd(), i]).sort((x, y) => x[0] - y[0]).map((x) => clients[x[1]]);
+        let used = 0;
+        const split = (amount, n, owner) => {
+          if (n <= 0 || amount <= 0) return;
+          const w = Array.from({ length: n }, () => 0.35 + Math.pow(rnd(), 1.6) * 2);
+          const sum = w.reduce((x, y) => x + y, 0);
+          let left = amount;
+          w.forEach((x, i) => {
+            const v = i === n - 1 ? left : Math.max(100, Math.round(amount * x / sum / 100) * 100);
+            left -= v;
+            const c = order[used++ % order.length];
+            const pool = owner === null && back === 0 ? sellers.filter((p) => p.i !== 'CA') : sellers;
+            const who = owner || (pool.length ? pool[Math.floor(rnd() * pool.length)].i : 'CA');
+            deals.push({ co: c[0], v, o: who, src: Orb.SOURCES[Math.floor(rnd() * 5)], seg: c[1], day: 1 + Math.floor(rnd() * days) });
+          });
+        };
+        if (back === 0 && count > 0 && rest > 0) {
+          // A sua parte do mês é a mesma de Metas (receita fechada por você); o resto fica com o time.
+          const mine = Math.min(o.me.won || 0, rest);
+          const myN = mine ? Math.min(count - (rest > mine ? 1 : 0), Math.max(1, Math.round(mine / avg))) : 0;
+          split(mine, myN, 'CA');
+          split(rest - mine, count - myN, sellers.filter((p) => p.i !== 'CA').length ? null : 'CA');
+        } else split(rest, count, null);
+        deals.forEach((d) => { d.who = seller(d.o); });
+        deals.sort((a, b) => b.v - a.v);
+        let rate = back === 0 ? conv : back === 1 ? convPrev : 0;
+        out.push({ key, back, y: dt.getFullYear(), mi: dt.getMonth(), m: MONTHS[dt.getMonth()], short: MONTHS[dt.getMonth()].slice(0, 3), days, total: deals.reduce((a, d) => a + d.v, 0), deals, rate, rnd });
+      }
+      // Conversão mensal: os dois últimos meses vêm do seed (taxa e variação); os anteriores variam pouco em volta deles.
+      for (let i = out.length - 3; i >= 0; i--) { const r = out[i].rnd; out[i].rate = Math.min(0.45, Math.max(0.06, out[i + 1].rate - (r() - 0.45) * 0.03)); }
+      const SHARE = [0.34, 0.14, 0.3, 0.12, 0.1];
+      out.forEach((mo) => {
+        const wins = mo.deals.length;
+        mo.leads = mo.rate > 0 ? Math.max(wins, Math.round(wins / mo.rate)) : wins;
+        mo.bySrc = Orb.SOURCES.map((src, i) => { const w = mo.deals.filter((d) => d.src === src).length; return { src, wins: w, leads: Math.max(w, Math.round(mo.leads * SHARE[i])) }; });
+        delete mo.rnd;
+      });
+      return out;
+    },
+
     // Organizações
     setOrg(id) { db.org = id; db.toast = 'Você está em ' + db.orgs[id].name; Orb.save(); },
     createOrg(name) {
@@ -722,11 +801,12 @@
 
     // Valores do menu lateral e do toast, comuns a todas as telas.
     shell(c, cur) {
+      if (Orb.afterRender) Orb.afterRender();
       if (db.toast) { const t = db.toast; db.toast = null; Orb.save(); setTimeout(() => Orb.flash(c, t)); }
       const s = c.state;
-      const IC = { dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', pipe: 'M3 4h18l-7 8.5V19l-4 2v-8.5z', cont: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', task: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11', sup: 'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z', goal: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3', team: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4', plan: 'M2 5h20v14H2zM2 10h20M6 15h4', chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', wpp: 'M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM11 18h2', org: 'M3 21h18M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17M15 9h3a1 1 0 0 1 1 1v11M9 7h2M9 11h2M9 15h2', cosmo: 'M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 3v4M17 5h4', user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' };
+      const IC = { dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', pipe: 'M3 4h18l-7 8.5V19l-4 2v-8.5z', cont: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', task: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11', sup: 'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z', goal: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3', team: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4', plan: 'M2 5h20v14H2zM2 10h20M6 15h4', chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', wpp: 'M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM11 18h2', org: 'M3 21h18M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17M15 9h3a1 1 0 0 1 1 1v11M9 7h2M9 11h2M9 15h2', cosmo: 'M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 3v4M17 5h4', user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', chart: 'M3 3v18h18M8 16v-5M13 16V8M18 16V5' };
       const pending = Orb.tasksPending();
-      const NAV = [['Main.dc.html', 'Painel', 'dash'], ['Conversas.dc.html', 'Conversas', 'chat'], ['Contatos.dc.html', 'Contatos', 'cont'], ['Pipeline.dc.html', 'Funil de vendas', 'pipe', String(Orb.totals().count)], ['Tarefas.dc.html', 'Tarefas', 'task', pending ? String(pending) : ''], ['Cosmo.dc.html', 'Respostas do Cosmo', 'cosmo'], ['Instancias.dc.html', 'Instâncias WhatsApp', 'wpp'], ['Metas.dc.html', 'Metas e conquistas', 'goal'], ['Organizacoes.dc.html', 'Organizações', 'org'], ['Equipe.dc.html', 'Equipe e permissões', 'team'], ['Planos.dc.html', 'Planos e pagamentos', 'plan'], ['Perfil.dc.html', 'Meu perfil', 'user'], ['Suporte.dc.html', 'Suporte interno', 'sup', String(Orb.ticketsOpen())]];
+      const NAV = [['Main.dc.html', 'Painel', 'dash'], ['Resultados.dc.html', 'Resultados', 'chart'], ['Conversas.dc.html', 'Conversas', 'chat'], ['Contatos.dc.html', 'Contatos', 'cont'], ['Pipeline.dc.html', 'Funil de vendas', 'pipe', String(Orb.totals().count)], ['Tarefas.dc.html', 'Tarefas', 'task', pending ? String(pending) : ''], ['Cosmo.dc.html', 'Respostas do Cosmo', 'cosmo'], ['Instancias.dc.html', 'Instâncias WhatsApp', 'wpp'], ['Metas.dc.html', 'Metas e conquistas', 'goal'], ['Organizacoes.dc.html', 'Organizações', 'org'], ['Equipe.dc.html', 'Equipe e permissões', 'team'], ['Planos.dc.html', 'Planos e pagamentos', 'plan'], ['Perfil.dc.html', 'Meu perfil', 'user'], ['Suporte.dc.html', 'Suporte interno', 'sup', String(Orb.ticketsOpen())]];
       const nav = NAV.map((a) => ({ link: true, href: a[0], label: a[1], d: IC[a[2]], badge: a[3] || '', hasBadge: !!a[3], cls: a[0] === cur ? 'nav on' : 'nav', current: a[0] === cur ? 'page' : false }));
       const links = nav.filter((n) => n.link);
       // No celular a barra .rail rola na horizontal; deixa a tela ativa à vista depois do desenho e das fontes, que mudam as larguras.
@@ -751,7 +831,7 @@
         xpTier: 'Nível ' + lv.lvl + ' · ' + lv.tier, xpNext: lv.lvl + 1,
         xpLabel: Orb.num(lv.xp) + ' / ' + Orb.num(lv.max), xpPct: lv.pct + '%', xpLeft: Orb.num(lv.left),
         rail: links.map((n) => Object.assign({}, n, { cls: n.href === cur ? 'rail-btn on' : 'rail-btn' })),
-        tabs: links.slice(0, 4).map((n) => Object.assign({}, n, { cls: n.href === cur ? 'tab on' : 'tab glass', short: SHORT[n.href] || n.label })),
+        tabs: links.slice(0, 5).map((n) => Object.assign({}, n, { cls: n.href === cur ? 'tab on' : 'tab glass', short: SHORT[n.href] || n.label })),
         schemeIcon: SCH[sch][2], schemeLabel: SCH[sch][1] + '. Clique para trocar',
         cycleScheme: () => { db.profile.prefs.scheme = SCH[sch][0]; Orb.save(); if (Orb.applyPrefs) Orb.applyPrefs(); c.setState({}); },
         hasToast: !!s.toast, toast: s.toast || ''
@@ -782,6 +862,7 @@
               <span style="flex:1;min-width:0"><span class="om-name">{{o.name}}</span><span class="om-sub">{{o.role}} · {{o.plan}}</span></span>
             </button>
           </sc-for>
+          <a class="btn ghost sm" href="Organizacao.dc.html" style="justify-content:flex-start">Perfil da organização</a>
           <a class="btn ghost sm" href="Organizacoes.dc.html?new=1" style="justify-content:flex-start">+ Nova organização</a>
         </div>
       </sc-if>
@@ -814,6 +895,226 @@
   };
   Orb.applyPrefs = applyPrefs;
   applyPrefs();
+
+  // Movimento: entrada em onda, números subindo do zero, barras, anéis e linhas se construindo,
+  // e a pílula das abas deslizando entre as opções. A opção "Animações de interface" do perfil desliga tudo.
+  const Motion = (() => {
+    const html = document.documentElement;
+    // Quem decide é a opção "Animações de interface" do perfil (ligada por padrão). O ajuste de animações do
+    // sistema não desliga mais tudo: no Windows ele vem desligado em muitos computadores, e o site ficava parado.
+    const reduce = () => html.classList.contains('no-motion');
+    const EASE = 'cubic-bezier(.16,1,.3,1)';
+    const WAVE = 'cubic-bezier(.34,1.32,.64,1)';
+    const NUM = /\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?/g;
+    const KINDS = [
+      ['w', '.bar > i, [data-grow="x"]'],
+      ['h', '[data-grow="y"]'],
+      ['ring', 'circle.ring-val, circle[stroke-linecap="round"][stroke-dasharray]'],
+      ['draw', 'polyline.line, polyline.spark, [data-draw]'],
+      ['fade', 'polygon.area, [data-fade]'],
+      ['pop', '[data-pop]'],
+      ['count', '.kpi, [data-count], svg[role="img"] text:not(.axis)']
+    ];
+    const seen = new WeakSet(), last = new WeakMap(), scenes = new WeakMap(), pills = new WeakMap();
+    const running = new WeakMap();
+    let queued = false;
+    const io = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        const job = e.target._motion;
+        if (!job) return;
+        e.target._motion = null;
+        const d = waveDelay(e.target, 0);
+        if (job.kind === 'count') { if (job.node.nodeValue === job.zero) job.node.nodeValue = job.final; countUp(e.target, null, d); }
+        else if (job.anim) { job.anim.effect.updateTiming({ delay: d }); job.anim.play(); }
+      });
+    }) : null;
+
+    const target = (el, kind) => {
+      if (kind === 'w') return el.style.width;
+      if (kind === 'h') return el.style.height;
+      if (kind === 'ring') return el.getAttribute('stroke-dasharray') || '';
+      if (kind === 'count') { const t = textNode(el); return t ? canonical(t) : ''; }
+      if (kind === 'draw') return el.getAttribute('points') || el.getAttribute('d') || '';
+      return '1';
+    };
+    const textNode = (el) => [...el.childNodes].find((n) => n.nodeType === 3 && /\d/.test(n.nodeValue));
+    // Atraso em onda: cresce na diagonal da tela, então a página "acorda" de cima para baixo e da esquerda para a direita.
+    const waveDelay = (el, i) => { const r = el.getBoundingClientRect(); const y = Math.max(0, Math.min(r.top, innerHeight)) / innerHeight, x = Math.max(0, r.left) / innerWidth; return Math.round(90 + y * 380 + x * 220 + (i || 0) * 55); };
+    const inView = (el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && (r.width || r.height); };
+
+    function stop(el) { const a = running.get(el); if (a) { a.forEach((x) => x.cancel && x.cancel()); running.delete(el); } }
+    function keep(el, anim) { const list = running.get(el) || []; list.push(anim); running.set(el, list); if (anim.finished) anim.finished.then(() => running.delete(el), () => {}); }
+
+    // Contagem: cada nó de texto guarda o valor final verdadeiro enquanto conta, para uma nova contagem
+    // (ex.: trocar de mês no meio da animação) nunca tomar um número intermediário como destino.
+    const loops = new WeakMap();
+    const canonical = (node) => { const st = loops.get(node); return st && !st.done && node.nodeValue === st.written ? st.final : node.nodeValue; };
+    function countUp(el, from, delay) {
+      const node = textNode(el);
+      if (!node) return;
+      const final = canonical(node);
+      const tokens = [...final.matchAll(NUM)].map((m) => ({ s: m.index, e: m.index + m[0].length, v: Number(m[0].replace(/\./g, '').replace(',', '.')), dec: (m[0].split(',')[1] || '').length, grp: m[0].includes('.') }));
+      if (!tokens.length) return;
+      let starts = tokens.map(() => 0);
+      if (from != null) { const p = [...String(from).matchAll(NUM)]; if (p.length !== tokens.length) return; starts = p.map((m) => Number(m[0].replace(/\./g, '').replace(',', '.'))); if (starts.every((v, i) => v === tokens[i].v)) return; }
+      const fmt = (p) => { let out = final; for (let i = tokens.length - 1; i >= 0; i--) { const t = tokens[i]; const v = starts[i] + (t.v - starts[i]) * p; out = out.slice(0, t.s) + v.toLocaleString('pt-BR', { minimumFractionDigits: t.dec, maximumFractionDigits: t.dec, useGrouping: t.grp }) + out.slice(t.e); } return out; };
+      const old = loops.get(node);
+      if (old) old.dead = true;
+      const st = { final, written: fmt(0), dead: false, done: false };
+      loops.set(node, st);
+      node.nodeValue = st.written;
+      const dur = 1100, t0 = performance.now() + delay;
+      const tick = (now) => {
+        if (st.dead) return;
+        if (node.nodeValue !== st.written && node.nodeValue !== final) { st.done = true; return; } // a tela mudou o valor: para aqui
+        const p = Math.min(1, Math.max(0, (now - t0) / dur));
+        st.written = p >= 1 ? final : fmt(1 - Math.pow(1 - p, 4));
+        node.nodeValue = st.written;
+        if (p < 1) requestAnimationFrame(tick); else st.done = true;
+      };
+      requestAnimationFrame(tick);
+    }
+
+    // Anima um elemento: do zero (prev null) ou do valor anterior até o atual.
+    function run(el, kind, prev, delay) {
+      stop(el);
+      const opt = { duration: 900, delay, easing: EASE, fill: 'backwards' };
+      let a = null;
+      if (kind === 'count') return countUp(el, prev, delay);
+      if (kind === 'w') a = el.animate([{ width: prev || '0%' }, { width: el.style.width || '100%' }], Object.assign(opt, { duration: 1000 }));
+      else if (kind === 'h') a = prev ? el.animate([{ height: prev }, { height: el.style.height }], opt) : el.animate([{ transform: 'scaleY(0)', transformOrigin: '50% 100%' }, { transform: 'scaleY(1)', transformOrigin: '50% 100%' }], Object.assign(opt, { easing: WAVE, duration: 950 }));
+      else if (kind === 'ring') { const to = el.getAttribute('stroke-dasharray') || ''; const gap = (to.split(/[\s,]+/)[1]) || '1000'; a = el.animate([{ strokeDasharray: prev || '0 ' + gap }, { strokeDasharray: to }], Object.assign(opt, { duration: 1300 })); }
+      else if (kind === 'draw') { if (!el.getTotalLength) return; const L = Math.ceil(el.getTotalLength()) + 1; a = el.animate([{ strokeDasharray: L + ' ' + L, strokeDashoffset: L }, { strokeDasharray: L + ' ' + L, strokeDashoffset: 0 }], Object.assign(opt, { duration: 1200, easing: 'cubic-bezier(.65,0,.35,1)' })); }
+      else if (kind === 'fade') a = el.animate([{ opacity: 0 }, { opacity: 1 }], Object.assign(opt, { delay: delay + 350, duration: 800 }));
+      else if (kind === 'pop') a = el.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], Object.assign(opt, { easing: WAVE, duration: 600, delay: delay + 500 }));
+      if (a) keep(el, a);
+      return a;
+    }
+
+    // Reentrada em onda dos cartões de uma área que acabou de mudar (ex.: Individual ↔ equipe).
+    function rewave(scope, skip) {
+      const cards = [...scope.querySelectorAll('.glass, [data-wave]')].filter((c) => !(skip && (c.contains(skip) || skip.contains(c))) && inView(c));
+      cards.forEach((c, i) => { stop(c); keep(c, c.animate([{ opacity: 0, transform: 'translateY(14px) scale(.985)', filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 650, delay: i * 45, easing: EASE, fill: 'backwards' })); });
+    }
+    function replay(scope, skip) {
+      if (!scope || reduce()) return;
+      KINDS.forEach(([kind, sel]) => [...scope.querySelectorAll(sel)].forEach((el, i) => { if (skip && skip.contains(el)) return; last.set(el, target(el, kind)); if (inView(el)) run(el, kind, null, 80 + i * 45); }));
+      rewave(scope, skip);
+    }
+
+    // Pílula: um clone das opções em cor invertida, recortado no formato da pílula, desliza da opção antiga à nova.
+    // A borda da frente sai primeiro e a de trás alcança depois, como no vídeo de referência.
+    function rel(box, el) { const b = box.getBoundingClientRect(), r = el.getBoundingClientRect(); return { l: r.left - b.left + box.scrollLeft, t: r.top - b.top + box.scrollTop, w: r.width, h: r.height }; }
+    function glide(box, from, to, done) {
+      if (reduce() || !from || !to) { if (done) done(); return; }
+      box.querySelectorAll(':scope > .pill-ghost').forEach((x) => x.remove());
+      // Largura fracionária (getBoundingClientRect): arredondar para baixo faria o texto da última opção quebrar no clone.
+      const bb = box.getBoundingClientRect();
+      const W = Math.max(bb.width, box.scrollWidth + box.clientLeft * 2), H = Math.max(bb.height, box.scrollHeight + box.clientTop * 2);
+      const ghost = box.cloneNode(true);
+      ghost.removeAttribute('id'); ghost.setAttribute('aria-hidden', 'true'); ghost.inert = true;
+      ghost.classList.add('pill-ghost');
+      Object.assign(ghost.style, { left: -box.clientLeft + 'px', top: -box.clientTop + 'px', width: W + 'px', height: H + 'px' });
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const fr = { l: from.l, t: from.t, r: from.l + from.w, b: from.t + from.h }, tr = { l: to.l, t: to.t, r: to.l + to.w, b: to.t + to.h };
+      const right = tr.l > fr.l, down = tr.t > fr.t;
+      const mid = { l: lerp(fr.l, tr.l, right ? 0.15 : 0.9), r: lerp(fr.r, tr.r, right ? 0.9 : 0.15), t: lerp(fr.t, tr.t, down ? 0.15 : 0.9), b: lerp(fr.b, tr.b, down ? 0.9 : 0.15) };
+      const clip = (q) => 'inset(' + q.t + 'px ' + (W - q.r) + 'px ' + (H - q.b) + 'px ' + q.l + 'px round 999px)';
+      box.classList.add('pill-run');
+      box.appendChild(ghost);
+      const a = ghost.animate([{ clipPath: clip(fr) }, { clipPath: clip(mid), offset: 0.45 }, { clipPath: clip(tr) }], { duration: 440, easing: 'cubic-bezier(.45,.05,.25,1)', fill: 'forwards' });
+      // A opção real reaparece por baixo do clone (que ainda a cobre) e só depois o clone sai: sem piscar.
+      const end = () => { box.classList.remove('pill-run'); setTimeout(() => ghost.remove(), 260); if (done) done(); };
+      a.finished.then(end, end);
+    }
+    function pillGroups(root) {
+      [...root.querySelectorAll('.seg, .scheme, .tabs, .rail, [data-pill]')].forEach((box) => {
+        const items = [...box.children].filter((c) => !c.classList.contains('pill-ghost'));
+        const idx = items.findIndex((c) => c.classList.contains('on'));
+        const prev = pills.get(box);
+        const now = idx >= 0 ? rel(box, items[idx]) : null;
+        pills.set(box, { idx, rect: now });
+        if (!prev || prev.idx === idx || prev.idx < 0 || idx < 0) return;
+        glide(box, prev.rect, now);
+        // Trocar de opção num grupo é entrar numa área nova: tudo nela se constrói de novo.
+        if (box.matches('.seg, .scheme, [data-pill]')) {
+          const main = document.querySelector('.main');
+          const scope = box.dataset.scope === 'main' || box.closest('header.top') ? main : box.closest('section, [data-scope-root]') || main;
+          setTimeout(() => replay(scope, box.closest('header.top') || box), 0);
+        }
+      });
+    }
+
+    function scan() {
+      queued = false;
+      const off = reduce();
+      // Áreas marcadas com data-scene: quando o valor muda (outro mês, outra visão), tudo nelas recomeça do zero.
+      [...document.querySelectorAll('[data-scene]')].forEach((el) => { const v = el.getAttribute('data-scene'); const p = scenes.get(el); scenes.set(el, v); if (p !== undefined && p !== v && !off) setTimeout(() => replay(el), 0); });
+      KINDS.forEach(([kind, sel]) => {
+        [...document.querySelectorAll(sel)].forEach((el, i) => {
+          if (el.closest('.pill-ghost')) return;
+          const tgt = target(el, kind);
+          if (!seen.has(el)) {
+            seen.add(el); last.set(el, tgt);
+            if (off) return;
+            if (inView(el)) run(el, kind, null, waveDelay(el, kind === 'h' || kind === 'pop' ? i % 14 : 0));
+            else if (io) {
+              // Fora da tela: fica parado no zero e só se constrói quando aparecer na rolagem.
+              if (kind === 'count') { const t = textNode(el); if (!t) return; const zero = t.nodeValue.replace(NUM, (m) => (m.includes(',') ? '0,' + '0'.repeat(m.split(',')[1].length) : '0')); el._motion = { kind, node: t, final: t.nodeValue, zero }; t.nodeValue = zero; }
+              else { const anim = run(el, kind, null, 0); if (!anim) return; anim.pause(); el._motion = { kind, anim }; }
+              io.observe(el);
+            }
+            return;
+          }
+          const prev = last.get(el);
+          if (prev !== tgt) { last.set(el, tgt); if (!off && kind !== 'draw' && kind !== 'fade' && kind !== 'pop') run(el, kind, prev, 0); }
+        });
+      });
+      pillGroups(document);
+    }
+
+    return {
+      schedule() { if (queued) return; queued = true; requestAnimationFrame(scan); },
+      rel, glide, reduce
+    };
+  })();
+  Orb.afterRender = () => Motion.schedule();
+
+  const html = document.documentElement;
+  // Troca de aba: a pílula desliza até a aba clicada, o conteúdo sai desfocando e a próxima tela entra em onda.
+  let leaving = false;
+  const swaps = [];
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || leaving || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === '_blank' || a.hasAttribute('download')) return;
+    const url = new URL(a.getAttribute('href'), location.href);
+    if (url.origin !== location.origin || !/\.dc\.html$/.test(url.pathname)) return;
+    if (url.pathname === location.pathname && url.search === location.search) return;
+    if (Motion.reduce()) return;
+    e.preventDefault();
+    leaving = true;
+    const file = url.pathname.split('/').pop();
+    let wait = 230;
+    document.querySelectorAll('.tabs, .rail').forEach((box) => {
+      const items = [...box.children].filter((c) => !c.classList.contains('pill-ghost'));
+      const on = items.find((c) => c.classList.contains('on'));
+      const to = items.find((c) => c.getAttribute && (c.getAttribute('href') || '').split(/[?#]/)[0] === file);
+      if (on && to && on !== to) { Motion.glide(box, Motion.rel(box, on), Motion.rel(box, to)); swaps.push([on, to, on.className, to.className]); to.classList.add('on'); on.classList.remove('on'); if (on.classList.contains('tab')) { on.classList.add('glass'); to.classList.remove('glass'); } wait = 380; }
+    });
+    html.classList.add('leaving');
+    setTimeout(() => { location.href = url.href; }, wait);
+  }, true);
+  // Voltar pelo histórico reaproveita a página congelada: limpa o estado de saída.
+  g.addEventListener('pageshow', (e) => {
+    if (!e.persisted) return;
+    leaving = false;
+    html.classList.remove('leaving');
+    swaps.splice(0).forEach(([on, to, onCls, toCls]) => { on.className = onCls; to.className = toCls; });
+    document.querySelectorAll('.pill-ghost').forEach((x) => x.remove());
+    document.querySelectorAll('.pill-run').forEach((x) => x.classList.remove('pill-run'));
+  });
 
   const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex="0"]';
   let lastFocus = null;
